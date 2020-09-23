@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30503.244
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tnt.drawing", "tnt.drawing\tnt.drawing.csproj", "{AC49554D-BFC4-40BA-8A7B-B8DEDEDB63F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sample", "sample\sample.csproj", "{27FD1DFE-761C-4898-9278-D9272BDFF818}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AC49554D-BFC4-40BA-8A7B-B8DEDEDB63F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC49554D-BFC4-40BA-8A7B-B8DEDEDB63F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC49554D-BFC4-40BA-8A7B-B8DEDEDB63F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC49554D-BFC4-40BA-8A7B-B8DEDEDB63F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27FD1DFE-761C-4898-9278-D9272BDFF818}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27FD1DFE-761C-4898-9278-D9272BDFF818}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27FD1DFE-761C-4898-9278-D9272BDFF818}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27FD1DFE-761C-4898-9278-D9272BDFF818}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7C30FC7B-3FF5-45FF-A6D8-19B437F7932A}
+	EndGlobalSection
+EndGlobal
