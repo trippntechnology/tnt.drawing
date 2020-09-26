@@ -67,6 +67,26 @@ namespace TNT.Drawing
 		}
 
 		/// <summary>
+		/// <see cref="Grid"/> height
+		/// </summary>
+		public int GridHeight { get { return Grid.Height; } set { Grid.Height = value; } }
+
+		/// <summary>
+		/// <see cref="Grid"/> width
+		/// </summary>
+		public int GridWidth { get { return Grid.Width; } set { Grid.Width = value; } }
+
+		/// <summary>
+		/// <see cref="Grid"/> line color
+		/// </summary>
+		public Color GridLineColor { get { return Grid.LineColor; } set { Grid.LineColor = value; } }
+
+		/// <summary>
+		/// Pixels between lines on the <see cref="Grid"/>
+		/// </summary>
+		public int PixelPerGridLines { get { return Grid.PixelsPerSegment; } set { Grid.PixelsPerSegment = value; } }
+
+		/// <summary>
 		/// Scaled grid width
 		/// </summary>
 		protected float ScaledWidth { get { return Grid.Width * Zoom; } }

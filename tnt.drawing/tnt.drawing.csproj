@@ -47,12 +47,14 @@
     <Compile Include="CanvasPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CanvasPanelProperties.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Grid.cs" />
     <Compile Include="Converters\GridTypeConverter.cs" />
     <Compile Include="Canvas.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Properties.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

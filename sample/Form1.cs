@@ -1,6 +1,6 @@
 ﻿using Microsoft.Win32;
+using System.Drawing;
 using System.Windows.Forms;
-using TNT.Drawing;
 using TNT.Utilities;
 
 namespace TNT.Drawing.Sample
@@ -8,15 +8,16 @@ namespace TNT.Drawing.Sample
 	public partial class Form1 : Form
 	{
 		private ApplicationRegistry applicationRegistery = null;
-		private CanvasPanel _MyControl = null;
+		private CanvasPanel _CanvasPanel = null;
 
 		public Form1()
 		{
 			InitializeComponent();
 			applicationRegistery = new ApplicationRegistry(this, Registry.CurrentUser, "Tripp'n Technology", "CenteredDrawing");
-			_MyControl = new CanvasPanel(splitContainer1.Panel1);
-			_MyControl.MouseMove += _MyControl_MouseMove;
-			propertyGrid1.SelectedObject = _MyControl.Canvas;
+			_CanvasPanel = new CanvasPanel(splitContainer1.Panel1);
+			_CanvasPanel.Canvas.MouseMove += _MyControl_MouseMove;
+			_CanvasPanel.Properties = new CanvasPanelProperties { BackColor = Color.Blue };
+			propertyGrid1.SelectedObject = _CanvasPanel.Properties;
 		}
 
 		private void _MyControl_MouseMove(object sender, MouseEventArgs e)
@@ -24,9 +25,6 @@ namespace TNT.Drawing.Sample
 			toolStripStatusLabel1.Text = $"{e.X}, {e.Y}";
 		}
 
-		private void fitToolStripMenuItem_Click(object sender, System.EventArgs e)
-		{
-			_MyControl.Fit();
-		}
+		private void fitToolStripMenuItem_Click(object sender, System.EventArgs e) => _CanvasPanel.Fit();
 	}
 }
