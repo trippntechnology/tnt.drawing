@@ -14,14 +14,20 @@ namespace TNT.Drawing
 		private const int MINIMUM_PADDING = 1000;
 		private const int PADDING = 20;
 
-		private int _ScalePercentage = 100;
-		private bool _ShowGrid = true;
 		private bool AdjustPostion = false;
 		private SolidBrush BackgrounBrush = new SolidBrush(Color.White);
 		private KeyEventArgs keyEventArgs = null;
 		private Point PreviousCursorPosition = Point.Empty;
 		private Point PreviousGridPosition;
 		private ScrollableControl ScrollableParent = null;
+
+		private BackingFields _BackingFields = new BackingFields {
+			{"ScalePercentage", 100},
+			{"ShowGrid", true },
+			{"GridLineColor", Color.Aqua},
+			{"GridHeight", 768},
+			{"GridWidth", 1024},
+		};
 
 		/// <summary>
 		/// The backgrond of the <see cref="Canvas"/>
@@ -40,8 +46,8 @@ namespace TNT.Drawing
 		[Category("Appearance")]
 		public int ScalePercentage
 		{
-			get { return _ScalePercentage; }
-			set { _ScalePercentage = value; Refresh(); }
+			get { return _BackingFields.Get<int>(); }
+			set { _BackingFields.Set(value); Refresh(); }
 		}
 
 		/// <summary>
@@ -49,12 +55,8 @@ namespace TNT.Drawing
 		/// </summary>
 		public bool ShowGrid
 		{
-			get { return _ShowGrid; }
-			set
-			{
-				_ShowGrid = value;
-				Refresh();
-			}
+			get { return _BackingFields.Get<bool>(); }
+			set { _BackingFields.Set(value); Refresh(); }
 		}
 
 		/// <summary>
@@ -99,9 +101,14 @@ namespace TNT.Drawing
 		/// <summary>
 		/// Initializes a <see cref="Canvas"/>
 		/// </summary>
-		public Canvas(Control parent, int left, int top, int width, int height)
-			: base(parent, string.Empty, left, top, width, height)
+		public Canvas(Control parent)
+			: base()
 		{
+			var canvasPanel = new CanvasPanel(parent);
+			Parent = canvasPanel;
+			Width = parent.Width;
+			Height = parent.Height;
+
 			DoubleBuffered = true;
 			parent.SizeChanged += OnParentResize;
 			ScrollableParent = (Parent as ScrollableControl);
