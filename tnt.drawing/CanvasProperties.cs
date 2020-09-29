@@ -5,7 +5,7 @@ namespace TNT.Drawing
 	/// <summary>
 	/// Properties that can be changed in a <see cref="CanvasPanel"/>
 	/// </summary>
-	public class CanvasProperties : BackedProperties
+	public class CanvasProperties : BackedProperties<Canvas>
 	{
 		/// <summary>
 		/// Initializer

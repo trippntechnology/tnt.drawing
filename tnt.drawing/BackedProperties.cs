@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
@@ -8,15 +7,14 @@ namespace TNT.Drawing
 	/// <summary>
 	/// Base class of classes that back the value using <see cref="_BackingObject"/>.
 	/// </summary>
-	public abstract class BackedProperties
+	public abstract class BackedProperties<C> 
 	{
-		private Dictionary<string, object> _BackingFields = new Dictionary<string, object>();
-		private object _BackingObject;
+		private C _BackingObject;
 
 		/// <summary>
 		/// Initilizer
 		/// </summary>
-		public BackedProperties(object backingObject)
+		public BackedProperties(C backingObject)
 		{
 			if (backingObject == null) throw new ArgumentNullException("backingObject can not be null");
 			_BackingObject = backingObject;
@@ -29,7 +27,6 @@ namespace TNT.Drawing
 		protected void Set<T>(T value, [CallerMemberName] string propertyName = null)
 		{
 			Debug.WriteLine($"Set({value}, {propertyName})");
-			_BackingFields[propertyName] = value;
 			var canvasPropInfo = _BackingObject.GetType().GetProperty(propertyName);
 			canvasPropInfo?.SetValue(_BackingObject, value);
 		}
@@ -40,7 +37,7 @@ namespace TNT.Drawing
 		protected T Get<T>([CallerMemberName] string propertyName = null)
 		{
 			var canvasPropInfo = _BackingObject.GetType().GetProperty(propertyName);
-			var value = (T)(canvasPropInfo?.GetValue(_BackingObject) ?? _BackingFields[propertyName]);
+			var value = (T)canvasPropInfo?.GetValue(_BackingObject);
 			Debug.WriteLine($"Get({value}, {propertyName})");
 			return value;
 		}
