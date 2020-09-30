@@ -1,28 +1,56 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Xml.Serialization;
 
 namespace TNT.Drawing
 {
 	/// <summary>
 	/// Properties that can be changed in a <see cref="CanvasPanel"/>
 	/// </summary>
-	public class CanvasProperties : BackedProperties<Canvas>
+	public class CanvasProperties : LiveProperties
 	{
 		/// <summary>
-		/// Initializer
+		/// Initializes default values
 		/// </summary>
-		public CanvasProperties(Canvas canvas) : base(canvas)
+		public CanvasProperties()
 		{
+			_BackingFields = new Dictionary<string, object>
+			{
+				{"BackColor", Color.Blue},
+				{"BackgroundColor", Color.White},
+				{"GridHeight", 768},
+				{"GridLineColor", Color.Aqua},
+				{"GridWidth", 1024},
+				{"PixelPerGridLines", 10},
+				{"ScalePercentage", 100},
+				{"ShowGrid", true},
+			};
 		}
 
 		/// <summary>
 		/// Background color of the <see cref="Canvas"/>
 		/// </summary>
+		[XmlIgnore]
 		public Color BackColor { get { return Get<Color>(); } set { Set(value); } }
+
+		/// <summary>
+		/// Serializable for <see cref="BackColor"/>
+		/// </summary>
+		[Browsable(false)]
+		public int _BackColor { get { return BackColor.ToArgb(); } set { BackColor = Color.FromArgb(value); } }
 
 		/// <summary>
 		/// BackgroundColor of the <see cref="Canvas.Grid"/>
 		/// </summary>
+		[XmlIgnore]
 		public Color BackgroundColor { get { return Get<Color>(); } set { Set(value); } }
+
+		/// <summary>
+		/// Serializable for <see cref="BackgroundColor"/>
+		/// </summary>
+		[Browsable(false)]
+		public int _BackgroundColor { get { return BackgroundColor.ToArgb(); } set { BackgroundColor = Color.FromArgb(value); } }
 
 		/// <summary>
 		/// Height of the <see cref="Canvas.Grid"/>
@@ -32,7 +60,14 @@ namespace TNT.Drawing
 		/// <summary>
 		/// Line color of the <see cref="Canvas.Grid"/>
 		/// </summary>
+		[XmlIgnore]
 		public Color GridLineColor { get { return Get<Color>(); } set { Set(value); } }
+
+		/// <summary>
+		/// Serializable for <see cref="GridLineColor"/>
+		/// </summary>
+		[Browsable(false)]
+		public int _GridLineColor { get { return GridLineColor.ToArgb(); } set { GridLineColor = Color.FromArgb(value); } }
 
 		/// <summary>
 		/// Width of the <see cref="Canvas.Grid"/>

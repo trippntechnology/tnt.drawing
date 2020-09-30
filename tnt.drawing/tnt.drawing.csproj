@@ -44,8 +44,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BackedProperties.cs" />
-    <Compile Include="BackingFields.cs" />
     <Compile Include="CanvasPanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -56,6 +54,7 @@
     <Compile Include="Canvas.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="LiveProperties.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

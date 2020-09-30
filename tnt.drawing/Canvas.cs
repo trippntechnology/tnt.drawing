@@ -20,14 +20,22 @@ namespace TNT.Drawing
 		private Point PreviousCursorPosition = Point.Empty;
 		private Point PreviousGridPosition;
 		private ScrollableControl ScrollableParent = null;
+		private CanvasProperties _Properties = new CanvasProperties();
 
-		private BackingFields _BackingFields = new BackingFields {
-			{"ScalePercentage", 100},
-			{"ShowGrid", true },
-			{"GridLineColor", Color.Aqua},
-			{"GridHeight", 768},
-			{"GridWidth", 1024},
-		};
+		/// <summary>
+		/// Persisted properties
+		/// </summary>
+		public CanvasProperties Properties
+		{
+			get { return _Properties; }
+			set
+			{
+				_Properties = value;
+				value.OnPropertyChanged = (prop, val) => { CanvasProperties.Set(this, prop, val); };
+				CanvasProperties.SetAll(value, this);
+				Refresh();
+			}
+		}
 
 		/// <summary>
 		/// The backgrond of the <see cref="Canvas"/>
@@ -46,8 +54,8 @@ namespace TNT.Drawing
 		[Category("Appearance")]
 		public int ScalePercentage
 		{
-			get { return _BackingFields.Get<int>(); }
-			set { _BackingFields.Set(value); Refresh(); }
+			get { return Properties.Get<int>(); }
+			set { Properties.Set(value); Refresh(); }
 		}
 
 		/// <summary>
@@ -55,8 +63,8 @@ namespace TNT.Drawing
 		/// </summary>
 		public bool ShowGrid
 		{
-			get { return _BackingFields.Get<bool>(); }
-			set { _BackingFields.Set(value); Refresh(); }
+			get { return Properties.Get<bool>(); }
+			set { Properties.Set(value); Refresh(); }
 		}
 
 		/// <summary>
