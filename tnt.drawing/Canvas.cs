@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Windows.Forms;
+using TNT.Drawing.DrawingMode;
+using TNT.Drawing.Layer;
 
 namespace TNT.Drawing
 {
@@ -21,6 +25,8 @@ namespace TNT.Drawing
 		private Point PreviousGridPosition;
 		private ScrollableControl ScrollableParent = null;
 		private CanvasProperties _Properties = new CanvasProperties();
+		private CanvasLayer _BackgroundLayer = new CanvasLayer();
+		private List<CanvasLayer> _Layers = new List<CanvasLayer>();
 
 		/// <summary>
 		/// Persisted properties
@@ -31,16 +37,45 @@ namespace TNT.Drawing
 			set
 			{
 				_Properties = value;
-				value.OnPropertyChanged = (prop, val) => { CanvasProperties.Set(this, prop, val); };
+				_Properties.OnPropertyChanged = (prop, val) => { CanvasProperties.Set(this, prop, val); };
 				CanvasProperties.SetAll(value, this);
 				Refresh();
 			}
 		}
 
+		private DrawingMode.DrawingMode _DrawingMode;
+		public DrawingMode.DrawingMode DrawingMode
+		{
+			get { return _DrawingMode ?? new LineMode(); }
+			set
+			{
+				_DrawingMode = value;
+				_DrawingMode.OnAddObject = (obj) => Layers.Last().CanvasObjects.Add(obj);
+				_DrawingMode.OnRequestRefresh = () => Refresh();
+			}
+		} 
+
+		protected override void OnMouseClick(MouseEventArgs e)
+		{
+			var gridPoint = e.Location.ToGridCoordinates(GetTransformedGraphics());
+			var mea = new MouseEventArgs(e.Button, e.Clicks, gridPoint.X, gridPoint.Y, e.Delta);
+			DrawingMode.OnMouseClick(null, mea, Keys.None);
+		}
+
+		protected override void OnMouseDoubleClick(MouseEventArgs e)
+		{
+			base.OnMouseDoubleClick(e);
+			DrawingMode.OnMouseDoubleClick(null, e);
+		}
+
+		public CanvasLayer BackgroundLayer { get { return _BackgroundLayer; } set { _BackgroundLayer = value; Refresh(); } }
+
 		/// <summary>
 		/// The backgrond of the <see cref="Canvas"/>
 		/// </summary>
-		public Grid Grid { get; set; } = new Grid(Color.Aqua, 10);
+		public GridLayer GridLayer { get; set; } = new GridLayer(Color.Aqua, 10);
+
+		public List<Layer.CanvasLayer> Layers { get { return _Layers; } set { _Layers = value; Refresh(); } }
 
 		/// <summary>
 		/// The <see cref="ScalePercentage"/> represented as a <see cref="float"/>
@@ -61,11 +96,7 @@ namespace TNT.Drawing
 		/// <summary>
 		/// Grid visibility
 		/// </summary>
-		public bool ShowGrid
-		{
-			get { return Properties.Get<bool>(); }
-			set { Properties.Set(value); Refresh(); }
-		}
+		public bool ShowGrid { get { return GridLayer.Visible; } set { GridLayer.Visible = value; Refresh(); } }
 
 		/// <summary>
 		/// Canvas background color
@@ -77,34 +108,34 @@ namespace TNT.Drawing
 		}
 
 		/// <summary>
-		/// <see cref="Grid"/> height
+		/// <see cref="GridLayer"/> height
 		/// </summary>
-		public int GridHeight { get { return Grid.Height; } set { Grid.Height = value; } }
+		public int GridHeight { get { return GridLayer.Height; } set { GridLayer.Height = value; } }
 
 		/// <summary>
-		/// <see cref="Grid"/> width
+		/// <see cref="GridLayer"/> width
 		/// </summary>
-		public int GridWidth { get { return Grid.Width; } set { Grid.Width = value; } }
+		public int GridWidth { get { return GridLayer.Width; } set { GridLayer.Width = value; } }
 
 		/// <summary>
-		/// <see cref="Grid"/> line color
+		/// <see cref="GridLayer"/> line color
 		/// </summary>
-		public Color GridLineColor { get { return Grid.LineColor; } set { Grid.LineColor = value; } }
+		public Color GridLineColor { get { return GridLayer.LineColor; } set { GridLayer.LineColor = value; } }
 
 		/// <summary>
-		/// Pixels between lines on the <see cref="Grid"/>
+		/// Pixels between lines on the <see cref="GridLayer"/>
 		/// </summary>
-		public int PixelPerGridLines { get { return Grid.PixelsPerSegment; } set { Grid.PixelsPerSegment = value; } }
+		public int PixelPerGridLines { get { return GridLayer.PixelsPerSegment; } set { GridLayer.PixelsPerSegment = value; } }
 
 		/// <summary>
 		/// Scaled grid width
 		/// </summary>
-		protected float ScaledWidth { get { return Grid.Width * Zoom; } }
+		protected float ScaledWidth { get { return GridLayer.Width * Zoom; } }
 
 		/// <summary>
 		/// Scaled grid height
 		/// </summary>
-		protected float ScaledHeight { get { return Grid.Height * Zoom; } }
+		protected float ScaledHeight { get { return GridLayer.Height * Zoom; } }
 
 		/// <summary>
 		/// Initializes a <see cref="Canvas"/>
@@ -117,11 +148,14 @@ namespace TNT.Drawing
 			Width = parent.Width;
 			Height = parent.Height;
 
+			//DrawingMode.OnAddObject = (obj) => Layers.Last().CanvasObjects.Add(obj);
+			//DrawingMode.OnRequestRefresh = () => Refresh();
+
 			DoubleBuffered = true;
 			parent.SizeChanged += OnParentResize;
 			ScrollableParent = (Parent as ScrollableControl);
 			ScrollableParent.AutoScroll = true;
-			Grid.OnRefreshRequest = () => { Refresh(); };
+			GridLayer.OnRefreshRequest = () => { Refresh(); };
 		}
 
 		/// <summary>
@@ -131,8 +165,8 @@ namespace TNT.Drawing
 		{
 			var parentWidth = Parent.Width;
 			var parentHeight = Parent.Height;
-			var gridWidth = Grid.Width;
-			var gridHeight = Grid.Height;
+			var gridWidth = GridLayer.Width;
+			var gridHeight = GridLayer.Height;
 			var gridRatio = gridWidth / (gridHeight * 1F);
 			var parentRatio = parentWidth / (parentHeight * 1F);
 			float newScale;
@@ -161,8 +195,11 @@ namespace TNT.Drawing
 			UpdateClientDimensions();
 			var graphics = GetTransformedGraphics(e.Graphics);
 
-			graphics.FillRectangle(BackgrounBrush, Grid.Rect);
-			if (ShowGrid) Grid.Draw(graphics);
+			graphics.FillRectangle(BackgrounBrush, GridLayer.Rect);
+
+			BackgroundLayer.Draw(graphics);
+			GridLayer.Draw(graphics);
+			Layers.ForEach(l => l.Draw(graphics));
 
 			if (AdjustPostion)
 			{
@@ -227,6 +264,10 @@ namespace TNT.Drawing
 		/// </summary>
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
+			var gridPoint = e.Location.ToGridCoordinates(GetTransformedGraphics());
+			var mea = new MouseEventArgs(e.Button, e.Clicks, gridPoint.X, gridPoint.Y, e.Delta);
+			DrawingMode.OnMouseMove(null, mea, Keys.None);
+
 			var currentCursorPosition = Cursor.Position;
 			var graphics = GetTransformedGraphics();
 			var mousePosition = new Point(e.X, e.Y);

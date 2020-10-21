@@ -41,7 +41,7 @@ namespace TNT.Drawing
 		public int _BackColor { get { return BackColor.ToArgb(); } set { BackColor = Color.FromArgb(value); } }
 
 		/// <summary>
-		/// BackgroundColor of the <see cref="Canvas.Grid"/>
+		/// BackgroundColor of the <see cref="Canvas.GridLayer"/>
 		/// </summary>
 		[XmlIgnore]
 		public Color BackgroundColor { get { return Get<Color>(); } set { Set(value); } }
@@ -53,12 +53,12 @@ namespace TNT.Drawing
 		public int _BackgroundColor { get { return BackgroundColor.ToArgb(); } set { BackgroundColor = Color.FromArgb(value); } }
 
 		/// <summary>
-		/// Height of the <see cref="Canvas.Grid"/>
+		/// Height of the <see cref="Canvas.GridLayer"/>
 		/// </summary>
 		public int GridHeight { get { return Get<int>(); } set { Set(value); } }
 
 		/// <summary>
-		/// Line color of the <see cref="Canvas.Grid"/>
+		/// Line color of the <see cref="Canvas.GridLayer"/>
 		/// </summary>
 		[XmlIgnore]
 		public Color GridLineColor { get { return Get<Color>(); } set { Set(value); } }
@@ -70,12 +70,12 @@ namespace TNT.Drawing
 		public int _GridLineColor { get { return GridLineColor.ToArgb(); } set { GridLineColor = Color.FromArgb(value); } }
 
 		/// <summary>
-		/// Width of the <see cref="Canvas.Grid"/>
+		/// Width of the <see cref="Canvas.GridLayer"/>
 		/// </summary>
 		public int GridWidth { get { return Get<int>(); } set { Set(value); } }
 
 		/// <summary>
-		/// Pixels between the lines on the <see cref="Canvas.Grid"/>
+		/// Pixels between the lines on the <see cref="Canvas.GridLayer"/>
 		/// </summary>
 		public int PixelPerGridLines { get { return Get<int>(); } set { Set(value); } }
 

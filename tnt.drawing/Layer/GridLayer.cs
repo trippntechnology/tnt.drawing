@@ -4,13 +4,13 @@ using System.Diagnostics;
 using System.Drawing;
 using TNT.Drawing.Converters;
 
-namespace TNT.Drawing
+namespace TNT.Drawing.Layer
 {
 	/// <summary>
 	/// Represents the grid area of the drawing surface
 	/// </summary>
 	[TypeConverter(typeof(GridTypeConverter))]
-	public class Grid
+	public class GridLayer : CanvasLayer
 	{
 		/// <summary>
 		/// Indicates whether <see cref="Draw(Graphics)"/> should be forced to draw or not
@@ -23,7 +23,7 @@ namespace TNT.Drawing
 		protected int _PixelsPerSegment = 10;
 
 		/// <summary>
-		/// <see cref="Pen"/> used to draw the lines on the <see cref="Grid"/>
+		/// <see cref="Pen"/> used to draw the lines on the <see cref="GridLayer"/>
 		/// </summary>
 		protected Pen LinePen { get; set; } = new Pen(Color.Black);
 
@@ -33,7 +33,7 @@ namespace TNT.Drawing
 		protected SolidBrush ShadowBrush { get; set; } = new SolidBrush(Color.FromArgb(40, Color.Black));
 
 		/// <summary>
-		/// <see cref="Rectangle"/> that represents the area of the <see cref="Grid"/>
+		/// <see cref="Rectangle"/> that represents the area of the <see cref="GridLayer"/>
 		/// </summary>
 		protected Rectangle _Rect = new Rectangle(0, 0, 1024, 768);
 
@@ -43,7 +43,7 @@ namespace TNT.Drawing
 		protected Bitmap GridImage { get; set; }
 
 		/// <summary>
-		/// Delegate that is called when the <see cref="Grid"/> needs to be refreshed. 
+		/// Delegate that is called when the <see cref="GridLayer"/> needs to be refreshed. 
 		/// </summary>
 		public Action OnRefreshRequest = () => { };
 
@@ -90,7 +90,7 @@ namespace TNT.Drawing
 		}
 
 		/// <summary>
-		/// A <see cref="Rectangle"/> that represents the area of this <see cref="Grid"/>
+		/// A <see cref="Rectangle"/> that represents the area of this <see cref="GridLayer"/>
 		/// </summary>
 		[Browsable(false)]
 		public Rectangle Rect { get { return _Rect; } }
@@ -124,18 +124,18 @@ namespace TNT.Drawing
 		}
 
 		/// <summary>
-		/// Initializes the <see cref="Grid"/>
+		/// Initializes the <see cref="GridLayer"/>
 		/// </summary>
-		public Grid(Color lineColor, int pixelsBetweenLines)
+		public GridLayer(Color lineColor, int pixelsBetweenLines)
 		{
 			PixelsPerSegment = pixelsBetweenLines;
 			LineColor = lineColor;
 		}
 
 		/// <summary>
-		/// Draws the <see cref="Grid"/>
+		/// Draws the <see cref="GridLayer"/>
 		/// </summary>
-		public void Draw(Graphics graphics)
+		override public void Draw(Graphics graphics)
 		{
 			if (ForceDraw)// || (Image == null || Image.Width != canvasWidth || Image.Height != canvasHeight))
 			{
@@ -162,7 +162,7 @@ namespace TNT.Drawing
 				ForceDraw = false;
 			}
 
-			graphics.DrawImage(GridImage, Rect);
+			if (Visible) graphics.DrawImage(GridImage, Rect);
 		}
 
 		private void Refresh()

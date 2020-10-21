@@ -58,7 +58,7 @@ namespace TNT.Drawing
 			{
 				value = (T)_BackingFields[propertyName];
 			}
-			Debug.WriteLine($"Get({value}, {propertyName})");
+			//Debug.WriteLine($"Get({value}, {propertyName})");
 			return value;
 		}
 

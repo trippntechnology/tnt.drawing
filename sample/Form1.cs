@@ -1,7 +1,11 @@
 ﻿using Microsoft.Win32;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using TNT.Drawing.DrawingMode;
+using TNT.Drawing.Layer;
+using TNT.Drawing.Objects;
 using TNT.Utilities;
 
 namespace TNT.Drawing.Sample
@@ -17,7 +21,27 @@ namespace TNT.Drawing.Sample
 			applicationRegistery = new ApplicationRegistry(this, Registry.CurrentUser, "Tripp'n Technology", "CenteredDrawing");
 			_CanvasPanel = new Canvas(splitContainer1.Panel1);
 			_CanvasPanel.Properties = new CanvasProperties(); ;
+
+			var layer1 = new CanvasLayer();
+			layer1.CanvasObjects = new List<CanvasObject>()
+			{
+				new Square(100,100,100,Color.Blue),
+				new Square(500,500,200,Color.Red),
+				new Line(new List<Vertex>(){new Vertex(300,100), new Vertex(100,300)})
+			};
+
+			_CanvasPanel.BackgroundLayer = new CanvasLayer().Also(it =>
+			{
+				it.CanvasObjects = new List<CanvasObject>() {
+					new Square(150,150,200,Color.Green)
+				};
+			});
+			_CanvasPanel.Layers = new List<CanvasLayer>() { layer1 };
+
 			propertyGrid1.SelectedObject = _CanvasPanel.Properties;
+
+			selectToolStripMenuItem.Tag = new SelectMode();
+			lineToolStripMenuItem.Tag = new LineMode();
 		}
 
 		//private void _MyControl_MouseMove(object sender, MouseEventArgs e) => toolStripStatusLabel1.Text = $"{e.X}, {e.Y}";
@@ -48,6 +72,13 @@ namespace TNT.Drawing.Sample
 					propertyGrid1.SelectedObject = _CanvasPanel.Properties;
 				}
 			}
+		}
+
+		private void lineToolStripMenuItem_Click(object sender, System.EventArgs e)
+		{
+			var menuItem = sender as ToolStripMenuItem;
+			var mode = menuItem.Tag as DrawingMode.DrawingMode;
+			_CanvasPanel.DrawingMode = mode.Copy();
 		}
 	}
 }
