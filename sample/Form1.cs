@@ -23,11 +23,16 @@ namespace TNT.Drawing.Sample
 			_CanvasPanel.Properties = new CanvasProperties(); ;
 
 			var layer1 = new CanvasLayer();
+			var line = new Line();
+			line.AddVertex(new Vertex(300, 100));
+			line.AddVertex(new Vertex(100,300));
+
 			layer1.CanvasObjects = new List<CanvasObject>()
 			{
 				new Square(100,100,100,Color.Blue),
 				new Square(500,500,200,Color.Red),
-				new Line(new List<Vertex>(){new Vertex(300,100), new Vertex(100,300)})
+				//new Line(new List<Vertex>(){new Vertex(300,100), new Vertex(100,300)})
+				new Line()
 			};
 
 			_CanvasPanel.BackgroundLayer = new CanvasLayer().Also(it =>

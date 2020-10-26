@@ -13,7 +13,7 @@ namespace TNT.Drawing.DrawingMode
 {
 	public class LineMode : DrawingMode
 	{
-		Line DefaultLine = new Line();
+		private Line DefaultLine = new Line();
 
 		Line ActiveLine = null;
 		Vertex ActiveVertex = null;
@@ -37,7 +37,9 @@ namespace TNT.Drawing.DrawingMode
 
 			if (ActiveLine == null)
 			{
-				ActiveLine = (Line)DefaultLine.Copy();
+				var line1 = new Line();
+
+				ActiveLine = DefaultLine.Copy() as Line;
 				ActiveLine.AddVertex(new Vertex(e.X, e.Y));
 				ActiveVertex = new Vertex(e.X, e.Y);
 				ActiveLine.AddVertex(ActiveVertex);

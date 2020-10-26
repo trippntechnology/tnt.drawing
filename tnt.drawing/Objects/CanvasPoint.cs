@@ -11,6 +11,10 @@ namespace TNT.Drawing.Objects
 	public class CanvasPoint : CanvasObject
 	{
 		private Image _Image = null;
+		private int _X;
+		private int _Y;
+
+		public Action<int, int, int, int> OnPositionChanged = (x, y, dx, dy) => { };
 
 		public Image Image
 		{
@@ -21,8 +25,26 @@ namespace TNT.Drawing.Objects
 			}
 		}
 
-		public int X { get; set; }
-		public int Y { get; set; }
+		public int X
+		{
+			get => _X;
+			set
+			{
+				var dx = value - _X;
+				_X = value;
+				OnPositionChanged(_X, Y, dx, 0);
+			}
+		}
+
+		public int Y
+		{
+			get => _Y;
+			set {
+				var dy = value - _Y;
+				_Y = value;
+				OnPositionChanged(X, _Y, 0, dy);
+			}
+		}
 
 		protected virtual string ImageResource => "TNT.Drawing.Image.ControlPoint.png";
 

@@ -61,6 +61,7 @@
     <Compile Include="LiveProperties.cs" />
     <Compile Include="Objects\CanvasObject.cs" />
     <Compile Include="Objects\CanvasPoint.cs" />
+    <Compile Include="Objects\ControlPoint.cs" />
     <Compile Include="Objects\Line.cs" />
     <Compile Include="Objects\Square.cs" />
     <Compile Include="Objects\Vertex.cs" />

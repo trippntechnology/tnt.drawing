@@ -11,20 +11,19 @@ namespace TNT.Drawing.Objects
 {
 	public class Line : CanvasObject
 	{
-		Pen Pen;
-		List<Vertex> Vertices = new List<Vertex>();
+		public List<CanvasPoint> Points = new List<CanvasPoint>();
 
-		public Line(List<Vertex> vertices = null, Pen pen = null)
-		{
-			Vertices = vertices ?? new List<Vertex>();
-			Pen = pen ?? new Pen(Color.Blue);
-		}
+		public Pen Pen { get; set; } = new Pen(Color.Black);
 
-		public Line(Line line) : this(line.Vertices, line.Pen) { }
+		public Line() : base() { }
+
+		public Line(Line line) : this() { Pen = line.Pen; }
 
 		public void AddVertex(Vertex vertex)
 		{
-			Vertices.Add(vertex);
+			if (Points.Count >= 4) Points.Add(new ControlPoint(Points.Last()));
+			Points.Add(vertex);
+			Points.Add(new ControlPoint(vertex));
 		}
 
 		public override CanvasObject Copy() => new Line(this);
@@ -32,7 +31,7 @@ namespace TNT.Drawing.Objects
 		public override bool MouseOver(Point mousePosition, Keys modifierKeys)
 		{
 			var path = new GraphicsPath();
-			var points = Vertices.Select(v => v.ToPoint).ToArray();
+			var points = Points.Select(v => v.ToPoint).ToArray();
 			path.AddLines(points);
 
 			return path.IsVisible(mousePosition);
@@ -48,23 +47,25 @@ namespace TNT.Drawing.Objects
 			//}
 
 			var path = new GraphicsPath();
-			path.StartFigure();
-			var points = Vertices.Select(v => v.ToPoint).ToArray();
+			//path.StartFigure();
+			var points = Points.Select(v => v.ToPoint).ToArray();
+			if (points.Length < 4) return;
 
-			if (points.Count() == 2)
-			{
-				path.AddLines(points);
-			}
-			else
-			{
-				path.AddPolygon(points);
-			}
+			//if (points.Count() == 2)
+			//{
+			//	path.AddLines(points);
+			//}
+			//else
+			//{
+			path.AddBeziers(points);
+			//	path.AddPolygon(points);
+			//}
 
-			path.CloseFigure();
+			//path.CloseFigure();
 
 			graphics.DrawPath(Pen, path);
 
-			Vertices.ForEach(v => v.Draw(graphics));
+			Points.ForEach(v => v.Draw(graphics));
 		}
 	}
 }
