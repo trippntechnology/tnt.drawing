@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
@@ -13,6 +14,7 @@ namespace TNT.Drawing.Objects
 		/// <summary>
 		/// <see cref="Guid"/> of the object
 		/// </summary>
+		[ReadOnly(true)]
 		public string Id { get; set; }
 
 		/// <summary>
@@ -36,9 +38,9 @@ namespace TNT.Drawing.Objects
 		public abstract CanvasObject Copy();
 
 		/// <summary>
-		/// Implement by subclass to indicate mouse is over object
+		/// Implement by subclass to indicate mouse is over object. Should return the object that is under mouse.
 		/// </summary>
-		public abstract bool MouseOver(Point mousePosition, Keys modifierKeys);
+		public abstract CanvasObject MouseOver(Point mousePosition, Keys modifierKeys);
 
 		/// <summary>
 		/// Gets an image associated with the <paramref name="resource"/> value within the calling assembly

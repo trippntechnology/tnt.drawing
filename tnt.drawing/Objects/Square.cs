@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,9 +34,11 @@ namespace TNT.Drawing.Objects
 			throw new NotImplementedException();
 		}
 
-		public override bool MouseOver(Point mousePosition, Keys modifierKeys)
+		public override CanvasObject MouseOver(Point mousePosition, Keys modifierKeys)
 		{
-			throw new NotImplementedException();
+			var path = new GraphicsPath();
+			path.AddRectangle(new Rectangle(X, Y, Width, Width));
+			return path.IsVisible(mousePosition) ? this : null;
 		}
 	}
 }

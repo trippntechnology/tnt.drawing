@@ -13,12 +13,10 @@ namespace TNT.Drawing.DrawingMode
 {
 	public class LineMode : DrawingMode
 	{
-		private Line DefaultLine = new Line();
-
 		Line ActiveLine = null;
 		Vertex ActiveVertex = null;
 
-		public override DrawingMode Copy() => new LineMode();
+		public override CanvasObject DefaultObject { get; } = new Line();
 
 		public override void OnKeyDown(Graphics graphics, KeyEventArgs e)
 		{
@@ -39,13 +37,12 @@ namespace TNT.Drawing.DrawingMode
 			{
 				var line1 = new Line();
 
-				ActiveLine = DefaultLine.Copy() as Line;
+				ActiveLine = DefaultObject.Copy() as Line;
 				ActiveLine.AddVertex(new Vertex(e.X, e.Y));
 				ActiveVertex = new Vertex(e.X, e.Y);
 				ActiveLine.AddVertex(ActiveVertex);
-				AddObject(ActiveLine);
+				RequestLayer().CanvasObjects.Add(ActiveLine);
 				RequestRefresh();
-				//graphics.DrawLine(new Pen(Color.Blue), (Point)start, (Point)end);
 			}
 			else if (ActiveVertex != null)
 			{
@@ -58,6 +55,10 @@ namespace TNT.Drawing.DrawingMode
 		public override void OnMouseDoubleClick(Graphics graphics, MouseEventArgs e)
 		{
 			base.OnMouseDoubleClick(graphics, e);
+
+			// Remove last three
+			var points = ActiveLine.Points;
+			points.RemoveRange(points.Count - 3, 3);
 
 			ActiveVertex = null;
 			ActiveLine = null;

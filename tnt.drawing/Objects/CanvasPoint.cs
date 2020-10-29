@@ -50,6 +50,8 @@ namespace TNT.Drawing.Objects
 
 		public virtual Point ToPoint => new Point(X, Y);
 
+		public virtual bool Visible { get; set; } = true;
+
 		public CanvasPoint() { }
 
 		public CanvasPoint(int x, int y) { X = x; Y = y; }
@@ -60,12 +62,13 @@ namespace TNT.Drawing.Objects
 
 		public override void Draw(Graphics graphics)
 		{
+			if (!Visible) return;
 			var imageCenter = new Point(Image.Width / 2, Image.Height / 2);
 			var topLeftPoint = ToPoint.Subtract(imageCenter);
 			graphics.DrawImage(Image, topLeftPoint);
 		}
 
-		public override bool MouseOver(Point mousePosition, Keys modifierKeys)
+		public override CanvasObject MouseOver(Point mousePosition, Keys modifierKeys)
 		{
 			throw new NotImplementedException();
 		}

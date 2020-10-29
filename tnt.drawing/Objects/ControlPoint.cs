@@ -12,7 +12,13 @@ namespace TNT.Drawing.Objects
 		public string EndpointId { get; set; }
 
 		[XmlIgnore()]
-		public Vertex EndPoint { get; set; }
+		public Vertex Endpoint { get; set; }
+
+		public override bool Visible
+		{
+			get => !Endpoint?.ToPoint.Equals(ToPoint) == true;
+			set => base.Visible = value;
+		}
 
 		public ControlPoint() { }
 
@@ -21,8 +27,8 @@ namespace TNT.Drawing.Objects
 		public ControlPoint(Vertex endPoint) : base(endPoint.X, endPoint.Y)
 		{
 			EndpointId = endPoint.Id;
-			EndPoint = endPoint;
-			EndPoint.OnPositionChanged = (x, y, dx, dy) =>
+			Endpoint = endPoint;
+			Endpoint.OnPositionChanged = (x, y, dx, dy) =>
 			{
 				X = x;
 				Y = y;

@@ -1,68 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TNT.Drawing.Objects
 {
 	public class Line : CanvasObject
 	{
+		private Pen Pen = new Pen(Color.Black, 1);
+
 		public List<CanvasPoint> Points = new List<CanvasPoint>();
 
-		public Pen Pen { get; set; } = new Pen(Color.Black);
+		public float Width { get => Pen.Width; set => Pen.Width = value; }
+		public Color Color { get => Pen.Color; set => Pen.Color = value; }
 
 		public Line() : base() { }
 
-		public Line(Line line) : this() { Pen = line.Pen; }
+		public Line(Line line) : this() { Width = line.Width; Color = line.Color; }
 
 		public void AddVertex(Vertex vertex)
 		{
-			if (Points.Count >= 4) Points.Add(new ControlPoint(Points.Last()));
+			//if (Points.Count >= 4) Points.Add(new ControlPoint(Points.Last()));
+			if (Points.Count > 0)
+			{
+				Points.Add(new ControlPoint(Points.Last()));
+				Points.Add(new ControlPoint(vertex));
+			}
 			Points.Add(vertex);
-			Points.Add(new ControlPoint(vertex));
+			//Points.Add(new ControlPoint(vertex));
 		}
 
 		public override CanvasObject Copy() => new Line(this);
 
-		public override bool MouseOver(Point mousePosition, Keys modifierKeys)
+		public override CanvasObject MouseOver(Point mousePosition, Keys modifierKeys)
 		{
 			var path = new GraphicsPath();
 			var points = Points.Select(v => v.ToPoint).ToArray();
-			path.AddLines(points);
+			path.AddBeziers(points);
+			var stringPoints = points.Select(p => p.ToString()).ToList();
+			Debug.WriteLine($"{string.Join(",", stringPoints)}");
 
-			return path.IsVisible(mousePosition);
+			return path.IsOutlineVisible(mousePosition, new Pen(Color.Black, 10F)) ? this : null;
 		}
 
 		public override void Draw(Graphics graphics)
 		{
-			//for (var index = 1; index < Vertices.Count; index++)
-			//{
-			//	var p1 = Vertices[index - 1].Location;
-			//	var p2 = Vertices[index].Location;
-			//	graphics.DrawLine(Pen, p1, p2);
-			//}
-
 			var path = new GraphicsPath();
-			//path.StartFigure();
 			var points = Points.Select(v => v.ToPoint).ToArray();
 			if (points.Length < 4) return;
-
-			//if (points.Count() == 2)
-			//{
-			//	path.AddLines(points);
-			//}
-			//else
-			//{
 			path.AddBeziers(points);
-			//	path.AddPolygon(points);
-			//}
-
-			//path.CloseFigure();
-
 			graphics.DrawPath(Pen, path);
 
 			Points.ForEach(v => v.Draw(graphics));

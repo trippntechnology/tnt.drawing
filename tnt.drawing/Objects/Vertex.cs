@@ -22,7 +22,7 @@ namespace TNT.Drawing.Objects
 
 		public override CanvasObject Copy() => new Vertex(this);
 
-		public override bool MouseOver(Point mousePosition, Keys modifierKeys)
+		public override CanvasObject MouseOver(Point mousePosition, Keys modifierKeys)
 		{
 			throw new NotImplementedException();
 		}

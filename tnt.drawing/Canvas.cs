@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows.Forms;
 using TNT.Drawing.DrawingMode;
 using TNT.Drawing.Layer;
+using TNT.Drawing.Objects;
 
 namespace TNT.Drawing
 {
@@ -15,6 +16,8 @@ namespace TNT.Drawing
 	/// </summary>
 	public class Canvas : Control
 	{
+		public Action<List<CanvasObject>> OnObjectsSelected = (_) => { };
+
 		private const int MINIMUM_PADDING = 1000;
 		private const int PADDING = 20;
 
@@ -46,27 +49,16 @@ namespace TNT.Drawing
 		private DrawingMode.DrawingMode _DrawingMode;
 		public DrawingMode.DrawingMode DrawingMode
 		{
-			get { return _DrawingMode ?? new LineMode(); }
+			get { return _DrawingMode ?? new SelectMode(); }
 			set
 			{
 				_DrawingMode = value;
-				_DrawingMode.OnAddObject = (obj) => Layers.Last().CanvasObjects.Add(obj);
+				//_DrawingMode.OnAddObject = (obj) => Layers.Last().CanvasObjects.Add(obj);
+				_DrawingMode.OnLayerRequest = () => Layers.Last();
 				_DrawingMode.OnRequestRefresh = () => Refresh();
+				_DrawingMode.OnObjectsSelected = (objs) => OnObjectsSelected(objs);
 			}
 		} 
-
-		protected override void OnMouseClick(MouseEventArgs e)
-		{
-			var gridPoint = e.Location.ToGridCoordinates(GetTransformedGraphics());
-			var mea = new MouseEventArgs(e.Button, e.Clicks, gridPoint.X, gridPoint.Y, e.Delta);
-			DrawingMode.OnMouseClick(null, mea, Keys.None);
-		}
-
-		protected override void OnMouseDoubleClick(MouseEventArgs e)
-		{
-			base.OnMouseDoubleClick(e);
-			DrawingMode.OnMouseDoubleClick(null, e);
-		}
 
 		public CanvasLayer BackgroundLayer { get { return _BackgroundLayer; } set { _BackgroundLayer = value; Refresh(); } }
 
@@ -75,7 +67,7 @@ namespace TNT.Drawing
 		/// </summary>
 		public GridLayer GridLayer { get; set; } = new GridLayer(Color.Aqua, 10);
 
-		public List<Layer.CanvasLayer> Layers { get { return _Layers; } set { _Layers = value; Refresh(); } }
+		public List<CanvasLayer> Layers { get { return _Layers; } set { _Layers = value; Refresh(); } }
 
 		/// <summary>
 		/// The <see cref="ScalePercentage"/> represented as a <see cref="float"/>
@@ -296,6 +288,7 @@ namespace TNT.Drawing
 					Cursor = Cursors.Hand;
 					break;
 			}
+			DrawingMode.OnKeyDown(null, null);
 		}
 
 		/// <summary>
@@ -305,6 +298,31 @@ namespace TNT.Drawing
 		{
 			keyEventArgs = null;
 			Cursor = Cursors.Default;
+			DrawingMode.OnKeyUp(null, null);
+		}
+
+		protected override void OnMouseClick(MouseEventArgs e)
+		{
+			var gridPoint = e.Location.ToGridCoordinates(GetTransformedGraphics());
+			var mea = new MouseEventArgs(e.Button, e.Clicks, gridPoint.X, gridPoint.Y, e.Delta);
+			DrawingMode.OnMouseClick(null, mea, Keys.None);
+		}
+
+		protected override void OnMouseDoubleClick(MouseEventArgs e)
+		{
+			base.OnMouseDoubleClick(e);
+			DrawingMode.OnMouseDoubleClick(null, e);
+		}
+
+		protected override void OnMouseDown(MouseEventArgs e)
+		{
+			base.OnMouseDown(e);
+			DrawingMode.OnMouseDown(null, null, Keys.None);
+		}
+		protected override void OnMouseUp(MouseEventArgs e)
+		{
+			base.OnMouseUp(e);
+			DrawingMode.OnMouseUp(null, null, Keys.None);
 		}
 
 		/// <summary>

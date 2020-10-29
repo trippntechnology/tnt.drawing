@@ -1,26 +1,36 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
+using TNT.Drawing.Layer;
 using TNT.Drawing.Objects;
 
 namespace TNT.Drawing.DrawingMode
 {
 	public abstract class DrawingMode
 	{
-		public Action<CanvasObject> OnAddObject = (_) => { };
+		//public Action<CanvasObject> OnAddObject = (_) => { };
 		public Action OnRequestRefresh = () => { };
+		public Func<CanvasLayer> OnLayerRequest = () => { return null; };
+		public Action<List<CanvasObject>> OnObjectsSelected = (_) => { };
 
-		abstract public DrawingMode Copy();
+		public abstract CanvasObject DefaultObject { get; }
 
-		virtual public void OnMouseMove(Graphics graphics, MouseEventArgs e, Keys modifierKeys) { }
-		virtual public void OnMouseUp(Graphics graphics, MouseEventArgs e, Keys modifierKeys) { }
-		virtual public void OnMouseDown(Graphics graphics, MouseEventArgs e, Keys modifierKeys) { }
-		virtual public void OnMouseDoubleClick(Graphics graphics, MouseEventArgs e) { }
-		virtual public void OnMouseClick(Graphics graphics, MouseEventArgs e, Keys modifierKeys) { }
-		virtual public void OnKeyDown(Graphics graphics, KeyEventArgs e) { }
-		virtual public void OnKeyUp(Graphics graphics, KeyEventArgs e) { }
+		public virtual void OnMouseMove(Graphics graphics, MouseEventArgs e, Keys modifierKeys) => Log();
+		public virtual void OnMouseUp(Graphics graphics, MouseEventArgs e, Keys modifierKeys) => Log();
+		public virtual void OnMouseDown(Graphics graphics, MouseEventArgs e, Keys modifierKeys) => Log();
+		public virtual void OnMouseDoubleClick(Graphics graphics, MouseEventArgs e) => Log();
+		public virtual void OnMouseClick(Graphics graphics, MouseEventArgs e, Keys modifierKeys) => Log();
+		public virtual void OnKeyDown(Graphics graphics, KeyEventArgs e) => Log();
+		public virtual void OnKeyUp(Graphics graphics, KeyEventArgs e) => Log();
 
-		virtual protected void AddObject(CanvasObject canvasObject) => OnAddObject(canvasObject);
-		virtual protected void RequestRefresh() => OnRequestRefresh();
+		//protected virtual void AddObject(CanvasObject canvasObject) => OnAddObject(canvasObject);
+		protected virtual void RequestRefresh() => OnRequestRefresh();
+		protected virtual CanvasLayer RequestLayer() => OnLayerRequest();
+		protected virtual void ObjectsSelected(List<CanvasObject> objs) => OnObjectsSelected(objs);
+
+		protected virtual void Log(string msg = "", [CallerMemberName] string callingMethod = null) => Debug.WriteLine($"{DateTime.Now} [{callingMethod}] {msg}");
 	}
 }
