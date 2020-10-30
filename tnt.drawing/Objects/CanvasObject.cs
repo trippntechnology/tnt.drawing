@@ -20,7 +20,7 @@ namespace TNT.Drawing.Objects
 		/// <summary>
 		/// Default constructor
 		/// </summary>
-		protected CanvasObject() { Id = Guid.NewGuid().ToString(); }
+		protected CanvasObject() => Id = Guid.NewGuid().ToString();
 
 		/// <summary>
 		/// Copy constructor

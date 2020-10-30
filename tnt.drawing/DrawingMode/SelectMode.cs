@@ -35,7 +35,7 @@ namespace TNT.Drawing.DrawingMode
 			{
 				underMouse = objs[index].MouseOver(e.Location, modifierKeys);
 			}
-			OnObjectsSelected(new List<CanvasObject>() { underMouse });
+			OnObjectsSelected(underMouse != null ? new List<object>() { underMouse } : null);
 		}
 
 		public override void OnMouseDoubleClick(Graphics graphics, MouseEventArgs e)

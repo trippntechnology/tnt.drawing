@@ -1,32 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TNT.Drawing.Objects
 {
 	public class Square : CanvasObject
 	{
+		private SolidBrush _SolidBrush = new SolidBrush(Color.Black);
+
 		public int X { get; set; }
 		public int Y { get; set; }
 		public int Width { get; set; }
-		public Brush SolidBrush { get; set; }
+		public int Height { get; set; }
+
+		public Color Color { get; set; } = Color.Black;
+
+		public Square() { }
 
 		public Square(int x, int y, int width, Color color) : base()
 		{
 			X = x;
 			Y = y;
 			Width = width;
-			SolidBrush = new SolidBrush(color);
+			Height = width;
+			Color = color;
 		}
 
 		public override void Draw(Graphics graphics)
 		{
-			graphics.FillRectangle(SolidBrush, X, Y, Width, Width);
+			_SolidBrush.Color = this.Color;
+			graphics.FillRectangle(_SolidBrush, X, Y, Width, Height);
 		}
 
 		public override CanvasObject Copy()

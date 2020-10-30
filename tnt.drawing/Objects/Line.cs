@@ -9,12 +9,23 @@ namespace TNT.Drawing.Objects
 {
 	public class Line : CanvasObject
 	{
-		private Pen Pen = new Pen(Color.Black, 1);
-
+		private Pen _Pen = new Pen(Color.Black, 1);
 		public List<CanvasPoint> Points = new List<CanvasPoint>();
 
-		public float Width { get => Pen.Width; set => Pen.Width = value; }
-		public Color Color { get => Pen.Color; set => Pen.Color = value; }
+		public float Width { get; set; } = 1;
+		public Color Color { get; set; } = Color.Blue;
+		public DashStyle Style { get; set; } = DashStyle.Solid;
+
+		public Pen Pen
+		{
+			get
+			{
+				_Pen.Color = Color;
+				_Pen.Width = Width;
+				_Pen.DashStyle = Style;
+				return _Pen;
+			}
+		}
 
 		public Line() : base() { }
 
@@ -22,14 +33,12 @@ namespace TNT.Drawing.Objects
 
 		public void AddVertex(Vertex vertex)
 		{
-			//if (Points.Count >= 4) Points.Add(new ControlPoint(Points.Last()));
 			if (Points.Count > 0)
 			{
 				Points.Add(new ControlPoint(Points.Last()));
 				Points.Add(new ControlPoint(vertex));
 			}
 			Points.Add(vertex);
-			//Points.Add(new ControlPoint(vertex));
 		}
 
 		public override CanvasObject Copy() => new Line(this);
@@ -38,6 +47,8 @@ namespace TNT.Drawing.Objects
 		{
 			var path = new GraphicsPath();
 			var points = Points.Select(v => v.ToPoint).ToArray();
+
+			if (points.Length < 4) return null;
 			path.AddBeziers(points);
 			var stringPoints = points.Select(p => p.ToString()).ToList();
 			Debug.WriteLine($"{string.Join(",", stringPoints)}");

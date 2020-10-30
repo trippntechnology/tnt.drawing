@@ -14,7 +14,7 @@ namespace TNT.Drawing.DrawingMode
 		//public Action<CanvasObject> OnAddObject = (_) => { };
 		public Action OnRequestRefresh = () => { };
 		public Func<CanvasLayer> OnLayerRequest = () => { return null; };
-		public Action<List<CanvasObject>> OnObjectsSelected = (_) => { };
+		public Action<List<object>> OnObjectsSelected = (_) => { };
 
 		public abstract CanvasObject DefaultObject { get; }
 
@@ -29,7 +29,7 @@ namespace TNT.Drawing.DrawingMode
 		//protected virtual void AddObject(CanvasObject canvasObject) => OnAddObject(canvasObject);
 		protected virtual void RequestRefresh() => OnRequestRefresh();
 		protected virtual CanvasLayer RequestLayer() => OnLayerRequest();
-		protected virtual void ObjectsSelected(List<CanvasObject> objs) => OnObjectsSelected(objs);
+		protected virtual void ObjectsSelected(List<object> objs) => OnObjectsSelected(objs);
 
 		protected virtual void Log(string msg = "", [CallerMemberName] string callingMethod = null) => Debug.WriteLine($"{DateTime.Now} [{callingMethod}] {msg}");
 	}

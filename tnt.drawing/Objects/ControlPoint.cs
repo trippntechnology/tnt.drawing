@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace TNT.Drawing.Objects
@@ -28,11 +24,7 @@ namespace TNT.Drawing.Objects
 		{
 			EndpointId = endPoint.Id;
 			Endpoint = endPoint;
-			Endpoint.OnPositionChanged = (x, y, dx, dy) =>
-			{
-				X = x;
-				Y = y;
-			};
+			Endpoint.OnPositionChanged = (x, y, dx, dy) => { X = x; Y = y; };
 		}
 
 		public override CanvasObject Copy()

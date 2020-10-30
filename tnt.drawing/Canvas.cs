@@ -7,7 +7,6 @@ using System.Linq;
 using System.Windows.Forms;
 using TNT.Drawing.DrawingMode;
 using TNT.Drawing.Layer;
-using TNT.Drawing.Objects;
 
 namespace TNT.Drawing
 {
@@ -16,7 +15,7 @@ namespace TNT.Drawing
 	/// </summary>
 	public class Canvas : Control
 	{
-		public Action<List<CanvasObject>> OnObjectsSelected = (_) => { };
+		public Action<List<object>> OnObjectsSelected = (_) => { };
 
 		private const int MINIMUM_PADDING = 1000;
 		private const int PADDING = 20;
@@ -42,7 +41,6 @@ namespace TNT.Drawing
 				_Properties = value;
 				_Properties.OnPropertyChanged = (prop, val) => { CanvasProperties.Set(this, prop, val); };
 				CanvasProperties.SetAll(value, this);
-				Refresh();
 			}
 		}
 
@@ -53,12 +51,11 @@ namespace TNT.Drawing
 			set
 			{
 				_DrawingMode = value;
-				//_DrawingMode.OnAddObject = (obj) => Layers.Last().CanvasObjects.Add(obj);
 				_DrawingMode.OnLayerRequest = () => Layers.Last();
 				_DrawingMode.OnRequestRefresh = () => Refresh();
-				_DrawingMode.OnObjectsSelected = (objs) => OnObjectsSelected(objs);
+				_DrawingMode.OnObjectsSelected = (objs) => OnObjectsSelected(objs ?? new List<object>() { Properties });
 			}
-		} 
+		}
 
 		public CanvasLayer BackgroundLayer { get { return _BackgroundLayer; } set { _BackgroundLayer = value; Refresh(); } }
 

@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TNT.Drawing.Objects
@@ -39,7 +35,8 @@ namespace TNT.Drawing.Objects
 		public int Y
 		{
 			get => _Y;
-			set {
+			set
+			{
 				var dy = value - _Y;
 				_Y = value;
 				OnPositionChanged(X, _Y, 0, dy);

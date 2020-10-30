@@ -2,14 +2,12 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using TNT.Drawing.Converters;
 
 namespace TNT.Drawing.Layer
 {
 	/// <summary>
 	/// Represents the grid area of the drawing surface
 	/// </summary>
-	[TypeConverter(typeof(GridTypeConverter))]
 	public class GridLayer : CanvasLayer
 	{
 		/// <summary>

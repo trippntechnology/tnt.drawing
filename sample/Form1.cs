@@ -49,7 +49,16 @@ namespace TNT.Drawing.Sample
 			lineToolStripMenuItem.Tag = new LineMode();
 
 			_CanvasPanel.DrawingMode = selectToolStripMenuItem.Tag as DrawingMode.DrawingMode;
-			_CanvasPanel.OnObjectsSelected = (objs) => propertyGrid1.SelectedObject = objs;
+			_CanvasPanel.OnObjectsSelected = (objs) =>
+			{
+				try
+				{
+					propertyGrid1.SelectedObjects = objs.ToArray();
+				}
+				catch (System.Exception)
+				{
+				}
+			};
 		}
 
 		//private void _MyControl_MouseMove(object sender, MouseEventArgs e) => toolStripStatusLabel1.Text = $"{e.X}, {e.Y}";
@@ -88,6 +97,11 @@ namespace TNT.Drawing.Sample
 			var mode = menuItem.Tag as DrawingMode.DrawingMode;
 			propertyGrid1.SelectedObject = mode.DefaultObject;
 			_CanvasPanel.DrawingMode = mode;
+		}
+
+		private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+		{
+			_CanvasPanel.Refresh();
 		}
 	}
 }
