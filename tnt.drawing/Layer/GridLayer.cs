@@ -10,116 +10,27 @@ namespace TNT.Drawing.Layer
 	/// </summary>
 	public class GridLayer : CanvasLayer
 	{
-		/// <summary>
-		/// Indicates whether <see cref="Draw(Graphics)"/> should be forced to draw or not
-		/// </summary>
-		protected bool ForceDraw = true;
+		private Pen _Pen = new Pen(Color.Black);
+		private SolidBrush _ShadowBrush = new SolidBrush(Color.FromArgb(40, Color.Black));
 
-		/// <summary>
-		/// Backing field for <see cref="PixelsPerSegment"/>
-		/// </summary>
-		protected int _PixelsPerSegment = 10;
-
-		/// <summary>
-		/// <see cref="Pen"/> used to draw the lines on the <see cref="GridLayer"/>
-		/// </summary>
-		protected Pen LinePen { get; set; } = new Pen(Color.Black);
-
-		/// <summary>
-		/// <see cref="SolidBrush"/> used to paint the shadow
-		/// </summary>
-		protected SolidBrush ShadowBrush { get; set; } = new SolidBrush(Color.FromArgb(40, Color.Black));
-
-		/// <summary>
-		/// <see cref="Rectangle"/> that represents the area of the <see cref="GridLayer"/>
-		/// </summary>
-		protected Rectangle _Rect = new Rectangle(0, 0, 1024, 768);
-
-		/// <summary>
-		/// The <see cref="GridImage"/> that is drawn by the grid
-		/// </summary>
-		protected Bitmap GridImage { get; set; }
-
-		/// <summary>
-		/// Delegate that is called when the <see cref="GridLayer"/> needs to be refreshed. 
-		/// </summary>
-		public Action OnRefreshRequest = () => { };
 
 		/// <summary>
 		/// The number of pixels between the line in the grid
 		/// </summary>
-		[Category("Layout")]
-		public int PixelsPerSegment
-		{
-			get { return _PixelsPerSegment; }
-			set
-			{
-				_PixelsPerSegment = value;
-				Refresh();
-			}
-		}
+		public int PixelsPerSegment { get => BackingFields.Get(10); set => BackingFields.Set(value); }
 
 		/// <summary>
 		/// The color of the grid lines
 		/// </summary>
-		[Category("Appearance")]
-		public Color LineColor
-		{
-			get { return LinePen.Color; }
-			set
-			{
-				LinePen.Color = value;
-				Refresh();
-			}
-		}
+		public Color LineColor { get => BackingFields.Get(_Pen.Color); set => BackingFields.Set(value); }
 
 		/// <summary>
 		/// The shadow color
 		/// </summary>
-		[Category("Appearance")]
-		public Color ShadowColor
-		{
-			get { return ShadowBrush.Color; }
-			set
-			{
-				ShadowBrush.Color = value;
-				Refresh();
-			}
-		}
+		public Color ShadowColor { get => BackingFields.Get(_ShadowBrush.Color); set => BackingFields.Set(value); }
 
-		/// <summary>
-		/// A <see cref="Rectangle"/> that represents the area of this <see cref="GridLayer"/>
-		/// </summary>
-		[Browsable(false)]
-		public Rectangle Rect { get { return _Rect; } }
 
-		/// <summary>
-		/// The width of the grid
-		/// </summary>
-		[Category("Layout")]
-		public int Width
-		{
-			get { return _Rect.Width; }
-			set
-			{
-				_Rect.Width = value;
-				Refresh();
-			}
-		}
-
-		/// <summary>
-		/// The height of the grid
-		/// </summary>
-		[Category("Layout")]
-		public int Height
-		{
-			get { return _Rect.Height; }
-			set
-			{
-				_Rect.Height = value;
-				Refresh();
-			}
-		}
+		public GridLayer() : base() { }
 
 		/// <summary>
 		/// Initializes the <see cref="GridLayer"/>
@@ -130,43 +41,24 @@ namespace TNT.Drawing.Layer
 			LineColor = lineColor;
 		}
 
-		/// <summary>
-		/// Draws the <see cref="GridLayer"/>
-		/// </summary>
-		override public void Draw(Graphics graphics)
+		protected override void DrawImage(Graphics graphics)
 		{
-			if (ForceDraw)// || (Image == null || Image.Width != canvasWidth || Image.Height != canvasHeight))
+			var largeSegment = PixelsPerSegment * 10;
+			_Pen.Color = LineColor;
+
+			for (int x = 0; x < Width; x += PixelsPerSegment)
 			{
-				var rectWidth = Rect.Width;
-				var rectHeight = Rect.Height;
-
-				Debug.WriteLine($"Drawing image");
-				var largeSegment = PixelsPerSegment * 10;
-				GridImage = new Bitmap(rectWidth, rectHeight);
-				var imageGraphics = Graphics.FromImage(GridImage);
-
-				for (int x = 0; x < rectWidth; x += PixelsPerSegment)
-				{
-					LinePen.Width = (x % largeSegment == 0) ? 3 : 1;
-					imageGraphics.DrawLine(LinePen, x, 0, x, rectHeight);
-				}
-
-				for (int y = 0; y < rectHeight; y += PixelsPerSegment)
-				{
-					LinePen.Width = (y % largeSegment == 0) ? 3 : 1;
-					imageGraphics.DrawLine(LinePen, 0, y, rectWidth, y);
-				}
-
-				ForceDraw = false;
+				_Pen.Width = (x % largeSegment == 0) ? 3 : 1;
+				graphics.DrawLine(_Pen, x, 0, x, Height);
 			}
 
-			if (Visible) graphics.DrawImage(GridImage, Rect);
-		}
+			for (int y = 0; y < Height; y += PixelsPerSegment)
+			{
+				_Pen.Width = (y % largeSegment == 0) ? 3 : 1;
+				graphics.DrawLine(_Pen, 0, y, Width, y);
+			}
 
-		private void Refresh()
-		{
-			ForceDraw = true;
-			OnRefreshRequest();
+			base.DrawImage(graphics);
 		}
 	}
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
 using System.Windows.Forms;
 using TNT.Drawing.DrawingMode;
 using TNT.Drawing.Layer;
@@ -15,11 +14,12 @@ namespace TNT.Drawing
 	/// </summary>
 	public class Canvas : Control
 	{
-		public Action<List<object>> OnObjectsSelected = (_) => { };
+		public Action<List<object>> OnSelected = (_) => { };
 
 		private const int MINIMUM_PADDING = 1000;
 		private const int PADDING = 20;
 
+		private bool FitOnPaint = false;
 		private bool AdjustPostion = false;
 		private SolidBrush BackgrounBrush = new SolidBrush(Color.White);
 		private KeyEventArgs keyEventArgs = null;
@@ -51,9 +51,7 @@ namespace TNT.Drawing
 			set
 			{
 				_DrawingMode = value;
-				_DrawingMode.OnLayerRequest = () => Layers.Last();
-				_DrawingMode.OnRequestRefresh = () => Refresh();
-				_DrawingMode.OnObjectsSelected = (objs) => OnObjectsSelected(objs ?? new List<object>() { Properties });
+				_DrawingMode.Canvas = this;
 			}
 		}
 
@@ -76,25 +74,17 @@ namespace TNT.Drawing
 		/// Amount the <see cref="Canvas"/> should be scaled
 		/// </summary>
 		[Category("Appearance")]
-		public int ScalePercentage
-		{
-			get { return Properties.Get<int>(); }
-			set { Properties.Set(value); Refresh(); }
-		}
+		public int ScalePercentage { get { return Properties.Get<int>(); } set { Properties.Set(value); Refresh(); } }
 
 		/// <summary>
 		/// Grid visibility
 		/// </summary>
-		public bool ShowGrid { get { return GridLayer.Visible; } set { GridLayer.Visible = value; Refresh(); } }
+		public bool ShowGrid { get { return GridLayer.IsVisible; } set { GridLayer.IsVisible = value; Refresh(); } }
 
 		/// <summary>
 		/// Canvas background color
 		/// </summary>
-		public Color BackgroundColor
-		{
-			get { return BackgrounBrush.Color; }
-			set { BackgrounBrush.Color = value; Refresh(); }
-		}
+		public Color BackgroundColor { get { return BackgrounBrush.Color; } set { BackgrounBrush.Color = value; Refresh(); } }
 
 		/// <summary>
 		/// <see cref="GridLayer"/> height
@@ -196,6 +186,12 @@ namespace TNT.Drawing
 				var currentCanvasPosition = PointToClient(Cursor.Position);
 				RepositionToAlignWithMouse(previousCanvasPosition, currentCanvasPosition);
 				AdjustPostion = false;
+			}
+
+			if (!FitOnPaint)
+			{
+				FitOnPaint = true;
+				Fit();
 			}
 
 			base.OnPaint(e);
@@ -352,6 +348,8 @@ namespace TNT.Drawing
 		/// Redraws <see cref="Canvas"/> when the parent's size changes.
 		/// </summary>
 		private void OnParentResize(object sender, EventArgs e) => Refresh();
+
+		public void OnObjectsSelected(List<object> objs) => OnSelected(objs ?? new List<object>() { Properties });
 
 		/// <summary>
 		/// Returns a <see cref="Graphics"/> that has been transformed

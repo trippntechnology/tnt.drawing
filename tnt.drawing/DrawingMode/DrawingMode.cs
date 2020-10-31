@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using TNT.Drawing.Layer;
@@ -11,10 +12,11 @@ namespace TNT.Drawing.DrawingMode
 {
 	public abstract class DrawingMode
 	{
-		//public Action<CanvasObject> OnAddObject = (_) => { };
-		public Action OnRequestRefresh = () => { };
-		public Func<CanvasLayer> OnLayerRequest = () => { return null; };
-		public Action<List<object>> OnObjectsSelected = (_) => { };
+		public Canvas Canvas { get; set; }
+
+		//public Action OnRequestRefresh = () => { };
+		//public Func<CanvasLayer> OnLayerRequest = () => { return null; };
+		//public Action<List<object>> OnObjectsSelected = (_) => { };
 
 		public abstract CanvasObject DefaultObject { get; }
 
@@ -26,10 +28,9 @@ namespace TNT.Drawing.DrawingMode
 		public virtual void OnKeyDown(Graphics graphics, KeyEventArgs e) => Log();
 		public virtual void OnKeyUp(Graphics graphics, KeyEventArgs e) => Log();
 
-		//protected virtual void AddObject(CanvasObject canvasObject) => OnAddObject(canvasObject);
-		protected virtual void RequestRefresh() => OnRequestRefresh();
-		protected virtual CanvasLayer RequestLayer() => OnLayerRequest();
-		protected virtual void ObjectsSelected(List<object> objs) => OnObjectsSelected(objs);
+		protected virtual void RefreshCanvas() => Canvas?.Refresh();
+		protected virtual CanvasLayer RequestLayer() => Canvas?.Layers.LastOrDefault();
+		protected virtual void ObjectsSelected(List<object> objs) => Canvas?.OnSelected(objs);
 
 		protected virtual void Log(string msg = "", [CallerMemberName] string callingMethod = null) => Debug.WriteLine($"{DateTime.Now} [{callingMethod}] {msg}");
 	}

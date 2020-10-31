@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using TNT.Drawing.Objects;
 
@@ -26,7 +22,6 @@ namespace TNT.Drawing.DrawingMode
 
 		public override void OnMouseClick(Graphics graphics, MouseEventArgs e, Keys modifierKeys)
 		{
-			//Debug.WriteLine($"SelectMode.OnMouseClick({e.Location})");
 			base.OnMouseClick(graphics, e, modifierKeys);
 
 			var objs = RequestLayer().CanvasObjects;
@@ -35,7 +30,7 @@ namespace TNT.Drawing.DrawingMode
 			{
 				underMouse = objs[index].MouseOver(e.Location, modifierKeys);
 			}
-			OnObjectsSelected(underMouse != null ? new List<object>() { underMouse } : null);
+			Canvas.OnObjectsSelected(underMouse != null ? new List<object>() { underMouse } : null);
 		}
 
 		public override void OnMouseDoubleClick(Graphics graphics, MouseEventArgs e)
@@ -52,12 +47,11 @@ namespace TNT.Drawing.DrawingMode
 		{
 			var objs = RequestLayer().CanvasObjects;
 			CanvasObject underMouse = null;
-			for(var index = 0; underMouse == null && index < objs.Count; index++)
+			for (var index = 0; underMouse == null && index < objs.Count; index++)
 			{
 				underMouse = objs[index].MouseOver(e.Location, modifierKeys);
 			}
 
-			//Debug.WriteLine($"SelectMode.OnMouseMove({e.Location})");
 			Debug.WriteLine($"SelectMode.OnMouseMove({underMouse})");
 
 			base.OnMouseMove(graphics, e, modifierKeys);

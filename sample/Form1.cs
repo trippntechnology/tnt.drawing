@@ -49,7 +49,7 @@ namespace TNT.Drawing.Sample
 			lineToolStripMenuItem.Tag = new LineMode();
 
 			_CanvasPanel.DrawingMode = selectToolStripMenuItem.Tag as DrawingMode.DrawingMode;
-			_CanvasPanel.OnObjectsSelected = (objs) =>
+			_CanvasPanel.OnSelected = (objs) =>
 			{
 				try
 				{

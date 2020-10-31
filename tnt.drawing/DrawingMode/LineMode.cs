@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using TNT.Drawing.Objects;
 
@@ -42,13 +37,13 @@ namespace TNT.Drawing.DrawingMode
 				ActiveVertex = new Vertex(e.X, e.Y);
 				ActiveLine.AddVertex(ActiveVertex);
 				RequestLayer().CanvasObjects.Add(ActiveLine);
-				RequestRefresh();
+				RefreshCanvas();
 			}
 			else if (ActiveVertex != null)
 			{
 				ActiveVertex = new Vertex(e.X, e.Y);
 				ActiveLine.AddVertex(ActiveVertex);
-				RequestRefresh();
+				RefreshCanvas();
 			}
 		}
 
@@ -62,7 +57,7 @@ namespace TNT.Drawing.DrawingMode
 
 			ActiveVertex = null;
 			ActiveLine = null;
-			RequestRefresh();
+			RefreshCanvas();
 		}
 
 		public override void OnMouseDown(Graphics graphics, MouseEventArgs e, Keys modifierKeys)
@@ -79,7 +74,7 @@ namespace TNT.Drawing.DrawingMode
 			{
 				ActiveVertex.X = e.X;
 				ActiveVertex.Y = e.Y;
-				RequestRefresh();
+				RefreshCanvas();
 			}
 		}
 
