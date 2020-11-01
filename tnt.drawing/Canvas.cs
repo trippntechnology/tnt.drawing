@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Windows.Forms;
 using TNT.Drawing.DrawingMode;
 using TNT.Drawing.Layer;
@@ -19,6 +20,7 @@ namespace TNT.Drawing
 		private const int MINIMUM_PADDING = 1000;
 		private const int PADDING = 20;
 
+		private Rectangle _CanvasRect = Rectangle.Empty;
 		private bool FitOnPaint = false;
 		private bool AdjustPostion = false;
 		private SolidBrush BackgrounBrush = new SolidBrush(Color.White);
@@ -27,7 +29,6 @@ namespace TNT.Drawing
 		private Point PreviousGridPosition;
 		private ScrollableControl ScrollableParent = null;
 		private CanvasProperties _Properties = new CanvasProperties();
-		private CanvasLayer _BackgroundLayer = new CanvasLayer();
 		private List<CanvasLayer> _Layers = new List<CanvasLayer>();
 
 		/// <summary>
@@ -55,12 +56,10 @@ namespace TNT.Drawing
 			}
 		}
 
-		public CanvasLayer BackgroundLayer { get { return _BackgroundLayer; } set { _BackgroundLayer = value; Refresh(); } }
-
 		/// <summary>
 		/// The backgrond of the <see cref="Canvas"/>
 		/// </summary>
-		public GridLayer GridLayer { get; set; } = new GridLayer(Color.Aqua, 10);
+		public GridLayer GridLayer { get => Layers.Find(l => l is GridLayer) as GridLayer; }
 
 		public List<CanvasLayer> Layers { get { return _Layers; } set { _Layers = value; Refresh(); } }
 
@@ -79,7 +78,7 @@ namespace TNT.Drawing
 		/// <summary>
 		/// Grid visibility
 		/// </summary>
-		public bool ShowGrid { get { return GridLayer.IsVisible; } set { GridLayer.IsVisible = value; Refresh(); } }
+		public bool ShowGrid { get { return GridLayer?.IsVisible ?? true; } set { GridLayer?.Let(it=> it.IsVisible = value); Refresh(); } }
 
 		/// <summary>
 		/// Canvas background color
@@ -89,32 +88,48 @@ namespace TNT.Drawing
 		/// <summary>
 		/// <see cref="GridLayer"/> height
 		/// </summary>
-		public int GridHeight { get { return GridLayer.Height; } set { GridLayer.Height = value; } }
+		public int CanvasHeight
+		{
+			get => _CanvasRect.Height;
+			set
+			{
+				_CanvasRect.Height = value;
+				Layers.ForEach(l => l.Height = value);
+			}
+		}
 
 		/// <summary>
 		/// <see cref="GridLayer"/> width
 		/// </summary>
-		public int GridWidth { get { return GridLayer.Width; } set { GridLayer.Width = value; } }
+		public int CanvasWidth
+		{
+			get => _CanvasRect.Width;
+			set
+			{
+				_CanvasRect.Width = value;
+				Layers.ForEach(l => l.Width = value);
+			}
+		}
 
 		/// <summary>
 		/// <see cref="GridLayer"/> line color
 		/// </summary>
-		public Color GridLineColor { get { return GridLayer.LineColor; } set { GridLayer.LineColor = value; } }
+		public Color GridLineColor { get { return GridLayer?.LineColor ?? Color.Black; } set { GridLayer?.Let(it => it.LineColor = value); } }
 
 		/// <summary>
 		/// Pixels between lines on the <see cref="GridLayer"/>
 		/// </summary>
-		public int PixelPerGridLines { get { return GridLayer.PixelsPerSegment; } set { GridLayer.PixelsPerSegment = value; } }
+		public int PixelPerGridLines { get { return GridLayer?.PixelsPerSegment ?? 10; } set { GridLayer?.Let(it => it.PixelsPerSegment = value); } }
 
 		/// <summary>
 		/// Scaled grid width
 		/// </summary>
-		protected float ScaledWidth { get { return GridLayer.Width * Zoom; } }
+		protected float ScaledWidth { get { return (GridLayer?.Width ?? 100) * Zoom; } }
 
 		/// <summary>
 		/// Scaled grid height
 		/// </summary>
-		protected float ScaledHeight { get { return GridLayer.Height * Zoom; } }
+		protected float ScaledHeight { get { return (GridLayer?.Height ?? 100) * Zoom; } }
 
 		/// <summary>
 		/// Initializes a <see cref="Canvas"/>
@@ -134,7 +149,7 @@ namespace TNT.Drawing
 			parent.SizeChanged += OnParentResize;
 			ScrollableParent = (Parent as ScrollableControl);
 			ScrollableParent.AutoScroll = true;
-			GridLayer.OnRefreshRequest = () => { Refresh(); };
+			//GridLayer.OnRefreshRequest = () => { Refresh(); };
 		}
 
 		/// <summary>
@@ -144,8 +159,8 @@ namespace TNT.Drawing
 		{
 			var parentWidth = Parent.Width;
 			var parentHeight = Parent.Height;
-			var gridWidth = GridLayer.Width;
-			var gridHeight = GridLayer.Height;
+			var gridWidth = GridLayer?.Width ?? 100;
+			var gridHeight = GridLayer?.Height ?? 100;
 			var gridRatio = gridWidth / (gridHeight * 1F);
 			var parentRatio = parentWidth / (parentHeight * 1F);
 			float newScale;
@@ -174,10 +189,10 @@ namespace TNT.Drawing
 			UpdateClientDimensions();
 			var graphics = GetTransformedGraphics(e.Graphics);
 
-			graphics.FillRectangle(BackgrounBrush, GridLayer.Rect);
+			graphics.FillRectangle(BackgrounBrush, _CanvasRect);
 
-			BackgroundLayer.Draw(graphics);
-			GridLayer.Draw(graphics);
+			//BackgroundLayer.Draw(graphics);
+			//GridLayer.Draw(graphics);
 			Layers.ForEach(l => l.Draw(graphics));
 
 			if (AdjustPostion)

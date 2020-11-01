@@ -19,9 +19,9 @@ namespace TNT.Drawing
 			{
 				{"BackColor", Color.Blue},
 				{"BackgroundColor", Color.White},
-				{"GridHeight", 768},
+				{"CanvasHeight", 768},
 				{"GridLineColor", Color.Aqua},
-				{"GridWidth", 1024},
+				{"CanvasWidth", 1024},
 				{"PixelPerGridLines", 10},
 				{"ScalePercentage", 100},
 				{"ShowGrid", true},
@@ -55,7 +55,8 @@ namespace TNT.Drawing
 		/// <summary>
 		/// Height of the <see cref="Canvas.GridLayer"/>
 		/// </summary>
-		public int GridHeight { get { return Get<int>(); } set { Set(value); } }
+		[DisplayName("Height")]
+		public int CanvasHeight { get { return Get<int>(); } set { Set(value); } }
 
 		/// <summary>
 		/// Line color of the <see cref="Canvas.GridLayer"/>
@@ -72,7 +73,8 @@ namespace TNT.Drawing
 		/// <summary>
 		/// Width of the <see cref="Canvas.GridLayer"/>
 		/// </summary>
-		public int GridWidth { get { return Get<int>(); } set { Set(value); } }
+		[DisplayName("Width")]
+		public int CanvasWidth { get { return Get<int>(); } set { Set(value); } }
 
 		/// <summary>
 		/// Pixels between the lines on the <see cref="Canvas.GridLayer"/>
