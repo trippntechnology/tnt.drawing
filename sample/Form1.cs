@@ -27,16 +27,17 @@ namespace TNT.Drawing.Sample
 			line.AddVertex(new Vertex(300, 100));
 			line.AddVertex(new Vertex(100, 300));
 
-			var layer0 = new CanvasLayer().Also(it =>
+			var layer1 = new CanvasLayer().Also(it =>
 			{
 				it.CanvasObjects = new List<CanvasObject>() {
 					new Square(150,150,200,Color.Green)
 				};
+				it.BackgroundColor = Color.White;
 			});
 
-			var layer1 = new GridLayer(Color.Aqua, 10);
+			var layer2 = new GridLayer(Color.Aqua, 10);
 
-			var layer2 = new CanvasLayer().Also(it =>
+			var layer3 = new CanvasLayer().Also(it =>
 			{
 				it.CanvasObjects = new List<CanvasObject>()
 				{
@@ -45,11 +46,11 @@ namespace TNT.Drawing.Sample
 				};
 			});
 
-			_CanvasPanel.Layers = new List<CanvasLayer>() { layer0, layer1, layer2 };
+			_CanvasPanel.Layers = new List<CanvasLayer>() { layer1, layer2, layer3 };
 
 			_CanvasPanel.Layers.ForEach(layer =>
 			{
-				layerToolStripMenuItem.DropDownItems.Add(new ToolStripMenuItem(layer.ToString()).Also(it=>
+				layerToolStripMenuItem.DropDownItems.Add(new ToolStripMenuItem(layer.ToString()).Also(it =>
 				{
 					it.Tag = layer;
 					it.Click += (sender, e) => { propertyGrid1.SelectedObject = (sender as ToolStripMenuItem).Tag; };
@@ -59,9 +60,9 @@ namespace TNT.Drawing.Sample
 			propertyGrid1.SelectedObject = _CanvasPanel.Properties;
 
 			selectToolStripMenuItem.Tag = new SelectMode();
-		lineToolStripMenuItem.Tag = new LineMode();
+			lineToolStripMenuItem.Tag = new LineMode();
 
-		_CanvasPanel.DrawingMode = selectToolStripMenuItem.Tag as DrawingMode.DrawingMode;
+			_CanvasPanel.DrawingMode = selectToolStripMenuItem.Tag as DrawingMode.DrawingMode;
 			_CanvasPanel.OnSelected = (objs) =>
 			{
 				try
@@ -78,43 +79,43 @@ namespace TNT.Drawing.Sample
 
 		private void fitToolStripMenuItem_Click(object sender, System.EventArgs e) => _CanvasPanel.Fit();
 
-private void saveToolStripMenuItem_Click(object sender, System.EventArgs e)
-{
-	using (var sfd = new SaveFileDialog())
-	{
-		if (sfd.ShowDialog() == DialogResult.OK)
+		private void saveToolStripMenuItem_Click(object sender, System.EventArgs e)
 		{
-			var ser = Utilities.Utilities.Serialize(_CanvasPanel.Properties, new System.Type[] { });
-			var foo = 0;
-			File.WriteAllText(sfd.FileName, ser);
+			using (var sfd = new SaveFileDialog())
+			{
+				if (sfd.ShowDialog() == DialogResult.OK)
+				{
+					var ser = Utilities.Utilities.Serialize(_CanvasPanel.Properties, new System.Type[] { });
+					var foo = 0;
+					File.WriteAllText(sfd.FileName, ser);
+				}
+			}
 		}
-	}
-}
 
-private void openToolStripMenuItem_Click(object sender, System.EventArgs e)
-{
-	using (var ofd = new OpenFileDialog())
-	{
-		if (ofd.ShowDialog() == DialogResult.OK)
+		private void openToolStripMenuItem_Click(object sender, System.EventArgs e)
 		{
-			var ser = File.ReadAllText(ofd.FileName);
-			_CanvasPanel.Properties = Utilities.Utilities.Deserialize<CanvasProperties>(ser, new System.Type[] { });
-			propertyGrid1.SelectedObject = _CanvasPanel.Properties;
+			using (var ofd = new OpenFileDialog())
+			{
+				if (ofd.ShowDialog() == DialogResult.OK)
+				{
+					var ser = File.ReadAllText(ofd.FileName);
+					_CanvasPanel.Properties = Utilities.Utilities.Deserialize<CanvasProperties>(ser, new System.Type[] { });
+					propertyGrid1.SelectedObject = _CanvasPanel.Properties;
+				}
+			}
 		}
-	}
-}
 
-private void lineToolStripMenuItem_Click(object sender, System.EventArgs e)
-{
-	var menuItem = sender as ToolStripMenuItem;
-	var mode = menuItem.Tag as DrawingMode.DrawingMode;
-	propertyGrid1.SelectedObject = mode.DefaultObject;
-	_CanvasPanel.DrawingMode = mode;
-}
+		private void lineToolStripMenuItem_Click(object sender, System.EventArgs e)
+		{
+			var menuItem = sender as ToolStripMenuItem;
+			var mode = menuItem.Tag as DrawingMode.DrawingMode;
+			propertyGrid1.SelectedObject = mode.DefaultObject;
+			_CanvasPanel.DrawingMode = mode;
+		}
 
-private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
-{
-	_CanvasPanel.Refresh();
-}
+		private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+		{
+			_CanvasPanel.Refresh();
+		}
 	}
 }

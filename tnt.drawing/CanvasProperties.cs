@@ -18,13 +18,9 @@ namespace TNT.Drawing
 			_BackingFields = new Dictionary<string, object>
 			{
 				{"BackColor", Color.Blue},
-				{"BackgroundColor", Color.White},
-				{"CanvasHeight", 768},
-				{"GridLineColor", Color.Aqua},
-				{"CanvasWidth", 1024},
-				{"PixelPerGridLines", 10},
+				{"LayerHeight", 768},
+				{"LayerWidth", 1024},
 				{"ScalePercentage", 100},
-				{"ShowGrid", true},
 			};
 		}
 
@@ -41,54 +37,16 @@ namespace TNT.Drawing
 		public int _BackColor { get { return BackColor.ToArgb(); } set { BackColor = Color.FromArgb(value); } }
 
 		/// <summary>
-		/// BackgroundColor of the <see cref="Canvas.GridLayer"/>
 		/// </summary>
-		[XmlIgnore]
-		public Color BackgroundColor { get { return Get<Color>(); } set { Set(value); } }
+		public int LayerHeight { get { return Get<int>(); } set { Set(value); } }
 
 		/// <summary>
-		/// Serializable for <see cref="BackgroundColor"/>
 		/// </summary>
-		[Browsable(false)]
-		public int _BackgroundColor { get { return BackgroundColor.ToArgb(); } set { BackgroundColor = Color.FromArgb(value); } }
-
-		/// <summary>
-		/// Height of the <see cref="Canvas.GridLayer"/>
-		/// </summary>
-		[DisplayName("Height")]
-		public int CanvasHeight { get { return Get<int>(); } set { Set(value); } }
-
-		/// <summary>
-		/// Line color of the <see cref="Canvas.GridLayer"/>
-		/// </summary>
-		[XmlIgnore]
-		public Color GridLineColor { get { return Get<Color>(); } set { Set(value); } }
-
-		/// <summary>
-		/// Serializable for <see cref="GridLineColor"/>
-		/// </summary>
-		[Browsable(false)]
-		public int _GridLineColor { get { return GridLineColor.ToArgb(); } set { GridLineColor = Color.FromArgb(value); } }
-
-		/// <summary>
-		/// Width of the <see cref="Canvas.GridLayer"/>
-		/// </summary>
-		[DisplayName("Width")]
-		public int CanvasWidth { get { return Get<int>(); } set { Set(value); } }
-
-		/// <summary>
-		/// Pixels between the lines on the <see cref="Canvas.GridLayer"/>
-		/// </summary>
-		public int PixelPerGridLines { get { return Get<int>(); } set { Set(value); } }
+		public int LayerWidth { get { return Get<int>(); } set { Set(value); } }
 
 		/// <summary>
 		/// ScalePercentage of the <see cref="Canvas"/>
 		/// </summary>
 		public int ScalePercentage { get { return Get<int>(); } set { Set(value); } }
-
-		/// <summary>
-		/// ShowGrid of the <see cref="Canvas"/>
-		/// </summary>
-		public bool ShowGrid { get { return Get<bool>(); } set { Set(value); } }
 	}
 }

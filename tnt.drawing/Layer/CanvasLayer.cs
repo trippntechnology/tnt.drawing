@@ -31,6 +31,11 @@ namespace TNT.Drawing.Layer
 		public bool IsVisible { get; set; } = true;
 
 		/// <summary>
+		/// Background color 
+		/// </summary>
+		public Color BackgroundColor { get => BackingFields.Get<Color>(Color.Transparent); set => BackingFields.Set(value); }
+
+		/// <summary>
 		/// The width of the <see cref="CanvasLayer"/>
 		/// </summary>
 		public int Width { get => BackingFields.Get(1024); set => BackingFields.Set(value); }
@@ -77,6 +82,7 @@ namespace TNT.Drawing.Layer
 		/// </summary>
 		protected virtual void DrawImage(Graphics graphics)
 		{
+			graphics.FillRectangle(new SolidBrush(BackgroundColor), Rect);
 			CanvasObjects?.ForEach(o => o.Draw(graphics));
 			IsInvalid = false;
 		}

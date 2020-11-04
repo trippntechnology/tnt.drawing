@@ -70,12 +70,16 @@ namespace TNT.Drawing.DrawingMode
 			Debug.WriteLine($"LineMode.OnMouseMove({e.Location})");
 			base.OnMouseMove(graphics, e, modifierKeys);
 
-			if (ActiveVertex != null)
-			{
-				ActiveVertex.X = e.X;
-				ActiveVertex.Y = e.Y;
-				RefreshCanvas();
-			}
+
+			//if (ActiveVertex != null)
+			//{
+			//	ActiveVertex.X = e.X;
+			//	ActiveVertex.Y = e.Y;
+			//	RefreshCanvas();
+			//}
+
+			Canvas.Refresh();
+			graphics.DrawRectangle(new Pen(Color.Blue), e.Location.X, e.Location.Y, 4, 4);
 		}
 
 		public override void OnMouseUp(Graphics graphics, MouseEventArgs e, Keys modifierKeys)

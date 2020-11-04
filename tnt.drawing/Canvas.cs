@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
 using System.Windows.Forms;
 using TNT.Drawing.DrawingMode;
 using TNT.Drawing.Layer;
@@ -20,10 +19,10 @@ namespace TNT.Drawing
 		private const int MINIMUM_PADDING = 1000;
 		private const int PADDING = 20;
 
-		private Rectangle _CanvasRect = Rectangle.Empty;
+		private DrawingMode.DrawingMode _DrawingMode;
+		private Rectangle _LayerRect = Rectangle.Empty;
 		private bool FitOnPaint = false;
 		private bool AdjustPostion = false;
-		private SolidBrush BackgrounBrush = new SolidBrush(Color.White);
 		private KeyEventArgs keyEventArgs = null;
 		private Point PreviousCursorPosition = Point.Empty;
 		private Point PreviousGridPosition;
@@ -45,21 +44,11 @@ namespace TNT.Drawing
 			}
 		}
 
-		private DrawingMode.DrawingMode _DrawingMode;
 		public DrawingMode.DrawingMode DrawingMode
 		{
 			get { return _DrawingMode ?? new SelectMode(); }
-			set
-			{
-				_DrawingMode = value;
-				_DrawingMode.Canvas = this;
-			}
+			set { _DrawingMode = value; _DrawingMode.Canvas = this; }
 		}
-
-		/// <summary>
-		/// The backgrond of the <see cref="Canvas"/>
-		/// </summary>
-		public GridLayer GridLayer { get => Layers.Find(l => l is GridLayer) as GridLayer; }
 
 		public List<CanvasLayer> Layers { get { return _Layers; } set { _Layers = value; Refresh(); } }
 
@@ -67,69 +56,49 @@ namespace TNT.Drawing
 		/// The <see cref="ScalePercentage"/> represented as a <see cref="float"/>
 		/// </summary>
 		[Browsable(false)]
-		public float Zoom { get { return ScalePercentage / 100F; } }
+		public float Zoom => ScalePercentage / 100F;
 
 		/// <summary>
 		/// Amount the <see cref="Canvas"/> should be scaled
 		/// </summary>
 		[Category("Appearance")]
-		public int ScalePercentage { get { return Properties.Get<int>(); } set { Properties.Set(value); Refresh(); } }
+		public int ScalePercentage { get => Properties.Get<int>(); set { Properties.Set(value); Refresh(); } }
 
 		/// <summary>
-		/// Grid visibility
+		/// <see cref="CanvasLayer"/> height
 		/// </summary>
-		public bool ShowGrid { get { return GridLayer?.IsVisible ?? true; } set { GridLayer?.Let(it=> it.IsVisible = value); Refresh(); } }
-
-		/// <summary>
-		/// Canvas background color
-		/// </summary>
-		public Color BackgroundColor { get { return BackgrounBrush.Color; } set { BackgrounBrush.Color = value; Refresh(); } }
-
-		/// <summary>
-		/// <see cref="GridLayer"/> height
-		/// </summary>
-		public int CanvasHeight
+		public int LayerHeight
 		{
-			get => _CanvasRect.Height;
+			get => _LayerRect.Height;
 			set
 			{
-				_CanvasRect.Height = value;
+				_LayerRect.Height = value;
 				Layers.ForEach(l => l.Height = value);
 			}
 		}
 
 		/// <summary>
-		/// <see cref="GridLayer"/> width
+		/// <see cref="CanvasLayer"/> width
 		/// </summary>
-		public int CanvasWidth
+		public int LayerWidth
 		{
-			get => _CanvasRect.Width;
+			get => _LayerRect.Width;
 			set
 			{
-				_CanvasRect.Width = value;
+				_LayerRect.Width = value;
 				Layers.ForEach(l => l.Width = value);
 			}
 		}
 
 		/// <summary>
-		/// <see cref="GridLayer"/> line color
-		/// </summary>
-		public Color GridLineColor { get { return GridLayer?.LineColor ?? Color.Black; } set { GridLayer?.Let(it => it.LineColor = value); } }
-
-		/// <summary>
-		/// Pixels between lines on the <see cref="GridLayer"/>
-		/// </summary>
-		public int PixelPerGridLines { get { return GridLayer?.PixelsPerSegment ?? 10; } set { GridLayer?.Let(it => it.PixelsPerSegment = value); } }
-
-		/// <summary>
 		/// Scaled grid width
 		/// </summary>
-		protected float ScaledWidth { get { return (GridLayer?.Width ?? 100) * Zoom; } }
+		protected int ScaledWidth => (int)(LayerWidth * Zoom);
 
 		/// <summary>
 		/// Scaled grid height
 		/// </summary>
-		protected float ScaledHeight { get { return (GridLayer?.Height ?? 100) * Zoom; } }
+		protected int ScaledHeight => (int)(LayerHeight * Zoom);
 
 		/// <summary>
 		/// Initializes a <see cref="Canvas"/>
@@ -142,14 +111,10 @@ namespace TNT.Drawing
 			Width = parent.Width;
 			Height = parent.Height;
 
-			//DrawingMode.OnAddObject = (obj) => Layers.Last().CanvasObjects.Add(obj);
-			//DrawingMode.OnRequestRefresh = () => Refresh();
-
 			DoubleBuffered = true;
 			parent.SizeChanged += OnParentResize;
 			ScrollableParent = (Parent as ScrollableControl);
 			ScrollableParent.AutoScroll = true;
-			//GridLayer.OnRefreshRequest = () => { Refresh(); };
 		}
 
 		/// <summary>
@@ -159,21 +124,19 @@ namespace TNT.Drawing
 		{
 			var parentWidth = Parent.Width;
 			var parentHeight = Parent.Height;
-			var gridWidth = GridLayer?.Width ?? 100;
-			var gridHeight = GridLayer?.Height ?? 100;
-			var gridRatio = gridWidth / (gridHeight * 1F);
+			var gridRatio = LayerWidth / (LayerHeight * 1F);
 			var parentRatio = parentWidth / (parentHeight * 1F);
 			float newScale;
 
 			if (gridRatio > parentRatio)
 			{
 				// Width is greater
-				newScale = 100 * (parentWidth * 1F) / (gridWidth + PADDING * 2);
+				newScale = 100 * (parentWidth * 1F) / (LayerWidth + PADDING * 2);
 			}
 			else
 			{
 				// Height is greater
-				newScale = 100 * (parentHeight * 1F) / (gridHeight + PADDING * 2);
+				newScale = 100 * (parentHeight * 1F) / (LayerHeight + PADDING * 2);
 			}
 
 			ScalePercentage = Convert.ToInt32(newScale);
@@ -187,13 +150,8 @@ namespace TNT.Drawing
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			UpdateClientDimensions();
-			var graphics = GetTransformedGraphics(e.Graphics);
-
-			graphics.FillRectangle(BackgrounBrush, _CanvasRect);
-
-			//BackgroundLayer.Draw(graphics);
-			//GridLayer.Draw(graphics);
-			Layers.ForEach(l => l.Draw(graphics));
+			var graphics = CreateTransformedGraphics(e.Graphics);
+			DrawLayers(graphics);
 
 			if (AdjustPostion)
 			{
@@ -210,6 +168,16 @@ namespace TNT.Drawing
 			}
 
 			base.OnPaint(e);
+		}
+
+		protected Graphics DrawLayers(Graphics graphics = null)
+		{
+			var image = new Bitmap(LayerWidth, LayerHeight);
+			var imageGraphics = Graphics.FromImage(image);
+
+			Layers.ForEach(l => l.Draw(imageGraphics));
+			graphics.DrawImage(image, _LayerRect);
+			return graphics;
 		}
 
 		private void RepositionToAlignWithMouse(Point previousPosition, Point currentPosition)
@@ -252,8 +220,8 @@ namespace TNT.Drawing
 		private void UpdateClientDimensions()
 		{
 			// Adjust the width and height of the canvas to fit the drawing canvas
-			var newWidth = (int)ScaledWidth > Parent.ClientRectangle.Width ? (int)ScaledWidth : Parent.ClientRectangle.Width;
-			var newHeight = (int)ScaledHeight > Parent.ClientRectangle.Height ? (int)ScaledHeight : Parent.ClientRectangle.Height;
+			var newWidth = ScaledWidth > Parent.ClientRectangle.Width ? ScaledWidth : Parent.ClientRectangle.Width;
+			var newHeight = ScaledHeight > Parent.ClientRectangle.Height ? ScaledHeight : Parent.ClientRectangle.Height;
 
 			Width = newWidth + MINIMUM_PADDING;
 			Height = newHeight + MINIMUM_PADDING;
@@ -264,12 +232,13 @@ namespace TNT.Drawing
 		/// </summary>
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
-			var gridPoint = e.Location.ToGridCoordinates(GetTransformedGraphics());
+			var graphics = CreateTransformedGraphics();
+			var gridPoint = e.Location.ToGridCoordinates(graphics);
 			var mea = new MouseEventArgs(e.Button, e.Clicks, gridPoint.X, gridPoint.Y, e.Delta);
-			DrawingMode.OnMouseMove(null, mea, Keys.None);
+			DrawingMode.OnMouseMove(graphics, mea, Keys.None);
 
 			var currentCursorPosition = Cursor.Position;
-			var graphics = GetTransformedGraphics();
+			//var graphics = GetTransformedGraphics();
 			var mousePosition = new Point(e.X, e.Y);
 			PreviousGridPosition = mousePosition.ToGridCoordinates(graphics);
 
@@ -311,7 +280,7 @@ namespace TNT.Drawing
 
 		protected override void OnMouseClick(MouseEventArgs e)
 		{
-			var gridPoint = e.Location.ToGridCoordinates(GetTransformedGraphics());
+			var gridPoint = e.Location.ToGridCoordinates(CreateTransformedGraphics());
 			var mea = new MouseEventArgs(e.Button, e.Clicks, gridPoint.X, gridPoint.Y, e.Delta);
 			DrawingMode.OnMouseClick(null, mea, Keys.None);
 		}
@@ -351,7 +320,7 @@ namespace TNT.Drawing
 			{
 				// Adjust position when Paint() is called
 				AdjustPostion = true;
-				var graphics = GetTransformedGraphics();
+				var graphics = CreateTransformedGraphics();
 				var positionOnCanvas = new Point(e.X, e.Y);
 				PreviousGridPosition = positionOnCanvas.ToGridCoordinates(graphics);
 				ScalePercentage += detents;
@@ -369,11 +338,11 @@ namespace TNT.Drawing
 		/// <summary>
 		/// Returns a <see cref="Graphics"/> that has been transformed
 		/// </summary>
-		private Graphics GetTransformedGraphics(Graphics graphics = null)
+		private Graphics CreateTransformedGraphics(Graphics graphics = null)
 		{
-			if (graphics == null) graphics = CreateGraphics();
+			graphics = graphics ?? CreateGraphics();
 
-			// X translation of the drawing  canvas
+			// X translation of the drawing canvas
 			var xTranslation = Math.Max((Width - ScaledWidth) / 2, 0);
 			// Y translation of the drawing canvas
 			var yTranslation = Math.Max((Height - ScaledHeight) / 2, 0);
