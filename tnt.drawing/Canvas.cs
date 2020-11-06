@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -167,6 +168,8 @@ namespace TNT.Drawing
 				Fit();
 			}
 
+			DrawingMode.OnPaint(e);
+
 			base.OnPaint(e);
 		}
 
@@ -233,12 +236,11 @@ namespace TNT.Drawing
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			var graphics = CreateTransformedGraphics();
-			var gridPoint = e.Location.ToGridCoordinates(graphics);
-			var mea = new MouseEventArgs(e.Button, e.Clicks, gridPoint.X, gridPoint.Y, e.Delta);
+			var layerPoint = e.Location.ToGridCoordinates(graphics).Snap(10);
+			var mea = new MouseEventArgs(e.Button, e.Clicks, layerPoint.X, layerPoint.Y, e.Delta);
 			DrawingMode.OnMouseMove(graphics, mea, Keys.None);
 
 			var currentCursorPosition = Cursor.Position;
-			//var graphics = GetTransformedGraphics();
 			var mousePosition = new Point(e.X, e.Y);
 			PreviousGridPosition = mousePosition.ToGridCoordinates(graphics);
 
@@ -246,6 +248,8 @@ namespace TNT.Drawing
 			{
 				RepositionToAlignWithMouse(PreviousCursorPosition, currentCursorPosition);
 			}
+
+			Debug.WriteLine($"layerPoint: {layerPoint}  mousePostion: {mousePosition}  previous: {PreviousGridPosition}  current: {currentCursorPosition}");
 
 			PreviousCursorPosition = currentCursorPosition;
 
@@ -280,9 +284,10 @@ namespace TNT.Drawing
 
 		protected override void OnMouseClick(MouseEventArgs e)
 		{
-			var gridPoint = e.Location.ToGridCoordinates(CreateTransformedGraphics());
+			var graphics = CreateTransformedGraphics();
+			var gridPoint = e.Location.ToGridCoordinates(graphics);
 			var mea = new MouseEventArgs(e.Button, e.Clicks, gridPoint.X, gridPoint.Y, e.Delta);
-			DrawingMode.OnMouseClick(null, mea, Keys.None);
+			DrawingMode.OnMouseClick(graphics, mea, Keys.None);
 		}
 
 		protected override void OnMouseDoubleClick(MouseEventArgs e)

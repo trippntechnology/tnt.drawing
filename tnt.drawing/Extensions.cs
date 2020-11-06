@@ -54,5 +54,14 @@ namespace TNT.Drawing
 		/// Subtracts the <see cref="Point"/> p2 from <see cref="Point"/> p1
 		/// </summary>
 		public static Point Subtract(this Point p1, Point p2) => new Point(p1.X - p2.X, p1.Y - p2.Y);
+
+		public static Point Snap(this Point point, int snap)
+		{
+			var newX = point.X / snap * snap;
+			var newY = point.Y / snap * snap;
+			point.X = newX;
+			point.Y = newY;
+			return point;
+		}
 	}
 }

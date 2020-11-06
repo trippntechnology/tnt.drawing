@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
+using TNT.Drawing.Layer;
 using TNT.Drawing.Objects;
 
 namespace TNT.Drawing.DrawingMode
 {
 	public class LineMode : DrawingMode
 	{
-		Line ActiveLine = null;
-		Vertex ActiveVertex = null;
+		private Line ActiveLine = null;
+		private Vertex ActiveVertex = null;
+		private Point Marker = Point.Empty;
+		private CanvasLayer Layer => Canvas?.Layers?.Find(l => string.Compare(l.Name, "Object", true) == 0);
 
 		public override CanvasObject DefaultObject { get; } = new Line();
 
@@ -36,14 +40,13 @@ namespace TNT.Drawing.DrawingMode
 				ActiveLine.AddVertex(new Vertex(e.X, e.Y));
 				ActiveVertex = new Vertex(e.X, e.Y);
 				ActiveLine.AddVertex(ActiveVertex);
-				RequestLayer().CanvasObjects.Add(ActiveLine);
-				RefreshCanvas();
+				Refresh();
 			}
 			else if (ActiveVertex != null)
 			{
 				ActiveVertex = new Vertex(e.X, e.Y);
 				ActiveLine.AddVertex(ActiveVertex);
-				RefreshCanvas();
+				Refresh();
 			}
 		}
 
@@ -51,13 +54,18 @@ namespace TNT.Drawing.DrawingMode
 		{
 			base.OnMouseDoubleClick(graphics, e);
 
-			// Remove last three
-			var points = ActiveLine.Points;
-			points.RemoveRange(points.Count - 3, 3);
+			if (ActiveLine != null)
+			{
+				// Remove last three
+				var points = ActiveLine.Points;
+				points.RemoveRange(points.Count - 3, 3);
 
-			ActiveVertex = null;
-			ActiveLine = null;
-			RefreshCanvas();
+				Layer?.CanvasObjects?.Add(ActiveLine);
+
+				ActiveVertex = null;
+				ActiveLine = null;
+				Refresh(Layer);
+			}
 		}
 
 		public override void OnMouseDown(Graphics graphics, MouseEventArgs e, Keys modifierKeys)
@@ -67,19 +75,25 @@ namespace TNT.Drawing.DrawingMode
 
 		public override void OnMouseMove(Graphics graphics, MouseEventArgs e, Keys modifierKeys)
 		{
-			Debug.WriteLine($"LineMode.OnMouseMove({e.Location})");
 			base.OnMouseMove(graphics, e, modifierKeys);
 
-
-			//if (ActiveVertex != null)
-			//{
-			//	ActiveVertex.X = e.X;
-			//	ActiveVertex.Y = e.Y;
-			//	RefreshCanvas();
-			//}
-
-			Canvas.Refresh();
-			graphics.DrawRectangle(new Pen(Color.Blue), e.Location.X, e.Location.Y, 4, 4);
+			if (ActiveVertex != null)
+			{
+				ActiveVertex.X = e.X;
+				ActiveVertex.Y = e.Y;
+				Marker = Point.Empty;
+			}
+			else
+			{
+				Marker = e.Location;
+			}
+			Invalidate();
+		}
+		public override void OnPaint(PaintEventArgs e)
+		{
+			base.OnPaint(e);
+			if (Marker != Point.Empty) e.Graphics.DrawRectangle(new Pen(Color.Blue), Marker.X, Marker.Y, 4, 4);
+			ActiveLine?.Draw(e.Graphics);
 		}
 
 		public override void OnMouseUp(Graphics graphics, MouseEventArgs e, Keys modifierKeys)

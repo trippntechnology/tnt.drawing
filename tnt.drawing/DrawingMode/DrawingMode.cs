@@ -27,8 +27,19 @@ namespace TNT.Drawing.DrawingMode
 		public virtual void OnMouseClick(Graphics graphics, MouseEventArgs e, Keys modifierKeys) => Log();
 		public virtual void OnKeyDown(Graphics graphics, KeyEventArgs e) => Log();
 		public virtual void OnKeyUp(Graphics graphics, KeyEventArgs e) => Log();
+		public virtual void OnPaint(PaintEventArgs e) => Log();
 
-		protected virtual void RefreshCanvas() => Canvas?.Refresh();
+		protected virtual void Refresh(CanvasLayer layer = null)
+		{
+			layer?.Invalidate();
+			Canvas?.Refresh();
+		}
+		protected virtual void Invalidate(CanvasLayer layer = null)
+		{
+			layer?.Invalidate();
+			Canvas?.Invalidate();
+		}
+
 		protected virtual CanvasLayer RequestLayer() => Canvas?.Layers.LastOrDefault();
 		protected virtual void ObjectsSelected(List<object> objs) => Canvas?.OnSelected(objs);
 

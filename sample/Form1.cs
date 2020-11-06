@@ -27,24 +27,24 @@ namespace TNT.Drawing.Sample
 			line.AddVertex(new Vertex(300, 100));
 			line.AddVertex(new Vertex(100, 300));
 
-			var layer1 = new CanvasLayer().Also(it =>
+			var layer1 = new CanvasLayer()
 			{
-				it.CanvasObjects = new List<CanvasObject>() {
-					new Square(150,150,200,Color.Green)
-				};
-				it.BackgroundColor = Color.White;
-			});
+				Name = "Background",
+				CanvasObjects = new List<CanvasObject>() { new Square(150, 150, 200, Color.Green) },
+				BackgroundColor = Color.White,
+			};
 
-			var layer2 = new GridLayer(Color.Aqua, 10);
+			var layer2 = new GridLayer(Color.Aqua, 10) { Name = "Grid" };
 
-			var layer3 = new CanvasLayer().Also(it =>
+			var layer3 = new CanvasLayer()
 			{
-				it.CanvasObjects = new List<CanvasObject>()
+				Name = "Object",
+				CanvasObjects = new List<CanvasObject>()
 				{
 					new Square(100,100,100,Color.Blue),
 					new Square(500,500,200,Color.Red),
-				};
-			});
+				}
+			};
 
 			_CanvasPanel.Layers = new List<CanvasLayer>() { layer1, layer2, layer3 };
 

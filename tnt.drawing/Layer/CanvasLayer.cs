@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Windows.Forms;
 using TNT.Drawing.Objects;
 
 namespace TNT.Drawing.Layer
@@ -55,11 +56,19 @@ namespace TNT.Drawing.Layer
 		/// </summary>
 		public Rectangle Rect => new Rectangle(0, 0, Width, Height);
 
+		/// <summary>
+		/// Name of Layer
+		/// </summary>
+		public string Name { get; set; }
+
 
 		/// <summary>
 		/// Default constructor
 		/// </summary>
 		public CanvasLayer() { BackingFields.OnFieldChanged = (_, __) => IsInvalid = true; }
+
+
+		public override string ToString() => Name;
 
 		/// <summary>
 		/// Draws the layer
@@ -76,6 +85,8 @@ namespace TNT.Drawing.Layer
 
 			graphics.DrawImage(Image, Rect);
 		}
+
+		public void Invalidate() => IsInvalid = true;
 
 		/// <summary>
 		/// 
