@@ -12,10 +12,19 @@ namespace TNT.Drawing.DrawingMode
 	{
 		private Line ActiveLine = null;
 		private Vertex ActiveVertex = null;
-		private Point Marker = Point.Empty;
-		private CanvasLayer Layer => Canvas?.Layers?.Find(l => string.Compare(l.Name, "Object", true) == 0);
+		private CanvasPoint Marker = null;
 
 		public override CanvasObject DefaultObject { get; } = new Line();
+
+		public override CanvasLayer Layer => Canvas?.Layers?.Find(l => string.Equals(l.Name, "Object"));
+
+		public override void Reset()
+		{
+			ActiveLine = null;
+			ActiveVertex = null;
+			Marker = null;
+			base.Reset();
+		}
 
 		public override void OnKeyDown(Graphics graphics, KeyEventArgs e)
 		{
@@ -81,18 +90,19 @@ namespace TNT.Drawing.DrawingMode
 			{
 				ActiveVertex.X = e.X;
 				ActiveVertex.Y = e.Y;
-				Marker = Point.Empty;
+				Marker = null;
 			}
 			else
 			{
-				Marker = e.Location;
+				if (Marker == null) Marker = new CanvasPoint();
+				Marker.MoveTo(e.Location);
 			}
 			Invalidate();
 		}
 		public override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
-			if (Marker != Point.Empty) e.Graphics.DrawRectangle(new Pen(Color.Blue), Marker.X, Marker.Y, 4, 4);
+			if (Marker != null) Marker.Draw(e.Graphics);
 			ActiveLine?.Draw(e.Graphics);
 		}
 

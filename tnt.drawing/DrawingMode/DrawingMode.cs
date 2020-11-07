@@ -17,8 +17,11 @@ namespace TNT.Drawing.DrawingMode
 		//public Action OnRequestRefresh = () => { };
 		//public Func<CanvasLayer> OnLayerRequest = () => { return null; };
 		//public Action<List<object>> OnObjectsSelected = (_) => { };
+		public  abstract CanvasLayer Layer { get; }
 
 		public abstract CanvasObject DefaultObject { get; }
+
+		public virtual void Reset() => Canvas?.Refresh(Layer);
 
 		public virtual void OnMouseMove(Graphics graphics, MouseEventArgs e, Keys modifierKeys) => Log();
 		public virtual void OnMouseUp(Graphics graphics, MouseEventArgs e, Keys modifierKeys) => Log();
@@ -29,16 +32,8 @@ namespace TNT.Drawing.DrawingMode
 		public virtual void OnKeyUp(Graphics graphics, KeyEventArgs e) => Log();
 		public virtual void OnPaint(PaintEventArgs e) => Log();
 
-		protected virtual void Refresh(CanvasLayer layer = null)
-		{
-			layer?.Invalidate();
-			Canvas?.Refresh();
-		}
-		protected virtual void Invalidate(CanvasLayer layer = null)
-		{
-			layer?.Invalidate();
-			Canvas?.Invalidate();
-		}
+		protected virtual void Refresh(CanvasLayer layer = null) => Canvas?.Refresh(layer);
+		protected virtual void Invalidate(CanvasLayer layer = null) => Canvas?.Invalidate(layer);
 
 		protected virtual CanvasLayer RequestLayer() => Canvas?.Layers.LastOrDefault();
 		protected virtual void ObjectsSelected(List<object> objs) => Canvas?.OnSelected(objs);

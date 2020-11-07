@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using TNT.Drawing.Layer;
 using TNT.Drawing.Objects;
 
 namespace TNT.Drawing.DrawingMode
@@ -9,6 +10,10 @@ namespace TNT.Drawing.DrawingMode
 	public class SelectMode : DrawingMode
 	{
 		public override CanvasObject DefaultObject => null;
+
+		public override CanvasLayer Layer => Canvas?.Layers?.Find(l => string.Equals(l.Name, "Object"));
+
+		public override void Reset() => base.Reset();
 
 		public override void OnKeyDown(Graphics graphics, KeyEventArgs e)
 		{

@@ -257,6 +257,18 @@ namespace TNT.Drawing
 			base.OnMouseMove(e);
 		}
 
+		public void Refresh(CanvasLayer layer)
+		{
+			layer?.Invalidate();
+			Refresh();
+		}
+
+		public void Invalidate(CanvasLayer layer)
+		{
+			layer?.Invalidate();
+			Invalidate();
+		}
+
 		/// <summary>
 		/// Sets <see cref="KeyEventArgs"/>
 		/// </summary>
@@ -285,7 +297,7 @@ namespace TNT.Drawing
 		protected override void OnMouseClick(MouseEventArgs e)
 		{
 			var graphics = CreateTransformedGraphics();
-			var gridPoint = e.Location.ToGridCoordinates(graphics);
+			var gridPoint = e.Location.ToGridCoordinates(graphics).Snap(10); ;
 			var mea = new MouseEventArgs(e.Button, e.Clicks, gridPoint.X, gridPoint.Y, e.Delta);
 			DrawingMode.OnMouseClick(graphics, mea, Keys.None);
 		}

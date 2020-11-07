@@ -57,10 +57,12 @@ namespace TNT.Drawing
 
 		public static Point Snap(this Point point, int snap)
 		{
+			var modX = point.X % snap;
+			var modY = point.Y % snap;
 			var newX = point.X / snap * snap;
 			var newY = point.Y / snap * snap;
-			point.X = newX;
-			point.Y = newY;
+			point.X = modX >= snap / 2 ? newX + snap : newX;
+			point.Y = modY >= snap / 2 ? newY + snap : newY;
 			return point;
 		}
 	}

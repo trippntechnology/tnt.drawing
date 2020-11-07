@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using TNT.Drawing.DrawingMode;
 using TNT.Drawing.Layer;
@@ -110,12 +111,10 @@ namespace TNT.Drawing.Sample
 			var menuItem = sender as ToolStripMenuItem;
 			var mode = menuItem.Tag as DrawingMode.DrawingMode;
 			propertyGrid1.SelectedObject = mode.DefaultObject;
+			_CanvasPanel.DrawingMode?.Reset();
 			_CanvasPanel.DrawingMode = mode;
 		}
 
-		private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
-		{
-			_CanvasPanel.Refresh();
-		}
+		private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e) => _CanvasPanel.Refresh(_CanvasPanel?.DrawingMode?.Layer);
 	}
 }

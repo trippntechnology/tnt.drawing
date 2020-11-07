@@ -69,5 +69,11 @@ namespace TNT.Drawing.Objects
 		{
 			throw new NotImplementedException();
 		}
+
+		public void MoveTo(Point point)
+		{
+			X = point.X;
+			Y = point.Y;
+		}
 	}
 }
