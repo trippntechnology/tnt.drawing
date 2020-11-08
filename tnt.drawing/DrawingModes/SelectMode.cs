@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using TNT.Drawing.Layer;
+using TNT.Drawing.Layers;
 using TNT.Drawing.Objects;
 
-namespace TNT.Drawing.DrawingMode
+namespace TNT.Drawing.DrawingModes
 {
 	public class SelectMode : DrawingMode
 	{

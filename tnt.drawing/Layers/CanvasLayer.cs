@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using TNT.Drawing.Objects;
 
-namespace TNT.Drawing.Layer
+namespace TNT.Drawing.Layers
 {
 	public class CanvasLayer
 	{

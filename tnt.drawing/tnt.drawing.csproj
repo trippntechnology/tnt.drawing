@@ -48,15 +48,15 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="CanvasProperties.cs" />
-    <Compile Include="DrawingMode\DrawingMode.cs" />
-    <Compile Include="DrawingMode\LineMode.cs" />
-    <Compile Include="DrawingMode\SelectMode.cs" />
+    <Compile Include="DrawingModes\DrawingMode.cs" />
+    <Compile Include="DrawingModes\LineMode.cs" />
+    <Compile Include="DrawingModes\SelectMode.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="Layer\GridLayer.cs" />
+    <Compile Include="Layers\GridLayer.cs" />
     <Compile Include="Canvas.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Layer\CanvasLayer.cs" />
+    <Compile Include="Layers\CanvasLayer.cs" />
     <Compile Include="LiveProperties.cs" />
     <Compile Include="Objects\CanvasObject.cs" />
     <Compile Include="Objects\CanvasPoint.cs" />

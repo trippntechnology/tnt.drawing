@@ -5,10 +5,10 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
-using TNT.Drawing.Layer;
+using TNT.Drawing.Layers;
 using TNT.Drawing.Objects;
 
-namespace TNT.Drawing.DrawingMode
+namespace TNT.Drawing.DrawingModes
 {
 	public abstract class DrawingMode
 	{
@@ -17,7 +17,7 @@ namespace TNT.Drawing.DrawingMode
 		//public Action OnRequestRefresh = () => { };
 		//public Func<CanvasLayer> OnLayerRequest = () => { return null; };
 		//public Action<List<object>> OnObjectsSelected = (_) => { };
-		public  abstract CanvasLayer Layer { get; }
+		public abstract CanvasLayer Layer { get; }
 
 		public abstract CanvasObject DefaultObject { get; }
 

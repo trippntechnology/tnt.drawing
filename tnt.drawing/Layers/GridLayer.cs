@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 
-namespace TNT.Drawing.Layer
+namespace TNT.Drawing.Layers
 {
 	/// <summary>
 	/// Represents the grid area of the drawing surface

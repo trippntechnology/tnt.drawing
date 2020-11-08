@@ -5,8 +5,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using TNT.Drawing.DrawingMode;
-using TNT.Drawing.Layer;
+using TNT.Drawing.DrawingModes;
+using TNT.Drawing.Layers;
 
 namespace TNT.Drawing
 {
@@ -20,7 +20,7 @@ namespace TNT.Drawing
 		private const int MINIMUM_PADDING = 1000;
 		private const int PADDING = 20;
 
-		private DrawingMode.DrawingMode _DrawingMode;
+		private DrawingMode _DrawingMode;
 		private Rectangle _LayerRect = Rectangle.Empty;
 		private bool FitOnPaint = false;
 		private bool AdjustPostion = false;
@@ -45,7 +45,7 @@ namespace TNT.Drawing
 			}
 		}
 
-		public DrawingMode.DrawingMode DrawingMode
+		public DrawingMode DrawingMode
 		{
 			get { return _DrawingMode ?? new SelectMode(); }
 			set { _DrawingMode = value; _DrawingMode.Canvas = this; }
@@ -57,7 +57,7 @@ namespace TNT.Drawing
 		/// The <see cref="ScalePercentage"/> represented as a <see cref="float"/>
 		/// </summary>
 		[Browsable(false)]
-		public float Zoom => ScalePercentage / 100F;
+		private float Zoom => ScalePercentage / 100F;
 
 		/// <summary>
 		/// Amount the <see cref="Canvas"/> should be scaled

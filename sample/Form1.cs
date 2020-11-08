@@ -1,12 +1,10 @@
 ﻿using Microsoft.Win32;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
-using TNT.Drawing.DrawingMode;
-using TNT.Drawing.Layer;
+using TNT.Drawing.DrawingModes;
+using TNT.Drawing.Layers;
 using TNT.Drawing.Objects;
 using TNT.Utilities;
 
@@ -60,10 +58,10 @@ namespace TNT.Drawing.Sample
 
 			propertyGrid1.SelectedObject = _CanvasPanel.Properties;
 
-			selectToolStripMenuItem.Tag = new SelectMode();
+			selectToolStripMenuItem.Tag = new DrawingModes.SelectMode();
 			lineToolStripMenuItem.Tag = new LineMode();
 
-			_CanvasPanel.DrawingMode = selectToolStripMenuItem.Tag as DrawingMode.DrawingMode;
+			_CanvasPanel.DrawingMode = selectToolStripMenuItem.Tag as DrawingMode;
 			_CanvasPanel.OnSelected = (objs) =>
 			{
 				try
@@ -109,7 +107,7 @@ namespace TNT.Drawing.Sample
 		private void lineToolStripMenuItem_Click(object sender, System.EventArgs e)
 		{
 			var menuItem = sender as ToolStripMenuItem;
-			var mode = menuItem.Tag as DrawingMode.DrawingMode;
+			var mode = menuItem.Tag as DrawingMode;
 			propertyGrid1.SelectedObject = mode.DefaultObject;
 			_CanvasPanel.DrawingMode?.Reset();
 			_CanvasPanel.DrawingMode = mode;
