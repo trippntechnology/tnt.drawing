@@ -64,7 +64,7 @@ namespace TNT.Drawing.Objects
 			path.AddBeziers(points);
 			graphics.DrawPath(Pen, path);
 
-			Points.ForEach(v => v.Draw(graphics));
+			if (IsSelected) Points.ForEach(v => v.Draw(graphics));
 		}
 	}
 }

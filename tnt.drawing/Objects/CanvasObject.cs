@@ -17,6 +17,9 @@ namespace TNT.Drawing.Objects
 		[ReadOnly(true)]
 		public string Id { get; set; }
 
+		public bool IsSelected { get; set; } = true;
+
+
 		/// <summary>
 		/// Default constructor
 		/// </summary>

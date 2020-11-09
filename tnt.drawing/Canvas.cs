@@ -260,13 +260,13 @@ namespace TNT.Drawing
 		public void Refresh(CanvasLayer layer)
 		{
 			layer?.Invalidate();
-			Refresh();
+			base.Refresh();
 		}
 
 		public void Invalidate(CanvasLayer layer)
 		{
 			layer?.Invalidate();
-			Invalidate();
+			base.Invalidate();
 		}
 
 		/// <summary>
