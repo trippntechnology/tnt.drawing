@@ -44,5 +44,11 @@ namespace TNT.Drawing.Objects
 			path.AddRectangle(new Rectangle(X, Y, Width, Width));
 			return path.IsVisible(mousePosition) ? this : null;
 		}
+
+		public override void MoveBy(int dx, int dy)
+		{
+			X += dx;
+			Y += dy;
+		}
 	}
 }

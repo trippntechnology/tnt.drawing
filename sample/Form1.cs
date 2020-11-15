@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Reflection;
 using System.Windows.Forms;
 using TNT.Drawing.DrawingModes;
 using TNT.Drawing.Layers;
@@ -84,8 +85,12 @@ namespace TNT.Drawing.Sample
 			{
 				if (sfd.ShowDialog() == DialogResult.OK)
 				{
-					var ser = Utilities.Utilities.Serialize(_CanvasPanel.Properties, new System.Type[] { });
-					var foo = 0;
+					var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+					var assPath = Path.Combine(path, "tnt.drawing.dll");
+					var types = Utilities.Utilities.GetTypes(assPath, t => !t.IsAbstract && (t.InheritsFrom(typeof(CanvasObject)) || t.InheritsFrom(typeof(CanvasLayer))));
+
+					var layer = _CanvasPanel.Layers.Find(l => l.Name == "Object");
+					var ser = Utilities.Utilities.Serialize(layer, types);
 					File.WriteAllText(sfd.FileName, ser);
 				}
 			}
@@ -97,8 +102,16 @@ namespace TNT.Drawing.Sample
 			{
 				if (ofd.ShowDialog() == DialogResult.OK)
 				{
+					var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+					var assPath = Path.Combine(path, "tnt.drawing.dll");
+					var types = Utilities.Utilities.GetTypes(assPath, t => !t.IsAbstract && (t.InheritsFrom(typeof(CanvasObject)) || t.InheritsFrom(typeof(CanvasLayer))));
+
+					var layer = _CanvasPanel.Layers.Find(l => l.Name == "Object");
+					_CanvasPanel.Layers.Remove(layer);
 					var ser = File.ReadAllText(ofd.FileName);
-					_CanvasPanel.Properties = Utilities.Utilities.Deserialize<CanvasProperties>(ser, new System.Type[] { });
+					layer = Utilities.Utilities.Deserialize<CanvasLayer>(ser, types);
+					_CanvasPanel.Layers.Add(layer);
+					//_CanvasPanel.Properties = Utilities.Utilities.Deserialize<CanvasProperties>(ser, new System.Type[] { });
 					propertyGrid1.SelectedObject = _CanvasPanel.Properties;
 				}
 			}

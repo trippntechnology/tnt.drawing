@@ -1,6 +1,4 @@
-﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
+﻿using System.Drawing;
 
 namespace TNT.Drawing.Objects
 {
@@ -16,9 +14,18 @@ namespace TNT.Drawing.Objects
 
 		public override CanvasObject Copy() => new Vertex(this);
 
-		public override CanvasObject MouseOver(Point mousePosition, Keys modifierKeys)
+		public override void MoveBy(int dx, int dy)
 		{
-			throw new NotImplementedException();
+			LinkedPoints.ForEach(p => p.MoveBy(dx, dy));
+			base.MoveBy(dx, dy);
+		}
+
+		public void MoveTo(Point point)
+		{
+			var dx = point.X - X;
+			var dy = point.Y - Y;
+			LinkedPoints.ForEach(p => p.MoveBy(dx, dy));
+			base.MoveTo(point);
 		}
 	}
 }

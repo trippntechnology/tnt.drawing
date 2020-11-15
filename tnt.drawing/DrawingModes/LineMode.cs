@@ -26,20 +26,20 @@ namespace TNT.Drawing.DrawingModes
 			base.Reset();
 		}
 
-		public override void OnKeyDown(Graphics graphics, KeyEventArgs e)
+		public override void OnKeyDown(KeyEventArgs e)
 		{
-			base.OnKeyDown(graphics, e);
+			base.OnKeyDown(e);
 		}
 
-		public override void OnKeyUp(Graphics graphics, KeyEventArgs e)
+		public override void OnKeyUp(KeyEventArgs e)
 		{
-			base.OnKeyUp(graphics, e);
+			base.OnKeyUp(e);
 		}
 
-		public override void OnMouseClick(Graphics graphics, MouseEventArgs e, Keys modifierKeys)
+		public override void OnMouseClick(MouseEventArgs e, Keys modifierKeys)
 		{
 			Debug.WriteLine($"LineMode.OnMouseClick({e.Location})");
-			base.OnMouseClick(graphics, e, modifierKeys);
+			base.OnMouseClick(e, modifierKeys);
 
 			if (ActiveLine == null)
 			{
@@ -59,37 +59,33 @@ namespace TNT.Drawing.DrawingModes
 			}
 		}
 
-		public override void OnMouseDoubleClick(Graphics graphics, MouseEventArgs e)
+		public override void OnMouseDoubleClick(MouseEventArgs e)
 		{
-			base.OnMouseDoubleClick(graphics, e);
+			base.OnMouseDoubleClick(e);
 
 			if (ActiveLine != null)
 			{
-				// Remove last three
-				var points = ActiveLine.Points;
-				points.RemoveRange(points.Count - 3, 3);
-
+				// Remove last vertex
+				ActiveLine.RemoveVertex(ActiveVertex);
 				Layer?.CanvasObjects?.Add(ActiveLine);
-
 				ActiveVertex = null;
 				ActiveLine = null;
 				Refresh(Layer);
 			}
 		}
 
-		public override void OnMouseDown(Graphics graphics, MouseEventArgs e, Keys modifierKeys)
+		public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
 		{
-			base.OnMouseDown(graphics, e, modifierKeys);
+			base.OnMouseDown(e, modifierKeys);
 		}
 
-		public override void OnMouseMove(Graphics graphics, MouseEventArgs e, Keys modifierKeys)
+		public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
 		{
-			base.OnMouseMove(graphics, e, modifierKeys);
+			base.OnMouseMove(e, modifierKeys);
 
 			if (ActiveVertex != null)
 			{
-				ActiveVertex.X = e.X;
-				ActiveVertex.Y = e.Y;
+				ActiveVertex.MoveTo(e.Location);
 				Marker = null;
 			}
 			else
@@ -106,9 +102,9 @@ namespace TNT.Drawing.DrawingModes
 			ActiveLine?.Draw(e.Graphics);
 		}
 
-		public override void OnMouseUp(Graphics graphics, MouseEventArgs e, Keys modifierKeys)
+		public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
 		{
-			base.OnMouseUp(graphics, e, modifierKeys);
+			base.OnMouseUp(e, modifierKeys);
 		}
 
 		protected void RunNotNull<A, B>(A arg1, B arg2, Action<A, B> callback)

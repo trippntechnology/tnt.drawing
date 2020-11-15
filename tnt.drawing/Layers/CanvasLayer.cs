@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Windows.Forms;
+using System.Xml.Serialization;
 using TNT.Drawing.Objects;
 
 namespace TNT.Drawing.Layers
 {
+	[Serializable]
 	public class CanvasLayer
 	{
 		protected BackingFields BackingFields = new BackingFields();
@@ -24,6 +25,7 @@ namespace TNT.Drawing.Layers
 		/// <summary>
 		/// Delegate that is called when the <see cref="GridLayer"/> needs to be refreshed. 
 		/// </summary>
+		[XmlIgnore]
 		public Action OnRefreshRequest = () => { };
 
 		/// <summary>

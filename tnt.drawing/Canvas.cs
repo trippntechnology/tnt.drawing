@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -236,9 +235,8 @@ namespace TNT.Drawing
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			var graphics = CreateTransformedGraphics();
-			var layerPoint = e.Location.ToGridCoordinates(graphics).Snap(10);
-			var mea = new MouseEventArgs(e.Button, e.Clicks, layerPoint.X, layerPoint.Y, e.Delta);
-			DrawingMode.OnMouseMove(graphics, mea, Keys.None);
+			var mea = Transform(e, graphics);
+			DrawingMode.OnMouseMove(mea, Keys.None);
 
 			var currentCursorPosition = Cursor.Position;
 			var mousePosition = new Point(e.X, e.Y);
@@ -248,8 +246,6 @@ namespace TNT.Drawing
 			{
 				RepositionToAlignWithMouse(PreviousCursorPosition, currentCursorPosition);
 			}
-
-			Debug.WriteLine($"layerPoint: {layerPoint}  mousePostion: {mousePosition}  previous: {PreviousGridPosition}  current: {currentCursorPosition}");
 
 			PreviousCursorPosition = currentCursorPosition;
 
@@ -281,7 +277,7 @@ namespace TNT.Drawing
 					Cursor = Cursors.Hand;
 					break;
 			}
-			DrawingMode.OnKeyDown(null, null);
+			DrawingMode.OnKeyDown(null);
 		}
 
 		/// <summary>
@@ -291,32 +287,40 @@ namespace TNT.Drawing
 		{
 			keyEventArgs = null;
 			Cursor = Cursors.Default;
-			DrawingMode.OnKeyUp(null, null);
+			DrawingMode.OnKeyUp(null);
 		}
 
 		protected override void OnMouseClick(MouseEventArgs e)
 		{
 			var graphics = CreateTransformedGraphics();
-			var gridPoint = e.Location.ToGridCoordinates(graphics).Snap(10); ;
-			var mea = new MouseEventArgs(e.Button, e.Clicks, gridPoint.X, gridPoint.Y, e.Delta);
-			DrawingMode.OnMouseClick(graphics, mea, Keys.None);
+			var mea = Transform(e, graphics);
+			DrawingMode.OnMouseClick(mea, Keys.None);
 		}
 
 		protected override void OnMouseDoubleClick(MouseEventArgs e)
 		{
 			base.OnMouseDoubleClick(e);
-			DrawingMode.OnMouseDoubleClick(null, e);
+			DrawingMode.OnMouseDoubleClick(e);
 		}
 
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
+			MouseEventArgs mea = Transform(e);
+			DrawingMode.OnMouseDown(mea, Keys.None);
 			base.OnMouseDown(e);
-			DrawingMode.OnMouseDown(null, null, Keys.None);
 		}
+
+		private MouseEventArgs Transform(MouseEventArgs e, Graphics graphics = null)
+		{
+			graphics = graphics ?? CreateTransformedGraphics();
+			var layerPoint = e.Location.ToGridCoordinates(graphics).Snap(10);
+			return new MouseEventArgs(e.Button, e.Clicks, layerPoint.X, layerPoint.Y, e.Delta);
+		}
+
 		protected override void OnMouseUp(MouseEventArgs e)
 		{
 			base.OnMouseUp(e);
-			DrawingMode.OnMouseUp(null, null, Keys.None);
+			DrawingMode.OnMouseUp(null, Keys.None);
 		}
 
 		/// <summary>

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace TNT.Drawing.Objects
 {
@@ -16,8 +18,9 @@ namespace TNT.Drawing.Objects
 		/// </summary>
 		[ReadOnly(true)]
 		public string Id { get; set; }
-
-		public bool IsSelected { get; set; } = true;
+		
+		[XmlIgnore]
+		public bool IsSelected { get; set; } = false;
 
 
 		/// <summary>
@@ -44,6 +47,8 @@ namespace TNT.Drawing.Objects
 		/// Implement by subclass to indicate mouse is over object. Should return the object that is under mouse.
 		/// </summary>
 		public abstract CanvasObject MouseOver(Point mousePosition, Keys modifierKeys);
+
+		public abstract void MoveBy(int dx, int dy);
 
 		/// <summary>
 		/// Gets an image associated with the <paramref name="resource"/> value within the calling assembly
