@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -22,7 +23,7 @@ namespace TNT.Drawing.Objects
 		public DashStyle Style { get; set; } = DashStyle.Solid;
 
 		[XmlIgnore]
-		public List<CanvasPoint> Points { get; set; } = new List<CanvasPoint>();
+		protected List<CanvasPoint> Points { get; set; } = new List<CanvasPoint>();
 
 		/// <summary>
 		/// Needed for deserialization so that set gets called. 
@@ -61,11 +62,13 @@ namespace TNT.Drawing.Objects
 
 		public void AddVertex(Vertex vertex)
 		{
+			vertex.Parent = this;
+
 			if (Points.Count > 0)
 			{
 				var p1 = Points.Last(p => p is Vertex) as Vertex;
-				var c1 = new ControlPoint(p1);
-				var c2 = new ControlPoint(vertex);
+				var c1 = new ControlPoint(p1) { Parent = this };
+				var c2 = new ControlPoint(vertex) { Parent = this };
 
 				p1.AddLinkedPoints(c1);
 				c1.AddLinkedPoints(p1);
@@ -94,30 +97,32 @@ namespace TNT.Drawing.Objects
 
 		public override CanvasObject MouseOver(Point mousePosition, Keys modifierKeys)
 		{
-			var path = new GraphicsPath();
-			var points = Points.Select(v => v.ToPoint).ToArray();
-
-			if (points.Length < 4) return null;
-			path.AddBeziers(points);
-			var stringPoints = points.Select(p => p.ToString()).ToList();
-			Debug.WriteLine($"{string.Join(",", stringPoints)}");
-
 			CanvasObject objUnderMouse = null;
 
-			if (IsSelected && modifierKeys == Keys.Control)
+			if (IsSelected)
 			{
-				// Check if over control point
-				var controlPoints = Points.FindAll(p => p is ControlPoint);
-				objUnderMouse = controlPoints.FirstOrDefault(p => p.MouseOver(mousePosition, modifierKeys) != null);
+				// Check points
+				if (modifierKeys == Keys.Control)
+				{
+					// Check ControlPoints points
+					objUnderMouse = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(mousePosition, modifierKeys) != null);
+				}
+				else
+				{
+					// Check visible points
+					objUnderMouse = Points.FirstOrDefault(p => p.Visible && p.MouseOver(mousePosition, modifierKeys) != null);
+				}
 			}
-			else if (IsSelected)
+			else if (Points.Count > 3)
 			{
-				// Check if I'm over vertex
-				var vertices = Points.FindAll(p => p is Vertex);
-				objUnderMouse = vertices.FirstOrDefault(v => v.MouseOver(mousePosition, modifierKeys) != null);
+				// Check line
+				var path = new GraphicsPath();
+				var points = Points.Select(v => v.ToPoint).ToArray();
+				path.AddBeziers(points);
+				objUnderMouse = path.IsOutlineVisible(mousePosition, new Pen(Color.Black, 10F)) ? this : null;
 			}
 
-			return objUnderMouse ?? (path.IsOutlineVisible(mousePosition, new Pen(Color.Black, 10F)) ? this : null);
+			return objUnderMouse; 
 		}
 
 		public override void Draw(Graphics graphics)
@@ -131,6 +136,6 @@ namespace TNT.Drawing.Objects
 			if (IsSelected) Points.ForEach(v => v.Draw(graphics));
 		}
 
-		public override void MoveBy(int dx, int dy) => Points.FindAll(p => p is Vertex)?.ForEach(p => p.MoveBy(dx, dy));
+		public override void MoveBy(int dx, int dy, Keys modifierKeys) => Points.FindAll(p => p is Vertex)?.ForEach(p => p.MoveBy(dx, dy, modifierKeys));
 	}
 }

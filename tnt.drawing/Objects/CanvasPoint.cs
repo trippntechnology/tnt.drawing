@@ -21,6 +21,9 @@ namespace TNT.Drawing.Objects
 			}
 		}
 
+		[XmlIgnore]
+		public CanvasObject Parent { get; set; }
+
 		public int X { get; set; }
 
 		public int Y { get; set; }
@@ -30,7 +33,7 @@ namespace TNT.Drawing.Objects
 		public virtual Point ToPoint => new Point(X, Y);
 
 		[XmlIgnore]
-		public virtual bool Visible { get; set; } = true;
+		public virtual bool Visible { get => true; }
 
 		public List<string> LinkedPointIds { get; set; } = new List<string>();
 		[XmlIgnore]
@@ -52,7 +55,7 @@ namespace TNT.Drawing.Objects
 			graphics.DrawImage(Image, topLeftPoint);
 		}
 
-		public override void MoveBy(int dx, int dy)
+		public override void MoveBy(int dx, int dy, Keys modifierKeys)
 		{
 			Debug.WriteLine($"MoveBy {this.ToString()}");
 			X += dx;
@@ -90,6 +93,21 @@ namespace TNT.Drawing.Objects
 				LinkedPointIds.Remove(CanvasPoint.Id);
 				LinkedPoints.Remove(CanvasPoint);
 			});
+		}
+
+		public override bool Equals(object obj)
+		{
+			return obj is CanvasPoint point &&
+						 X == point.X &&
+						 Y == point.Y;
+		}
+
+		public override int GetHashCode()
+		{
+			int hashCode = 1861411795;
+			hashCode = hashCode * -1521134295 + X.GetHashCode();
+			hashCode = hashCode * -1521134295 + Y.GetHashCode();
+			return hashCode;
 		}
 	}
 }

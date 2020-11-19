@@ -85,7 +85,7 @@ namespace TNT.Drawing.DrawingModes
 
 			if (ActiveVertex != null)
 			{
-				ActiveVertex.MoveTo(e.Location);
+				ActiveVertex.MoveTo(e.Location, modifierKeys);
 				Marker = null;
 			}
 			else
@@ -105,11 +105,6 @@ namespace TNT.Drawing.DrawingModes
 		public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
 		{
 			base.OnMouseUp(e, modifierKeys);
-		}
-
-		protected void RunNotNull<A, B>(A arg1, B arg2, Action<A, B> callback)
-		{
-			if (arg1 != null && arg2 != null) callback(arg1, arg2);
 		}
 	}
 }

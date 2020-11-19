@@ -236,7 +236,7 @@ namespace TNT.Drawing
 		{
 			var graphics = CreateTransformedGraphics();
 			var mea = Transform(e, graphics);
-			DrawingMode.OnMouseMove(mea, Keys.None);
+			DrawingMode.OnMouseMove(mea, ModifierKeys);
 
 			var currentCursorPosition = Cursor.Position;
 			var mousePosition = new Point(e.X, e.Y);
@@ -294,7 +294,7 @@ namespace TNT.Drawing
 		{
 			var graphics = CreateTransformedGraphics();
 			var mea = Transform(e, graphics);
-			DrawingMode.OnMouseClick(mea, Keys.None);
+			DrawingMode.OnMouseClick(mea, ModifierKeys);
 		}
 
 		protected override void OnMouseDoubleClick(MouseEventArgs e)
@@ -306,7 +306,7 @@ namespace TNT.Drawing
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			MouseEventArgs mea = Transform(e);
-			DrawingMode.OnMouseDown(mea, Keys.None);
+			DrawingMode.OnMouseDown(mea, ModifierKeys);
 			base.OnMouseDown(e);
 		}
 
@@ -320,7 +320,7 @@ namespace TNT.Drawing
 		protected override void OnMouseUp(MouseEventArgs e)
 		{
 			base.OnMouseUp(e);
-			DrawingMode.OnMouseUp(null, Keys.None);
+			DrawingMode.OnMouseUp(null, ModifierKeys);
 		}
 
 		/// <summary>

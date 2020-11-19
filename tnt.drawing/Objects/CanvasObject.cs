@@ -48,7 +48,7 @@ namespace TNT.Drawing.Objects
 		/// </summary>
 		public abstract CanvasObject MouseOver(Point mousePosition, Keys modifierKeys);
 
-		public abstract void MoveBy(int dx, int dy);
+		public abstract void MoveBy(int dx, int dy, Keys modifierKeys);
 
 		/// <summary>
 		/// Gets an image associated with the <paramref name="resource"/> value within the calling assembly
@@ -59,5 +59,7 @@ namespace TNT.Drawing.Objects
 			var resourceStream = assembly.GetManifestResourceStream(resource);
 			return resourceStream == null ? null : new Bitmap(resourceStream);
 		}
+
+		public virtual void Delete() { }
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using TNT.Drawing.Layers;
@@ -28,8 +29,14 @@ namespace TNT.Drawing.DrawingModes
 		public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
 		{
 			_SelectedObject = GetObjectUnderMouse(Layer.CanvasObjects, e.Location, modifierKeys);
+			Debug.WriteLine($"selectedObject: {_SelectedObject}");
 			if (_SelectedObject == null) Layer.CanvasObjects.ForEach(o => o.IsSelected = false);
 			if (_SelectedObject != null) _SelectedObject.IsSelected = true;
+
+			if (modifierKeys == (Keys.Shift | Keys.Control))
+			{
+				_SelectedObject.Delete();
+			}
 			base.OnMouseDown(e, modifierKeys);
 		}
 
@@ -41,6 +48,7 @@ namespace TNT.Drawing.DrawingModes
 
 		public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
 		{
+			Debug.WriteLine($"OnMouseMove\nmodifierKeys: {modifierKeys}");
 			var dx = e.X - _PreviousMouseLocation.X;
 			var dy = e.Y - _PreviousMouseLocation.Y;
 			_PreviousMouseLocation = e.Location;
@@ -48,7 +56,7 @@ namespace TNT.Drawing.DrawingModes
 			CanvasObject objUnderMouse = GetObjectUnderMouse(Layer.CanvasObjects, e.Location, modifierKeys);
 			Log($"dx: {dx} dy: {dy} e.X: {e.X} e.Y: {e.Y} Location: {e.Location} objUnderMouse: {objUnderMouse}");
 
-			_SelectedObject?.MoveBy(dx, dy);
+			_SelectedObject?.MoveBy(dx, dy, modifierKeys);
 
 			Canvas.Cursor = objUnderMouse == null ? Cursors.Default : Cursors.Hand;
 			Refresh(Layer);

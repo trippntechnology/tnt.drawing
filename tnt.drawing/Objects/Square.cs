@@ -45,7 +45,7 @@ namespace TNT.Drawing.Objects
 			return path.IsVisible(mousePosition) ? this : null;
 		}
 
-		public override void MoveBy(int dx, int dy)
+		public override void MoveBy(int dx, int dy, Keys modifierKeys)
 		{
 			X += dx;
 			Y += dy;

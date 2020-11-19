@@ -18,6 +18,12 @@ namespace TNT.Drawing
 			return block(value);
 		}
 
+		public static void Let<T>(this T value, Action<T> block)
+		{
+			if (value == null) return;
+			block(value);
+		}
+
 		/// <summary>
 		/// Kotlin also
 		/// </summary>
@@ -55,6 +61,8 @@ namespace TNT.Drawing
 		/// </summary>
 		public static Point Subtract(this Point p1, Point p2) => new Point(p1.X - p2.X, p1.Y - p2.Y);
 
+		public static Point Add(this Point p1, Point p2) => new Point(p1.X + p2.X, p1.Y + p2.Y);
+
 		public static Point Snap(this Point point, int snap)
 		{
 			var modX = point.X % snap;
@@ -64,6 +72,16 @@ namespace TNT.Drawing
 			point.X = modX >= snap / 2 ? newX + snap : newX;
 			point.Y = modY >= snap / 2 ? newY + snap : newY;
 			return point;
+		}
+
+		public static void RunNotNull<A>(A arg1, Action<A> callback)
+		{
+			if (arg1 != null) callback(arg1);
+		}
+
+		public static void RunNotNull<A, B>(A arg1, B arg2, Action<A, B> callback)
+		{
+			if (arg1 != null && arg2 != null) callback(arg1, arg2);
 		}
 	}
 }

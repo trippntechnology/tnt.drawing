@@ -25,7 +25,8 @@ namespace TNT.Drawing.Sample
 
 			var line = new Line();
 			line.AddVertex(new Vertex(300, 100));
-			line.AddVertex(new Vertex(100, 300));
+			line.AddVertex(new Vertex(400, 300));
+			line.AddVertex(new Vertex(500, 100));
 
 			var layer1 = new CanvasLayer()
 			{
@@ -43,6 +44,7 @@ namespace TNT.Drawing.Sample
 				{
 					new Square(100,100,100,Color.Blue),
 					new Square(500,500,200,Color.Red),
+					line,
 				}
 			};
 
