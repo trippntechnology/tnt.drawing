@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -10,15 +9,7 @@ namespace TNT.Drawing.Objects
 	{
 		private Pen pen = new Pen(Color.FromArgb(100, Color.Black));
 
-		public override bool Visible
-		{
-			get
-			{
-				var isVisible = LinkedPoints.FirstOrDefault(p => p.Id != Id && p.Equals(this)) == null;
-				Debug.WriteLine($"this: {this.Id}  isVisible: {isVisible}");
-				return isVisible;
-			}
-		}
+		public override bool Visible => LinkedPoints.FirstOrDefault(p => p.Id != Id && p.Equals(this)) == null;
 
 		/// <summary>
 		/// Default Constructor
@@ -28,7 +19,13 @@ namespace TNT.Drawing.Objects
 		/// <summary>
 		/// Copy constructor
 		/// </summary>
-		public ControlPoint(CanvasPoint controlPoint) : base(controlPoint) { }
+		public ControlPoint(ControlPoint controlPoint) : base(controlPoint) { }
+
+		public ControlPoint(Vertex vertex) : base(vertex)
+		{
+			AddLinkedPoints(vertex);
+			vertex.AddLinkedPoints(this);
+		}
 
 		public override void Draw(Graphics graphics)
 		{

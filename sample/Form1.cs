@@ -23,10 +23,15 @@ namespace TNT.Drawing.Sample
 			_CanvasPanel = new Canvas(splitContainer1.Panel1);
 			_CanvasPanel.Properties = new CanvasProperties(); ;
 
-			var line = new Line();
-			line.AddVertex(new Vertex(300, 100));
-			line.AddVertex(new Vertex(400, 300));
-			line.AddVertex(new Vertex(500, 100));
+			var line1 = new Line();
+			line1.AddVertex(new Vertex(300, 100));
+			line1.AddVertex(new Vertex(400, 300));
+			line1.AddVertex(new Vertex(500, 100));
+
+			var line2 = new Line();
+			line2.AddVertex(new Vertex(500, 100));
+			line2.AddVertex(new Vertex(600, 300));
+			line2.AddVertex(new Vertex(700, 100));
 
 			var layer1 = new CanvasLayer()
 			{
@@ -44,7 +49,8 @@ namespace TNT.Drawing.Sample
 				{
 					new Square(100,100,100,Color.Blue),
 					new Square(500,500,200,Color.Red),
-					line,
+					line1,
+					line2,
 				}
 			};
 

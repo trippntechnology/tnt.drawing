@@ -11,6 +11,7 @@ namespace TNT.Drawing.Objects
 {
 	public class Line : CanvasObject
 	{
+		private CanvasObject activeObject = null;
 		private Pen _Pen = new Pen(Color.Black, 1);
 
 		public float Width { get; set; } = 1;
@@ -33,7 +34,6 @@ namespace TNT.Drawing.Objects
 			get => Points.ToArray();
 			set
 			{
-				Debug.WriteLine($"Set Points");
 				Points = value.ToList();
 				var ctrlPoints = Points.ToList().FindAll(p => p is ControlPoint);
 				var vertices = Points.ToList().FindAll(p => p is Vertex);
@@ -70,11 +70,6 @@ namespace TNT.Drawing.Objects
 				var c1 = new ControlPoint(p1) { Parent = this };
 				var c2 = new ControlPoint(vertex) { Parent = this };
 
-				p1.AddLinkedPoints(c1);
-				c1.AddLinkedPoints(p1);
-				vertex.AddLinkedPoints(c2);
-				c2.AddLinkedPoints(vertex);
-
 				Points.Add(c1);
 				Points.Add(c2);
 			}
@@ -93,36 +88,84 @@ namespace TNT.Drawing.Objects
 			}
 		}
 
+		public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
+		{
+			activeObject = this;
+
+			if (IsSelected)
+			{
+				CanvasPoint point = null;
+
+				// Check points
+				if (modifierKeys == (Keys.Shift | Keys.Control))
+				{
+					// Find point
+					point = Points.FirstOrDefault(p => p is Vertex && p.MouseOver(e.Location, modifierKeys) != null) ??
+						Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(e.Location, modifierKeys) != null);
+					point?.Delete();
+				}
+				else if (modifierKeys == Keys.Control)
+				{
+					// Check ControlPoints points
+					point = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(e.Location, modifierKeys) != null);
+				}
+				else
+				{
+					// Check visible points
+					point = Points.FirstOrDefault(p => p.Visible && p.MouseOver(e.Location, modifierKeys) != null);
+				}
+
+				if (point == null && modifierKeys == Keys.Control)
+				{
+					var path = new GraphicsPath();
+					var pen = new Pen(Color.Black, 10);
+					int? insertIndex = null;
+
+					// Find the line that the mouse is over
+					for (var index = 3; insertIndex == null && index < Points.Count(); index += 4)
+					{
+						var points = Points.GetRange(index - 3, 4).Select(p => p.ToPoint);
+						path.ClearMarkers();
+						path.AddBeziers(points.ToArray());
+
+						if (path.IsOutlineVisible(e.Location, pen)) insertIndex = index - 1;
+					}
+
+					if (insertIndex != null)
+					{
+						var vertex = new Vertex(e.X, e.Y) { Parent = this };
+						var c1 = new ControlPoint(vertex) { Parent = this };
+						var c2 = new ControlPoint(vertex) { Parent = this };
+						Points.InsertRange((int)insertIndex, new List<CanvasPoint>() { c1, vertex, c2 });
+					}
+				}
+
+				activeObject = point ?? activeObject;
+			}
+		}
+
 		public override CanvasObject Copy() => new Line(this);
 
 		public override CanvasObject MouseOver(Point mousePosition, Keys modifierKeys)
 		{
 			CanvasObject objUnderMouse = null;
 
-			if (IsSelected)
+			if (Points.Count > 3)
 			{
-				// Check points
-				if (modifierKeys == Keys.Control)
-				{
-					// Check ControlPoints points
-					objUnderMouse = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(mousePosition, modifierKeys) != null);
-				}
-				else
-				{
-					// Check visible points
-					objUnderMouse = Points.FirstOrDefault(p => p.Visible && p.MouseOver(mousePosition, modifierKeys) != null);
-				}
-			}
-			else if (Points.Count > 3)
-			{
-				// Check line
+				// Check if over this line
 				var path = new GraphicsPath();
 				var points = Points.Select(v => v.ToPoint).ToArray();
 				path.AddBeziers(points);
 				objUnderMouse = path.IsOutlineVisible(mousePosition, new Pen(Color.Black, 10F)) ? this : null;
+
+				if (objUnderMouse == null)
+				{
+					// Check if over any points
+					objUnderMouse = Points.FirstOrDefault(p => p.MouseOver(mousePosition, modifierKeys) != null) != null ? this : null;
+				}
 			}
 
-			return objUnderMouse; 
+			return objUnderMouse;
 		}
 
 		public override void Draw(Graphics graphics)
@@ -136,6 +179,16 @@ namespace TNT.Drawing.Objects
 			if (IsSelected) Points.ForEach(v => v.Draw(graphics));
 		}
 
-		public override void MoveBy(int dx, int dy, Keys modifierKeys) => Points.FindAll(p => p is Vertex)?.ForEach(p => p.MoveBy(dx, dy, modifierKeys));
+		public override void MoveBy(int dx, int dy, Keys modifierKeys)
+		{
+			if (activeObject == this)
+			{
+				Points.FindAll(p => p is Vertex)?.ForEach(p => p.MoveBy(dx, dy, modifierKeys));
+			}
+			else
+			{
+				activeObject?.MoveBy(dx, dy, modifierKeys);
+			}
+		}
 	}
 }

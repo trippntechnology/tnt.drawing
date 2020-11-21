@@ -57,7 +57,6 @@ namespace TNT.Drawing.Objects
 
 		public override void MoveBy(int dx, int dy, Keys modifierKeys)
 		{
-			Debug.WriteLine($"MoveBy {this.ToString()}");
 			X += dx;
 			Y += dy;
 		}

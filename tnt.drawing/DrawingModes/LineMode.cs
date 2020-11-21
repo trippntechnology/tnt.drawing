@@ -38,7 +38,6 @@ namespace TNT.Drawing.DrawingModes
 
 		public override void OnMouseClick(MouseEventArgs e, Keys modifierKeys)
 		{
-			Debug.WriteLine($"LineMode.OnMouseClick({e.Location})");
 			base.OnMouseClick(e, modifierKeys);
 
 			if (ActiveLine == null)

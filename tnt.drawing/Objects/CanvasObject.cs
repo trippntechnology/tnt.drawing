@@ -18,7 +18,7 @@ namespace TNT.Drawing.Objects
 		/// </summary>
 		[ReadOnly(true)]
 		public string Id { get; set; }
-		
+
 		[XmlIgnore]
 		public bool IsSelected { get; set; } = false;
 
@@ -43,12 +43,14 @@ namespace TNT.Drawing.Objects
 		/// </summary>
 		public abstract CanvasObject Copy();
 
-		/// <summary>
+			/// <summary>
 		/// Implement by subclass to indicate mouse is over object. Should return the object that is under mouse.
 		/// </summary>
 		public abstract CanvasObject MouseOver(Point mousePosition, Keys modifierKeys);
 
 		public abstract void MoveBy(int dx, int dy, Keys modifierKeys);
+
+		public virtual void OnMouseDown(MouseEventArgs e, Keys modifierKeys) { }
 
 		/// <summary>
 		/// Gets an image associated with the <paramref name="resource"/> value within the calling assembly
