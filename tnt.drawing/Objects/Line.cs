@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using TNT.Drawing.Resource;
 
 namespace TNT.Drawing.Objects
 {
@@ -88,7 +87,7 @@ namespace TNT.Drawing.Objects
 			}
 		}
 
-		public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
+		public override CanvasObject OnMouseDown(Point location, Keys modifierKeys)
 		{
 			activeObject = this;
 
@@ -99,49 +98,79 @@ namespace TNT.Drawing.Objects
 				// Check points
 				if (modifierKeys == (Keys.Shift | Keys.Control))
 				{
-					// Find point
-					point = Points.FirstOrDefault(p => p is Vertex && p.MouseOver(e.Location, modifierKeys) != null) ??
-						Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(e.Location, modifierKeys) != null);
-					point?.Delete();
+					// Delete point
+					point = TryDeletePoint(location, modifierKeys);
 				}
-				else if (modifierKeys == Keys.Control)
+				else if (modifierKeys == Keys.Shift)
 				{
 					// Check ControlPoints points
-					point = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(e.Location, modifierKeys) != null);
+					point = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys) != null);
 				}
 				else
 				{
 					// Check visible points
-					point = Points.FirstOrDefault(p => p.Visible && p.MouseOver(e.Location, modifierKeys) != null);
+					point = Points.FirstOrDefault(p => p.Visible && p.MouseOver(location, modifierKeys) != null);
 				}
 
-				if (point == null && modifierKeys == Keys.Control)
+				if (point == null && modifierKeys == (Keys.Control | Keys.Shift))
 				{
-					var path = new GraphicsPath();
-					var pen = new Pen(Color.Black, 10);
-					int? insertIndex = null;
-
-					// Find the line that the mouse is over
-					for (var index = 3; insertIndex == null && index < Points.Count(); index += 4)
-					{
-						var points = Points.GetRange(index - 3, 4).Select(p => p.ToPoint);
-						path.ClearMarkers();
-						path.AddBeziers(points.ToArray());
-
-						if (path.IsOutlineVisible(e.Location, pen)) insertIndex = index - 1;
-					}
-
-					if (insertIndex != null)
-					{
-						var vertex = new Vertex(e.X, e.Y) { Parent = this };
-						var c1 = new ControlPoint(vertex) { Parent = this };
-						var c2 = new ControlPoint(vertex) { Parent = this };
-						Points.InsertRange((int)insertIndex, new List<CanvasPoint>() { c1, vertex, c2 });
-					}
+					TryAddPoint(location);
 				}
 
 				activeObject = point ?? activeObject;
 			}
+
+			return activeObject;
+		}
+
+		private void TryAddPoint(Point location)
+		{
+			var path = new GraphicsPath();
+			var pen = new Pen(Color.Black, 10);
+			int? insertIndex = null;
+
+			// Find the line that the mouse is over
+			for (var index = 3; insertIndex == null && index < Points.Count(); index += 3)
+			{
+				var points = Points.GetRange(index - 3, 4).Select(p => p.ToPoint);
+				path.ClearMarkers();
+				path.AddBeziers(points.ToArray());
+
+				if (path.IsOutlineVisible(location, pen)) insertIndex = index - 1;
+			}
+
+			if (insertIndex != null)
+			{
+				var vertex = new Vertex(location.X, location.Y) { Parent = this };
+				var c1 = new ControlPoint(vertex) { Parent = this };
+				var c2 = new ControlPoint(vertex) { Parent = this };
+				Points.InsertRange((int)insertIndex, new List<CanvasPoint>() { c1, vertex, c2 });
+			}
+		}
+
+		private CanvasPoint TryDeletePoint(Point location, Keys modifierKeys)
+		{
+			// Find point
+			CanvasPoint point = Points.FirstOrDefault(p => p is Vertex && p.MouseOver(location, modifierKeys) != null) ??
+				Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys) != null);
+
+			if (point is Vertex vertex)
+			{
+				// Only remove if there are two verteces remaining
+				if (Points.Sum(p => p is Vertex ? 1 : 0) > 2)
+				{
+					// Remove the vertex
+					RemoveVertex(vertex);
+				}
+			}
+			else if (point is ControlPoint ctrlPoint)
+			{
+				// Reset position of ControlPoint
+				var canvasPoint = ctrlPoint.LinkedPoints.FirstOrDefault(p => p is Vertex);
+				ctrlPoint.MoveTo(canvasPoint.ToPoint);
+			}
+
+			return point;
 		}
 
 		public override CanvasObject Copy() => new Line(this);
@@ -160,12 +189,49 @@ namespace TNT.Drawing.Objects
 
 				if (objUnderMouse == null)
 				{
-					// Check if over any points
+					// Check if over any points that might be outside of the line
 					objUnderMouse = Points.FirstOrDefault(p => p.MouseOver(mousePosition, modifierKeys) != null) != null ? this : null;
 				}
 			}
 
 			return objUnderMouse;
+		}
+
+		public override Cursor GetCursor(Point location, Keys keys)
+		{
+			var cursor = Cursors.Hand;
+			CanvasObject point = null;
+
+			// Check if over any points
+			if (IsSelected)
+			{
+				point = Points.FirstOrDefault(p => p.MouseOver(location, keys) != null);
+
+				if (point != null)
+				{
+					if (keys == (Keys.Control | Keys.Shift))
+					{
+						cursor = Resources.Cursors.RemovePoint;
+					}
+					else if (keys == Keys.Shift)
+					{
+						cursor = Resources.Cursors.AddCurve;
+					}
+					else
+					{
+						cursor = Resources.Cursors.MovePoint;
+					}
+				}
+				else
+				{
+					if (keys == (Keys.Control | Keys.Shift))
+					{
+						cursor = Resources.Cursors.AddPoint;
+					}
+				}
+			}
+
+			return cursor;
 		}
 
 		public override void Draw(Graphics graphics)

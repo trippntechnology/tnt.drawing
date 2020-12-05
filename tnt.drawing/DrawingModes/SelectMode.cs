@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -12,6 +11,7 @@ namespace TNT.Drawing.DrawingModes
 	{
 		private Point previousMouseLocation = Point.Empty;
 		private List<CanvasObject> selectedObjects = new List<CanvasObject>();
+		private CanvasObject objectUnderMouse = null;
 
 		public override CanvasObject DefaultObject => null;
 
@@ -19,26 +19,27 @@ namespace TNT.Drawing.DrawingModes
 
 		public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
 		{
-			var foundObject = FindObjectAt(Layer.CanvasObjects, e.Location, modifierKeys);
-			foundObject?.OnMouseDown(e, modifierKeys);
+			//var objectUnderMouse = FindObjectAt(Layer.CanvasObjects, e.Location, modifierKeys);
+			var activeObject = objectUnderMouse?.OnMouseDown(e.Location, modifierKeys);
 
-			if (foundObject == null)
+			if (activeObject != null && objectUnderMouse != activeObject) selectedObjects.Clear();
+
+			if (objectUnderMouse == null)
 			{
 				selectedObjects.Clear();
 			}
-			else if (modifierKeys == Keys.Shift && selectedObjects.Contains(foundObject))
+			else if (modifierKeys == Keys.Shift && selectedObjects.Contains(objectUnderMouse))
 			{
-				selectedObjects.Remove(foundObject);
+				selectedObjects.Remove(objectUnderMouse);
 			}
-			else if (modifierKeys == Keys.Shift && !selectedObjects.Contains(foundObject))
+			else if (modifierKeys == Keys.Shift && !selectedObjects.Contains(objectUnderMouse))
 			{
-				selectedObjects.Add(foundObject);
+				selectedObjects.Add(objectUnderMouse);
 			}
-			else if (!selectedObjects.Contains(foundObject))
+			else if (!selectedObjects.Contains(objectUnderMouse))
 			{
 				selectedObjects.Clear();
-				selectedObjects.Add(foundObject);
-
+				selectedObjects.Add(objectUnderMouse);
 			}
 
 			Canvas.OnObjectsSelected(selectedObjects.Select(o => o as object).ToList());
@@ -46,7 +47,21 @@ namespace TNT.Drawing.DrawingModes
 			// Select/unselect objects
 			Layer.CanvasObjects.ForEach(o => o.IsSelected = selectedObjects.Contains(o));
 
+			Refresh(Layer);
+
 			base.OnMouseDown(e, modifierKeys);
+		}
+
+		public override void OnKeyDown(KeyEventArgs e)
+		{
+			Canvas.Cursor = objectUnderMouse?.GetCursor(previousMouseLocation, e.Modifiers) ?? Cursors.Default;
+			base.OnKeyDown(e);
+		}
+
+		public override void OnKeyUp(KeyEventArgs e)
+		{
+			Canvas.Cursor = objectUnderMouse?.GetCursor(previousMouseLocation, e.Modifiers) ?? Cursors.Default;
+			base.OnKeyUp(e);
 		}
 
 		public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
@@ -56,19 +71,26 @@ namespace TNT.Drawing.DrawingModes
 
 		public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
 		{
-			Debug.WriteLine($"OnMouseMove\nmodifierKeys: {modifierKeys}");
+			//Debug.WriteLine($"OnMouseMove\nmodifierKeys: {modifierKeys}");
 			var dx = e.X - previousMouseLocation.X;
 			var dy = e.Y - previousMouseLocation.Y;
 			previousMouseLocation = e.Location;
 
-			CanvasObject objUnderMouse = FindObjectAt(Layer.CanvasObjects, e.Location, modifierKeys);
-			Log($"dx: {dx} dy: {dy} e.X: {e.X} e.Y: {e.Y} Location: {e.Location} objUnderMouse: {objUnderMouse}");
+			objectUnderMouse = FindObjectAt(Layer.CanvasObjects, e.Location, modifierKeys);
+			Log($"dx: {dx} dy: {dy} e.X: {e.X} e.Y: {e.Y} Location: {e.Location} objUnderMouse: {objectUnderMouse}");
 
 			if (IsMouseDown) selectedObjects.ForEach(o => o.MoveBy(dx, dy, modifierKeys));
 
-			Canvas.Cursor = objUnderMouse == null ? Cursors.Default : Cursors.Hand;
-			Refresh(Layer);
+			Canvas.Cursor = objectUnderMouse?.GetCursor(e.Location, modifierKeys) ?? Cursors.Default;
+			Refresh();
 			base.OnMouseMove(e, modifierKeys);
+		}
+
+		public override void OnPaint(PaintEventArgs e)
+		{
+			// Draw selected objects
+			Layer.CanvasObjects.FindAll(o => o.IsSelected).ForEach(o => o.Draw(e.Graphics));
+			base.OnPaint(e);
 		}
 
 		protected CanvasObject FindObjectAt(List<CanvasObject> objs, Point mouseLocation, Keys modifierKeys) => objs.FirstOrDefault(o => o.MouseOver(mouseLocation, modifierKeys) != null);

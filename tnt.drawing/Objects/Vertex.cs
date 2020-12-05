@@ -1,11 +1,12 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
+using TNT.Drawing.Resource;
 
 namespace TNT.Drawing.Objects
 {
 	public class Vertex : CanvasPoint
 	{
-		protected override string ImageResource => "TNT.Drawing.Image.Vertex.png";
+		public override Image Image => Resources.Images.Vertex;
 
 		public Vertex() { }
 
@@ -27,13 +28,6 @@ namespace TNT.Drawing.Objects
 			var dy = point.Y - Y;
 			LinkedPoints.ForEach(p => p.MoveBy(dx, dy, modifierKeys));
 			base.MoveTo(point);
-		}
-
-		public override void Delete()
-		{
-			base.Delete();
-			var line = Parent as Line;
-			line.RemoveVertex(this);
 		}
 	}
 }

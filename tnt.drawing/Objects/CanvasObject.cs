@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
@@ -22,7 +21,6 @@ namespace TNT.Drawing.Objects
 		[XmlIgnore]
 		public bool IsSelected { get; set; } = false;
 
-
 		/// <summary>
 		/// Default constructor
 		/// </summary>
@@ -43,25 +41,15 @@ namespace TNT.Drawing.Objects
 		/// </summary>
 		public abstract CanvasObject Copy();
 
-			/// <summary>
+		/// <summary>
 		/// Implement by subclass to indicate mouse is over object. Should return the object that is under mouse.
 		/// </summary>
 		public abstract CanvasObject MouseOver(Point mousePosition, Keys modifierKeys);
 
 		public abstract void MoveBy(int dx, int dy, Keys modifierKeys);
 
-		public virtual void OnMouseDown(MouseEventArgs e, Keys modifierKeys) { }
+		public virtual CanvasObject OnMouseDown(Point location, Keys modifierKeys) => null;
 
-		/// <summary>
-		/// Gets an image associated with the <paramref name="resource"/> value within the calling assembly
-		/// </summary>
-		protected Image ResourceToImage(string resource)
-		{
-			var assembly = Assembly.GetCallingAssembly();
-			var resourceStream = assembly.GetManifestResourceStream(resource);
-			return resourceStream == null ? null : new Bitmap(resourceStream);
-		}
-
-		public virtual void Delete() { }
+		public virtual Cursor GetCursor(Point location, Keys keys) => Cursors.Default;
 	}
 }

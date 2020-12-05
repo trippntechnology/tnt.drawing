@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -167,7 +168,7 @@ namespace TNT.Drawing
 				Fit();
 			}
 
-			DrawingMode.OnPaint(e);
+			DrawingMode.OnPaint(e); // This works with transformed graphics because e.Graphics is transformed
 
 			base.OnPaint(e);
 		}
@@ -270,6 +271,7 @@ namespace TNT.Drawing
 		/// </summary>
 		protected override void OnKeyDown(KeyEventArgs e)
 		{
+			Debug.WriteLine($"OnKeyDown");
 			keyEventArgs = e;
 			switch (keyEventArgs.KeyCode)
 			{
@@ -277,7 +279,7 @@ namespace TNT.Drawing
 					Cursor = Cursors.Hand;
 					break;
 			}
-			DrawingMode.OnKeyDown(null);
+			DrawingMode.OnKeyDown(e);
 		}
 
 		/// <summary>
@@ -285,9 +287,10 @@ namespace TNT.Drawing
 		/// </summary>
 		protected override void OnKeyUp(KeyEventArgs e)
 		{
+			Debug.WriteLine($"OnKeyUp");
 			keyEventArgs = null;
 			Cursor = Cursors.Default;
-			DrawingMode.OnKeyUp(null);
+			DrawingMode.OnKeyUp(e);
 		}
 
 		protected override void OnMouseClick(MouseEventArgs e)
@@ -313,7 +316,7 @@ namespace TNT.Drawing
 		private MouseEventArgs Transform(MouseEventArgs e, Graphics graphics = null)
 		{
 			graphics = graphics ?? CreateTransformedGraphics();
-			var layerPoint = e.Location.ToGridCoordinates(graphics).Snap(10);
+			var layerPoint = e.Location.ToGridCoordinates(graphics); //.Snap(10);
 			return new MouseEventArgs(e.Button, e.Clicks, layerPoint.X, layerPoint.Y, e.Delta);
 		}
 

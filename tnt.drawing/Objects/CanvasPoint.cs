@@ -5,21 +5,13 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using TNT.Drawing.Resource;
 
 namespace TNT.Drawing.Objects
 {
-	public class CanvasPoint : CanvasObject
+	public  class CanvasPoint : CanvasObject
 	{
-		private Image _Image = null;
-
-		public Image Image
-		{
-			get
-			{
-				if (_Image == null) _Image = ResourceToImage(ImageResource);
-				return _Image;
-			}
-		}
+		public virtual Image Image => Resources.Images.ControlPoint;
 
 		[XmlIgnore]
 		public CanvasObject Parent { get; set; }
@@ -27,8 +19,6 @@ namespace TNT.Drawing.Objects
 		public int X { get; set; }
 
 		public int Y { get; set; }
-
-		protected virtual string ImageResource => "TNT.Drawing.Image.ControlPoint.png";
 
 		public virtual Point ToPoint => new Point(X, Y);
 

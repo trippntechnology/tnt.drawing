@@ -2,11 +2,14 @@
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using TNT.Drawing.Resource;
 
 namespace TNT.Drawing.Objects
 {
 	public class ControlPoint : CanvasPoint
 	{
+		public override Image Image => Resources.Images.ControlPoint;
+
 		private Pen pen = new Pen(Color.FromArgb(100, Color.Black));
 
 		public override bool Visible => LinkedPoints.FirstOrDefault(p => p.Id != Id && p.Equals(this)) == null;
@@ -49,12 +52,6 @@ namespace TNT.Drawing.Objects
 				var newPoint = vertex.ToPoint.Add(offset);
 				opposite?.MoveTo(newPoint);
 			}
-		}
-
-		public override void Delete()
-		{
-			var vertex = LinkedPoints.FirstOrDefault(p => p is Vertex);
-			MoveTo(vertex.ToPoint);
 		}
 
 		public override CanvasObject Copy()

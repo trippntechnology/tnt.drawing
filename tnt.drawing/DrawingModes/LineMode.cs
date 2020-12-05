@@ -26,16 +26,6 @@ namespace TNT.Drawing.DrawingModes
 			base.Reset();
 		}
 
-		public override void OnKeyDown(KeyEventArgs e)
-		{
-			base.OnKeyDown(e);
-		}
-
-		public override void OnKeyUp(KeyEventArgs e)
-		{
-			base.OnKeyUp(e);
-		}
-
 		public override void OnMouseClick(MouseEventArgs e, Keys modifierKeys)
 		{
 			base.OnMouseClick(e, modifierKeys);
@@ -97,7 +87,7 @@ namespace TNT.Drawing.DrawingModes
 		public override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
-			if (Marker != null) Marker.Draw(e.Graphics);
+			Marker?.Draw(e.Graphics);
 			ActiveLine?.Draw(e.Graphics);
 		}
 

@@ -69,16 +69,23 @@
     <Compile Include="Objects\Vertex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BackingFields.cs" />
+    <Compile Include="Resource\Resources.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Image\Vertex.png" />
+    <EmbeddedResource Include="Resource\Image\Vertex.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Image\ControlPoint.png" />
-    <EmbeddedResource Include="Image\SideControlPoint.png" />
+    <EmbeddedResource Include="Resource\Image\ControlPoint.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resource\Cursor\AddCurve.cur" />
+    <EmbeddedResource Include="Resource\Cursor\AddPoint.cur" />
+    <EmbeddedResource Include="Resource\Cursor\Curve.cur" />
+    <EmbeddedResource Include="Resource\Cursor\MovePoint.cur" />
+    <EmbeddedResource Include="Resource\Cursor\RemovePoint.cur" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

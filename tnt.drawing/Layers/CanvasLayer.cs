@@ -96,7 +96,7 @@ namespace TNT.Drawing.Layers
 		protected virtual void DrawImage(Graphics graphics)
 		{
 			graphics.FillRectangle(new SolidBrush(BackgroundColor), Rect);
-			CanvasObjects?.ForEach(o => o.Draw(graphics));
+			CanvasObjects?.ForEach(o => { if (!o.IsSelected) o.Draw(graphics); });
 			IsInvalid = false;
 		}
 	}
