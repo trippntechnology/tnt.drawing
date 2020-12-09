@@ -271,7 +271,6 @@ namespace TNT.Drawing
 		/// </summary>
 		protected override void OnKeyDown(KeyEventArgs e)
 		{
-			Debug.WriteLine($"OnKeyDown");
 			keyEventArgs = e;
 			switch (keyEventArgs.KeyCode)
 			{
@@ -357,7 +356,11 @@ namespace TNT.Drawing
 		/// </summary>
 		private void OnParentResize(object sender, EventArgs e) => Refresh();
 
-		public void OnObjectsSelected(List<object> objs) => OnSelected(objs ?? new List<object>() { Properties });
+		public void OnObjectsSelected(List<object> objs)
+		{
+			var selected = objs.Count == 0 ? new List<Object>() { Properties } : objs;
+			OnSelected(selected);
+		}
 
 		/// <summary>
 		/// Returns a <see cref="Graphics"/> that has been transformed

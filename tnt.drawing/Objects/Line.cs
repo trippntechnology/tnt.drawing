@@ -93,23 +93,21 @@ namespace TNT.Drawing.Objects
 
 			if (IsSelected)
 			{
-				CanvasPoint point = null;
+				var vertex = Points.FirstOrDefault(p => p is Vertex && p.MouseOver(location, modifierKeys) != null);
+				var ctrlPoint = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys) != null);
+				CanvasPoint point = vertex ?? ctrlPoint;
 
 				// Check points
-				if (modifierKeys == (Keys.Shift | Keys.Control))
+				if (point != null && modifierKeys == (Keys.Shift | Keys.Control))
 				{
 					// Delete point
-					point = TryDeletePoint(location, modifierKeys);
+					DeletePoint(point);
+
 				}
-				else if (modifierKeys == Keys.Shift)
+				else if (ctrlPoint != null && modifierKeys == Keys.Shift)
 				{
 					// Check ControlPoints points
-					point = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys) != null);
-				}
-				else
-				{
-					// Check visible points
-					point = Points.FirstOrDefault(p => p.Visible && p.MouseOver(location, modifierKeys) != null);
+					point = ctrlPoint;
 				}
 
 				if (point == null && modifierKeys == (Keys.Control | Keys.Shift))
@@ -148,12 +146,8 @@ namespace TNT.Drawing.Objects
 			}
 		}
 
-		private CanvasPoint TryDeletePoint(Point location, Keys modifierKeys)
+		private void DeletePoint(CanvasPoint point)
 		{
-			// Find point
-			CanvasPoint point = Points.FirstOrDefault(p => p is Vertex && p.MouseOver(location, modifierKeys) != null) ??
-				Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys) != null);
-
 			if (point is Vertex vertex)
 			{
 				// Only remove if there are two verteces remaining
@@ -169,8 +163,6 @@ namespace TNT.Drawing.Objects
 				var canvasPoint = ctrlPoint.LinkedPoints.FirstOrDefault(p => p is Vertex);
 				ctrlPoint.MoveTo(canvasPoint.ToPoint);
 			}
-
-			return point;
 		}
 
 		public override CanvasObject Copy() => new Line(this);
@@ -200,12 +192,13 @@ namespace TNT.Drawing.Objects
 		public override Cursor GetCursor(Point location, Keys keys)
 		{
 			var cursor = Cursors.Hand;
-			CanvasObject point = null;
 
 			// Check if over any points
 			if (IsSelected)
 			{
-				point = Points.FirstOrDefault(p => p.MouseOver(location, keys) != null);
+				var vertex = Points.FirstOrDefault(p => p is Vertex && p.MouseOver(location, keys) != null);
+				var ctrlPoint = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, keys) != null);
+				CanvasPoint point = vertex ?? ctrlPoint;
 
 				if (point != null)
 				{
@@ -213,7 +206,7 @@ namespace TNT.Drawing.Objects
 					{
 						cursor = Resources.Cursors.RemovePoint;
 					}
-					else if (keys == Keys.Shift)
+					else if (ctrlPoint != null && keys == Keys.Shift)
 					{
 						cursor = Resources.Cursors.AddCurve;
 					}

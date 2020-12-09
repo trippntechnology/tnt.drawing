@@ -18,7 +18,7 @@ namespace TNT.Drawing.Objects
 
 		public override void MoveBy(int dx, int dy, Keys modifierKeys)
 		{
-			LinkedPoints.ForEach(p => p.MoveBy(dx, dy, modifierKeys));
+			LinkedPoints.ForEach(p => p.MoveBy(dx, dy, Keys.None));
 			base.MoveBy(dx, dy, modifierKeys);
 		}
 

@@ -12,7 +12,7 @@ namespace TNT.Drawing.Objects
 
 		private Pen pen = new Pen(Color.FromArgb(100, Color.Black));
 
-		public override bool Visible => LinkedPoints.FirstOrDefault(p => p.Id != Id && p.Equals(this)) == null;
+		public override bool Visible => LinkedPoints.FirstOrDefault(p => p.Id != Id && p.X == this.X && p.Y == this.Y) == null;
 
 		/// <summary>
 		/// Default Constructor

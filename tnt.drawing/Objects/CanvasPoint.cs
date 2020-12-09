@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -9,7 +8,7 @@ using TNT.Drawing.Resource;
 
 namespace TNT.Drawing.Objects
 {
-	public  class CanvasPoint : CanvasObject
+	public class CanvasPoint : CanvasObject
 	{
 		public virtual Image Image => Resources.Images.ControlPoint;
 
@@ -84,18 +83,12 @@ namespace TNT.Drawing.Objects
 			});
 		}
 
-		public override bool Equals(object obj)
-		{
-			return obj is CanvasPoint point &&
-						 X == point.X &&
-						 Y == point.Y;
-		}
+		public override bool Equals(object obj) => obj is CanvasPoint point && Id == point.Id;
 
 		public override int GetHashCode()
 		{
 			int hashCode = 1861411795;
-			hashCode = hashCode * -1521134295 + X.GetHashCode();
-			hashCode = hashCode * -1521134295 + Y.GetHashCode();
+			hashCode = hashCode * -1521134295 + Id.GetHashCode();
 			return hashCode;
 		}
 	}
