@@ -10,7 +10,7 @@ namespace TNT.Drawing.Objects
 {
 	public class CanvasPoint : CanvasObject
 	{
-		public virtual Image Image => Resources.Images.ControlPoint;
+		public virtual Image Image => Resources.Images.Vertex;
 
 		[XmlIgnore]
 		public CanvasObject Parent { get; set; }

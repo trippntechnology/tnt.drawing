@@ -16,7 +16,7 @@ namespace TNT.Drawing.DrawingModes
 
 		public override CanvasObject DefaultObject { get; } = new Line();
 
-		public override CanvasLayer Layer => Canvas?.Layers?.Find(l => string.Equals(l.Name, "Object"));
+		public LineMode(CanvasLayer layer) : base(layer) { }
 
 		public override void Reset()
 		{
@@ -30,20 +30,36 @@ namespace TNT.Drawing.DrawingModes
 		{
 			base.OnMouseClick(e, modifierKeys);
 
-			if (ActiveLine == null)
+			if (e.Button == MouseButtons.Left)
 			{
-				var line1 = new Line();
+				if (ActiveLine == null)
+				{
+					var line1 = new Line();
 
-				ActiveLine = DefaultObject.Copy() as Line;
-				ActiveLine.AddVertex(new Vertex(e.X, e.Y));
-				ActiveVertex = new Vertex(e.X, e.Y);
-				ActiveLine.AddVertex(ActiveVertex);
-				Refresh();
+					ActiveLine = DefaultObject.Copy() as Line;
+					ActiveLine.IsSelected = true;
+					ActiveLine.AddVertex(new Vertex(e.X, e.Y));
+					ActiveVertex = new Vertex(e.X, e.Y);
+					ActiveLine.AddVertex(ActiveVertex);
+					Refresh();
+				}
+				else if (ActiveVertex != null)
+				{
+					ActiveVertex = new Vertex(e.X, e.Y);
+					ActiveLine.AddVertex(ActiveVertex);
+					Refresh();
+				}
 			}
-			else if (ActiveVertex != null)
+			else if (e.Button == MouseButtons.Right && ActiveVertex != null && ActiveLine != null)
 			{
-				ActiveVertex = new Vertex(e.X, e.Y);
-				ActiveLine.AddVertex(ActiveVertex);
+				ActiveLine.RemoveVertex(ActiveVertex);
+				ActiveVertex = ActiveLine.PointsArray.Last() as Vertex;
+				Debug.WriteLine($"ActiveVertex: {ActiveVertex}");
+				if (ActiveLine.PointsArray.Length < 2)
+				{
+					ActiveLine = null;
+					ActiveVertex = null;
+				}
 				Refresh();
 			}
 		}
@@ -56,6 +72,7 @@ namespace TNT.Drawing.DrawingModes
 			{
 				// Remove last vertex
 				ActiveLine.RemoveVertex(ActiveVertex);
+				ActiveLine.IsSelected = false;
 				Layer?.CanvasObjects?.Add(ActiveLine);
 				ActiveVertex = null;
 				ActiveLine = null;

@@ -7,15 +7,17 @@ using TNT.Drawing.Objects;
 
 namespace TNT.Drawing.DrawingModes
 {
-	public abstract class DrawingMode
+	public class DrawingMode
 	{
 		protected bool IsMouseDown = false;
 
 		public Canvas Canvas { get; set; }
 
-		public abstract CanvasLayer Layer { get; }
+		public CanvasLayer Layer { get; protected set; }
 
-		public abstract CanvasObject DefaultObject { get; }
+		public virtual CanvasObject DefaultObject { get; } = null;
+
+		public DrawingMode(CanvasLayer layer) { this.Layer = layer; }
 
 		public virtual void Reset() => Refresh(Layer);
 

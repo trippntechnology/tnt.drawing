@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Xml.Serialization;
 using TNT.Drawing.Objects;
 
@@ -10,6 +11,7 @@ namespace TNT.Drawing.Layers
 	public class CanvasLayer
 	{
 		protected BackingFields BackingFields = new BackingFields();
+		protected Canvas Canvas = null;
 
 		/// <summary>
 		/// Indicates whether <see cref="Draw(Graphics)"/> should redraw the <see cref="Image"/>
@@ -67,7 +69,11 @@ namespace TNT.Drawing.Layers
 		/// <summary>
 		/// Default constructor
 		/// </summary>
-		public CanvasLayer() { BackingFields.OnFieldChanged = (_, __) => IsInvalid = true; }
+		public CanvasLayer(Canvas canvas)
+		{
+			Canvas = canvas;
+			BackingFields.OnFieldChanged = (_, __) => IsInvalid = true;
+		}
 
 
 		public override string ToString() => Name;
@@ -77,27 +83,13 @@ namespace TNT.Drawing.Layers
 		/// </summary>
 		public virtual void Draw(Graphics graphics)
 		{
-			if (!IsVisible) return;
-			if (IsInvalid)
-			{
-				Image = new Bitmap(Width, Height);
-				var imageGraphics = Graphics.FromImage(Image);
-				DrawImage(imageGraphics);
-			}
+			// Draw background
+			graphics.FillRectangle(new SolidBrush(BackgroundColor), Rect);
 
-			graphics.DrawImage(Image, Rect);
+			// Draw objects
+			CanvasObjects?.ForEach(o => { if (!o.IsSelected) o.Draw(graphics); });
 		}
 
 		public void Invalidate() => IsInvalid = true;
-
-		/// <summary>
-		/// 
-		/// </summary>
-		protected virtual void DrawImage(Graphics graphics)
-		{
-			graphics.FillRectangle(new SolidBrush(BackgroundColor), Rect);
-			CanvasObjects?.ForEach(o => { if (!o.IsSelected) o.Draw(graphics); });
-			IsInvalid = false;
-		}
 	}
 }

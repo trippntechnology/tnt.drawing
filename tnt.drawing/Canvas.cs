@@ -47,7 +47,7 @@ namespace TNT.Drawing
 
 		public DrawingMode DrawingMode
 		{
-			get { return _DrawingMode ?? new SelectMode(); }
+			get { return _DrawingMode; }
 			set { _DrawingMode = value; _DrawingMode.Canvas = this; }
 		}
 
@@ -63,7 +63,7 @@ namespace TNT.Drawing
 		/// Amount the <see cref="Canvas"/> should be scaled
 		/// </summary>
 		[Category("Appearance")]
-		public int ScalePercentage { get => Properties.Get<int>(); set { Properties.Set(value); Refresh(); } }
+		public int ScalePercentage { get => Properties.Get<int>(); set { Properties.Set(value); Invalidate(); } }
 
 		/// <summary>
 		/// <see cref="CanvasLayer"/> height
@@ -90,6 +90,10 @@ namespace TNT.Drawing
 				Layers.ForEach(l => l.Width = value);
 			}
 		}
+
+		public int SnapInterval { get; set; } = 10;
+
+		public bool SnapToInterval { get; set; }
 
 		/// <summary>
 		/// Scaled grid width
@@ -152,7 +156,9 @@ namespace TNT.Drawing
 		{
 			UpdateClientDimensions();
 			var graphics = CreateTransformedGraphics(e.Graphics);
-			DrawLayers(graphics);
+
+			// Draw layers
+			Layers.ForEach(l => l.Draw(graphics));
 
 			if (AdjustPostion)
 			{
@@ -171,16 +177,6 @@ namespace TNT.Drawing
 			DrawingMode.OnPaint(e); // This works with transformed graphics because e.Graphics is transformed
 
 			base.OnPaint(e);
-		}
-
-		protected Graphics DrawLayers(Graphics graphics = null)
-		{
-			var image = new Bitmap(LayerWidth, LayerHeight);
-			var imageGraphics = Graphics.FromImage(image);
-
-			Layers.ForEach(l => l.Draw(imageGraphics));
-			graphics.DrawImage(image, _LayerRect);
-			return graphics;
 		}
 
 		private void RepositionToAlignWithMouse(Point previousPosition, Point currentPosition)
@@ -368,6 +364,7 @@ namespace TNT.Drawing
 		private Graphics CreateTransformedGraphics(Graphics graphics = null)
 		{
 			graphics = graphics ?? CreateGraphics();
+			graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
 			// X translation of the drawing canvas
 			var xTranslation = Math.Max((Width - ScaledWidth) / 2, 0);

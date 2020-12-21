@@ -13,13 +13,16 @@ namespace TNT.Drawing.DrawingModes
 		private List<CanvasObject> selectedObjects = new List<CanvasObject>();
 		private CanvasObject objectUnderMouse = null;
 
-		public override CanvasObject DefaultObject => null;
+		public SelectMode(CanvasLayer layer) : base(layer) { }
 
-		public override CanvasLayer Layer => Canvas?.Layers?.Find(l => string.Equals(l.Name, "Object")) ?? new CanvasLayer();
+		public override void Reset()
+		{
+			Layer.CanvasObjects.ForEach(o => o.IsSelected = false);
+			base.Reset();
+		}
 
 		public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
 		{
-			//var objectUnderMouse = FindObjectAt(Layer.CanvasObjects, e.Location, modifierKeys);
 			var activeObject = objectUnderMouse?.OnMouseDown(e.Location, modifierKeys);
 
 			if (activeObject != null && objectUnderMouse != activeObject) selectedObjects.Clear();
@@ -71,7 +74,6 @@ namespace TNT.Drawing.DrawingModes
 
 		public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
 		{
-			//Debug.WriteLine($"OnMouseMove\nmodifierKeys: {modifierKeys}");
 			var dx = e.X - previousMouseLocation.X;
 			var dy = e.Y - previousMouseLocation.Y;
 			previousMouseLocation = e.Location;

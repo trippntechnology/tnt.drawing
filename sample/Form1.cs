@@ -33,16 +33,16 @@ namespace TNT.Drawing.Sample
 			line2.AddVertex(new Vertex(600, 300));
 			line2.AddVertex(new Vertex(700, 100));
 
-			var layer1 = new CanvasLayer()
+			var layer1 = new CanvasLayer(_CanvasPanel)
 			{
 				Name = "Background",
 				CanvasObjects = new List<CanvasObject>() { new Square(150, 150, 200, Color.Green) },
 				BackgroundColor = Color.White,
 			};
 
-			var layer2 = new GridLayer(Color.Aqua, 10) { Name = "Grid" };
+			var layer2 = new GridLayer(_CanvasPanel) { Name = "Grid", LineColor = Color.Aqua };
 
-			var layer3 = new CanvasLayer()
+			var layer3 = new CanvasLayer(_CanvasPanel)
 			{
 				Name = "Object",
 				CanvasObjects = new List<CanvasObject>()
@@ -67,8 +67,8 @@ namespace TNT.Drawing.Sample
 
 			propertyGrid1.SelectedObject = _CanvasPanel.Properties;
 
-			selectToolStripMenuItem.Tag = new DrawingModes.SelectMode();
-			lineToolStripMenuItem.Tag = new LineMode();
+			selectToolStripMenuItem.Tag = new DrawingModes.SelectMode(layer3);
+			lineToolStripMenuItem.Tag = new LineMode(layer3);
 
 			_CanvasPanel.DrawingMode = selectToolStripMenuItem.Tag as DrawingMode;
 			_CanvasPanel.OnSelected = (objs) =>

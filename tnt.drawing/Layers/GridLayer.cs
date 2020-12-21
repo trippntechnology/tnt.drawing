@@ -1,7 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace TNT.Drawing.Layers
 {
@@ -15,11 +12,6 @@ namespace TNT.Drawing.Layers
 
 
 		/// <summary>
-		/// The number of pixels between the line in the grid
-		/// </summary>
-		public int PixelsPerSegment { get => BackingFields.Get(10); set => BackingFields.Set(value); }
-
-		/// <summary>
 		/// The color of the grid lines
 		/// </summary>
 		public Color LineColor { get => BackingFields.Get(_Pen.Color); set => BackingFields.Set(value); }
@@ -30,35 +22,26 @@ namespace TNT.Drawing.Layers
 		public Color ShadowColor { get => BackingFields.Get(_ShadowBrush.Color); set => BackingFields.Set(value); }
 
 
-		public GridLayer() : base() { }
+		public GridLayer(Canvas canvas) : base(canvas) { }
 
-		/// <summary>
-		/// Initializes the <see cref="GridLayer"/>
-		/// </summary>
-		public GridLayer(Color lineColor, int pixelsBetweenLines)
+		public override void Draw(Graphics graphics)
 		{
-			PixelsPerSegment = pixelsBetweenLines;
-			LineColor = lineColor;
-		}
-
-		protected override void DrawImage(Graphics graphics)
-		{
-			var largeSegment = PixelsPerSegment * 10;
+			var largeSegment = Canvas.SnapInterval * 10;
 			_Pen.Color = LineColor;
 
-			for (int x = 0; x < Width; x += PixelsPerSegment)
+			for (int x = 0; x < Width; x += Canvas.SnapInterval)
 			{
 				_Pen.Width = (x % largeSegment == 0) ? 3 : 1;
 				graphics.DrawLine(_Pen, x, 0, x, Height);
 			}
 
-			for (int y = 0; y < Height; y += PixelsPerSegment)
+			for (int y = 0; y < Height; y += Canvas.SnapInterval)
 			{
 				_Pen.Width = (y % largeSegment == 0) ? 3 : 1;
 				graphics.DrawLine(_Pen, 0, y, Width, y);
 			}
 
-			base.DrawImage(graphics);
+			base.Draw(graphics);
 		}
 	}
 }

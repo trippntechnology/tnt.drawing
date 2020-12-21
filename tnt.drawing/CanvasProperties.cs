@@ -21,6 +21,8 @@ namespace TNT.Drawing
 				{"LayerHeight", 768},
 				{"LayerWidth", 1024},
 				{"ScalePercentage", 100},
+				{"SnapInterval", 10},
+				{"SnapToInterval", true},
 			};
 		}
 
@@ -28,6 +30,7 @@ namespace TNT.Drawing
 		/// Background color of the <see cref="Canvas"/>
 		/// </summary>
 		[XmlIgnore]
+		[DisplayName("Back Color")]
 		public Color BackColor { get { return Get<Color>(); } set { Set(value); } }
 
 		/// <summary>
@@ -38,15 +41,25 @@ namespace TNT.Drawing
 
 		/// <summary>
 		/// </summary>
+		[DisplayName("Layer Height")]
 		public int LayerHeight { get { return Get<int>(); } set { Set(value); } }
 
 		/// <summary>
 		/// </summary>
+		[DisplayName("Layer Width")]
 		public int LayerWidth { get { return Get<int>(); } set { Set(value); } }
 
 		/// <summary>
 		/// ScalePercentage of the <see cref="Canvas"/>
 		/// </summary>
+		[DisplayName("Scale Percentage")]
 		public int ScalePercentage { get { return Get<int>(); } set { Set(value); } }
+
+		[DisplayName("Snap Interval")]
+		[ReadOnly(true)]
+		public int SnapInterval { get { return Get<int>(); } set { Set(value); } }
+
+		[DisplayName("Snap To Interval")]
+		public bool SnapToInterval { get { return Get<bool>(); } set { Set(value); } }
 	}
 }
