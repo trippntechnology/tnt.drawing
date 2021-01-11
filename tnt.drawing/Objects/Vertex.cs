@@ -12,6 +12,8 @@ namespace TNT.Drawing.Objects
 
 		public Vertex(int x, int y) : base(x, y) { }
 
+		public Vertex(Point location) : base(location.X, location.Y) { }
+
 		public Vertex(Vertex vertex) : base(vertex) { }
 
 		public override CanvasObject Copy() => new Vertex(this);

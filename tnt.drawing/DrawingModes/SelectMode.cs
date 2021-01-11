@@ -74,12 +74,14 @@ namespace TNT.Drawing.DrawingModes
 
 		public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
 		{
-			var dx = e.X - previousMouseLocation.X;
-			var dy = e.Y - previousMouseLocation.Y;
-			previousMouseLocation = e.Location;
+			var location = Canvas.SnapToInterval ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
+
+			var dx = location.X - previousMouseLocation.X;
+			var dy = location.Y - previousMouseLocation.Y;
+			previousMouseLocation = location;
 
 			objectUnderMouse = FindObjectAt(Layer.CanvasObjects, e.Location, modifierKeys);
-			Log($"dx: {dx} dy: {dy} e.X: {e.X} e.Y: {e.Y} Location: {e.Location} objUnderMouse: {objectUnderMouse}");
+			Log($"dx: {dx} dy: {dy} e.X: {location.X} e.Y: {location.Y} Location: {location} objUnderMouse: {objectUnderMouse}");
 
 			if (IsMouseDown) selectedObjects.ForEach(o => o.MoveBy(dx, dy, modifierKeys));
 
@@ -95,6 +97,12 @@ namespace TNT.Drawing.DrawingModes
 			base.OnPaint(e);
 		}
 
-		protected CanvasObject FindObjectAt(List<CanvasObject> objs, Point mouseLocation, Keys modifierKeys) => objs.FirstOrDefault(o => o.MouseOver(mouseLocation, modifierKeys) != null);
+		protected CanvasObject FindObjectAt(List<CanvasObject> objs, Point mouseLocation, Keys modifierKeys)
+		{
+			// See if where over a selected object first just in case the selected object is in the list
+			// after another object in the same place
+			return selectedObjects.FirstOrDefault(o => o.MouseOver(mouseLocation, modifierKeys) != null) ??
+				objs.FirstOrDefault(o => o.MouseOver(mouseLocation, modifierKeys) != null);
+		}
 	}
 }

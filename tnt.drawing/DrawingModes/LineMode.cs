@@ -29,6 +29,7 @@ namespace TNT.Drawing.DrawingModes
 		public override void OnMouseClick(MouseEventArgs e, Keys modifierKeys)
 		{
 			base.OnMouseClick(e, modifierKeys);
+			var location = Canvas.SnapToInterval ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
 
 			if (e.Button == MouseButtons.Left)
 			{
@@ -38,14 +39,14 @@ namespace TNT.Drawing.DrawingModes
 
 					ActiveLine = DefaultObject.Copy() as Line;
 					ActiveLine.IsSelected = true;
-					ActiveLine.AddVertex(new Vertex(e.X, e.Y));
-					ActiveVertex = new Vertex(e.X, e.Y);
+					ActiveLine.AddVertex(new Vertex(location));
+					ActiveVertex = new Vertex(location);
 					ActiveLine.AddVertex(ActiveVertex);
 					Refresh();
 				}
 				else if (ActiveVertex != null)
 				{
-					ActiveVertex = new Vertex(e.X, e.Y);
+					ActiveVertex = new Vertex(location);
 					ActiveLine.AddVertex(ActiveVertex);
 					Refresh();
 				}
@@ -88,16 +89,17 @@ namespace TNT.Drawing.DrawingModes
 		public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
 		{
 			base.OnMouseMove(e, modifierKeys);
+			var location = Canvas.SnapToInterval?  e.Location.Snap(Canvas.SnapInterval) : e.Location;
 
 			if (ActiveVertex != null)
 			{
-				ActiveVertex.MoveTo(e.Location, modifierKeys);
+				ActiveVertex.MoveTo(location, modifierKeys);
 				Marker = null;
 			}
 			else
 			{
 				if (Marker == null) Marker = new CanvasPoint();
-				Marker.MoveTo(e.Location);
+				Marker.MoveTo(location);
 			}
 			Invalidate();
 		}

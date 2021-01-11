@@ -63,14 +63,14 @@ namespace TNT.Drawing
 
 		public static Point Add(this Point p1, Point p2) => new Point(p1.X + p2.X, p1.Y + p2.Y);
 
-		public static Point Snap(this Point point, int snap)
+		public static Point Snap(this Point point, int snapInterval)
 		{
-			var modX = point.X % snap;
-			var modY = point.Y % snap;
-			var newX = point.X / snap * snap;
-			var newY = point.Y / snap * snap;
-			point.X = modX >= snap / 2 ? newX + snap : newX;
-			point.Y = modY >= snap / 2 ? newY + snap : newY;
+			var modX = point.X % snapInterval;
+			var modY = point.Y % snapInterval;
+			var newX = point.X / snapInterval * snapInterval;
+			var newY = point.Y / snapInterval * snapInterval;
+			point.X = modX >= snapInterval / 2 ? newX + snapInterval : newX;
+			point.Y = modY >= snapInterval / 2 ? newY + snapInterval : newY;
 			return point;
 		}
 
