@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Windows.Forms;
 using TNT.Drawing.DrawingModes;
 using TNT.Drawing.Layers;
@@ -147,6 +148,12 @@ namespace TNT.Drawing
 			ScalePercentage = Convert.ToInt32(newScale);
 			var position = new Point(-(Parent.Width / 2 - Width / 2), -(Parent.Height / 2 - Height / 2));
 			ScrollableParent.AutoScrollPosition = position;
+		}
+
+		public void AlignToInterval()
+		{
+			var selectedObjects = Layers.SelectMany(l => l.GetSelected()).ToList();
+			selectedObjects.ForEach(o => o.Align(SnapInterval));
 		}
 
 		/// <summary>

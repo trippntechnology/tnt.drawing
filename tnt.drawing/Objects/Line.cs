@@ -25,6 +25,17 @@ namespace TNT.Drawing.Objects
 		[XmlIgnore]
 		protected List<CanvasPoint> Points { get; set; } = new List<CanvasPoint>();
 
+		protected GraphicsPath Path
+		{
+			get
+			{
+				var path = new GraphicsPath();
+				var points = Points.Select(v => v.ToPoint).ToArray();
+				path.AddBeziers(points);
+				return path;
+			}
+		}
+
 		/// <summary>
 		/// Needed for deserialization so that set gets called. 
 		/// </summary>
@@ -174,10 +185,7 @@ namespace TNT.Drawing.Objects
 			if (Points.Count > 3)
 			{
 				// Check if over this line
-				var path = new GraphicsPath();
-				var points = Points.Select(v => v.ToPoint).ToArray();
-				path.AddBeziers(points);
-				objUnderMouse = path.IsOutlineVisible(mousePosition, new Pen(Color.Black, 10F)) ? this : null;
+				objUnderMouse = Path.IsOutlineVisible(mousePosition, new Pen(Color.Black, 10F)) ? this : null;
 
 				if (objUnderMouse == null)
 				{
@@ -229,12 +237,7 @@ namespace TNT.Drawing.Objects
 
 		public override void Draw(Graphics graphics)
 		{
-			var path = new GraphicsPath();
-			var points = Points.Select(v => v.ToPoint).ToArray();
-			if (points.Length < 4) return;
-			path.AddBeziers(points);
-			graphics.DrawPath(Pen, path);
-
+			graphics.DrawPath(Pen, Path);
 			if (IsSelected) Points.ForEach(v => v.Draw(graphics));
 		}
 
@@ -249,5 +252,7 @@ namespace TNT.Drawing.Objects
 				activeObject?.MoveBy(dx, dy, modifierKeys);
 			}
 		}
+
+		public override void Align(int alignInterval) => Points.ForEach(p => p.Align(alignInterval));
 	}
 }

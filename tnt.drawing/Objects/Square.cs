@@ -50,5 +50,9 @@ namespace TNT.Drawing.Objects
 			X += dx;
 			Y += dy;
 		}
+
+		public override void Align(int alignInterval)
+		{
+		}
 	}
 }

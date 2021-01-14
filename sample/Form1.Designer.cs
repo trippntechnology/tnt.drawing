@@ -37,10 +37,11 @@
 			this.modeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.lineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.selectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.layerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-			this.layerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.alignToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -84,7 +85,8 @@
 			this.menuToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fitToolStripMenuItem1,
             this.saveToolStripMenuItem1,
-            this.openToolStripMenuItem1});
+            this.openToolStripMenuItem1,
+            this.alignToolStripMenuItem});
 			this.menuToolStripMenuItem.Name = "menuToolStripMenuItem";
 			this.menuToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
 			this.menuToolStripMenuItem.Text = "Menu";
@@ -133,6 +135,12 @@
 			this.selectToolStripMenuItem.Text = "Select";
 			this.selectToolStripMenuItem.Click += new System.EventHandler(this.lineToolStripMenuItem_Click);
 			// 
+			// layerToolStripMenuItem
+			// 
+			this.layerToolStripMenuItem.Name = "layerToolStripMenuItem";
+			this.layerToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
+			this.layerToolStripMenuItem.Text = "Layer";
+			// 
 			// propertyGrid1
 			// 
 			this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -158,11 +166,12 @@
 			this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
 			this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
 			// 
-			// layerToolStripMenuItem
+			// alignToolStripMenuItem
 			// 
-			this.layerToolStripMenuItem.Name = "layerToolStripMenuItem";
-			this.layerToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
-			this.layerToolStripMenuItem.Text = "Layer";
+			this.alignToolStripMenuItem.Name = "alignToolStripMenuItem";
+			this.alignToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.alignToolStripMenuItem.Text = "Align";
+			this.alignToolStripMenuItem.Click += new System.EventHandler(this.alignToolStripMenuItem_Click);
 			// 
 			// Form1
 			// 
@@ -203,6 +212,7 @@
 		private System.Windows.Forms.ToolStripMenuItem lineToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem selectToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem layerToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem alignToolStripMenuItem;
 	}
 }
 

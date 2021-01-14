@@ -41,6 +41,8 @@ namespace TNT.Drawing.Objects
 		/// </summary>
 		public abstract CanvasObject Copy();
 
+		public abstract void Align(int alignInterval);
+
 		/// <summary>
 		/// Implement by subclass to indicate mouse is over object. Should return the object that is under mouse.
 		/// </summary>

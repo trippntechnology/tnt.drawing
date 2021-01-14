@@ -53,7 +53,7 @@ namespace TNT.Drawing.Layers
 		/// <summary>
 		/// <see cref="CanvasObject"/> managed by this layer
 		/// </summary>
-		public List<CanvasObject> CanvasObjects { get; set; }
+		public List<CanvasObject> CanvasObjects { get; set; } = new List<CanvasObject>();
 
 		/// <summary>
 		/// A <see cref="Rectangle"/> that represents the area of this <see cref="CanvasLayer"/>
@@ -75,6 +75,7 @@ namespace TNT.Drawing.Layers
 			BackingFields.OnFieldChanged = (_, __) => IsInvalid = true;
 		}
 
+		public virtual List<CanvasObject> GetSelected() => CanvasObjects.FindAll(o => o.IsSelected);
 
 		public override string ToString() => Name;
 

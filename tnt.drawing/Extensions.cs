@@ -74,6 +74,8 @@ namespace TNT.Drawing
 			return point;
 		}
 
+		public static (int, int) Deconstruct(this Point point) => (point.X, point.Y);
+
 		public static void RunNotNull<A>(A arg1, Action<A> callback)
 		{
 			if (arg1 != null) callback(arg1);

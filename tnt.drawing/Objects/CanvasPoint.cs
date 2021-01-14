@@ -59,6 +59,12 @@ namespace TNT.Drawing.Objects
 			return path.IsVisible(mousePosition) ? this : null;
 		}
 
+		public override void Align(int alignInterval)
+		{
+			var point = new Point(X, Y).Snap(alignInterval);
+			(X, Y) = point.Deconstruct();
+		}
+
 		public void MoveTo(Point point)
 		{
 			X = point.X;

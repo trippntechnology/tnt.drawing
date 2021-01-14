@@ -74,7 +74,7 @@ namespace TNT.Drawing.DrawingModes
 
 		public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
 		{
-			var location = Canvas.SnapToInterval ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
+			var location = Canvas.SnapToInterval && (modifierKeys & Keys.Control) != Keys.Control ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
 
 			var dx = location.X - previousMouseLocation.X;
 			var dy = location.Y - previousMouseLocation.Y;
