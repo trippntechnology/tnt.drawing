@@ -10,6 +10,11 @@ namespace TNT.Drawing
 	public class CanvasPanel : Panel
 	{
 		/// <summary>
+		/// Default constructor
+		/// </summary>
+		public CanvasPanel() { }
+
+		/// <summary>
 		/// Initializes <see cref="CanvasPanel"/>
 		/// </summary>
 		public CanvasPanel(Control parent)
