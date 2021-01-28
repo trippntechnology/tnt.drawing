@@ -55,10 +55,16 @@ namespace TNT.Drawing
 		[DisplayName("Scale Percentage")]
 		public int ScalePercentage { get { return Get<int>(); } set { Set(value); } }
 
+		/// <summary>
+		/// Indicates the snap interval
+		/// </summary>
 		[DisplayName("Snap Interval")]
 		[ReadOnly(true)]
 		public int SnapInterval { get { return Get<int>(); } set { Set(value); } }
 
+		/// <summary>
+		/// Indicates objects should be snapped to <see cref="SnapInterval"/>
+		/// </summary>
 		[DisplayName("Snap To Interval")]
 		public bool SnapToInterval { get { return Get<bool>(); } set { Set(value); } }
 	}

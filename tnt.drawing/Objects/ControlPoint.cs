@@ -1,18 +1,29 @@
 ﻿using System;
 using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 using TNT.Drawing.Resource;
 
 namespace TNT.Drawing.Objects
 {
+	/// <summary>
+	/// Represents a controll point on the <see cref="Canvas"/>
+	/// </summary>
 	public class ControlPoint : CanvasPoint
 	{
+		/// <summary>
+		/// <see cref="Func{ControlPoint, Boolean}"/> delegate called to see if this <see cref="ControlPoint"/>
+		/// should be visible or not
+		/// </summary>
+		public Func<ControlPoint, bool> IsVisible { get; set; } = (_) => { return false; };
+
+		/// <summary>
+		/// <see cref="Image"/> that represents this point
+		/// </summary>
 		public override Image Image => Resources.Images.ControlPoint;
 
-		private Pen pen = new Pen(Color.FromArgb(100, Color.Black));
-
-		public override bool Visible => LinkedPoints.FirstOrDefault(p => p.Id != Id && p.X == this.X && p.Y == this.Y) == null;
+		/// <summary>
+		/// Indicates whether the <see cref="ControlPoint"/> is visible or not
+		/// </summary>
+		public override bool Visible => IsVisible(this);
 
 		/// <summary>
 		/// Default Constructor
@@ -20,43 +31,29 @@ namespace TNT.Drawing.Objects
 		public ControlPoint() { }
 
 		/// <summary>
+		/// Initializes the <see cref="ControlPoint"/> with an initial <paramref name="initPoint"/>
+		/// </summary>
+		/// <param name="initPoint"></param>
+		public ControlPoint(Point initPoint) : base(initPoint.X, initPoint.Y) { }
+
+		/// <summary>
 		/// Copy constructor
 		/// </summary>
 		public ControlPoint(ControlPoint controlPoint) : base(controlPoint) { }
 
-		public ControlPoint(Vertex vertex) : base(vertex)
-		{
-			AddLinkedPoints(vertex);
-			vertex.AddLinkedPoints(this);
-		}
-
+		/// <summary>
+		/// Draws the <see cref="ControlPoint"/> if <see cref="Visible"/>
+		/// </summary>
 		public override void Draw(Graphics graphics)
 		{
 			if (!Visible) return;
-			LinkedPoints.FirstOrDefault(p => p is Vertex).Let(p => graphics.DrawLine(pen, ToPoint, p.ToPoint));
 			base.Draw(graphics);
 		}
 
-		public override void MoveBy(int dx, int dy, Keys modifierKeys)
-		{
-			base.MoveBy(dx, dy, modifierKeys);
-
-			if (modifierKeys == Keys.Shift)
-			{
-				// Get vertex point
-				var vertex = LinkedPoints.FirstOrDefault(p => p is Vertex);
-				// Get the opposite control point
-				var opposite = vertex?.LinkedPoints.FirstOrDefault(p => p.Id != Id);
-
-				var offset = vertex.ToPoint.Subtract(ToPoint);
-				var newPoint = vertex.ToPoint.Add(offset);
-				opposite?.MoveTo(newPoint);
-			}
-		}
-
-		public override CanvasObject Copy()
-		{
-			throw new NotImplementedException();
-		}
+		/// <summary>
+		/// Copies this <see cref="ControlPoint"/>
+		/// </summary>
+		/// <returns>Copy of this <see cref="ControlPoint"/></returns>
+		public override CanvasObject Copy() => new ControlPoint(this);
 	}
 }

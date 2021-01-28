@@ -21,9 +21,14 @@ namespace TNT.Drawing.Layers
 		/// </summary>
 		public Color ShadowColor { get => BackingFields.Get(_ShadowBrush.Color); set => BackingFields.Set(value); }
 
-
+		/// <summary>
+		/// Copy constructor
+		/// </summary>
 		public GridLayer(Canvas canvas) : base(canvas) { }
 
+		/// <summary>
+		/// Draws the <see cref="GridLayer"/>
+		/// </summary>
 		public override void Draw(Graphics graphics)
 		{
 			var largeSegment = Canvas.SnapInterval * 10;

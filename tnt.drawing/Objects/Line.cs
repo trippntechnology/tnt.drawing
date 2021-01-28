@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -8,23 +9,44 @@ using TNT.Drawing.Resource;
 
 namespace TNT.Drawing.Objects
 {
+	/// <summary>
+	/// Repesents a line on the <see cref="Canvas"/>
+	/// </summary>
 	public class Line : CanvasObject
 	{
 		private CanvasObject activeObject = null;
 		private Pen _Pen = new Pen(Color.Black, 1);
 
+		/// <summary>
+		/// Indicates the width of the <see cref="Line"/>
+		/// </summary>
 		public float Width { get; set; } = 1;
 
+		/// <summary>
+		/// Represents the <see cref="Color"/> as an ARGB value so that it can be persisted
+		/// </summary>
 		public int ColorARGB { get => this.Color.ToArgb(); set => this.Color = Color.FromArgb(value); }
 
+		/// <summary>
+		/// Indicates the <see cref="Color"/> of the <see cref="Line"/>
+		/// </summary>
 		[XmlIgnore]
 		public Color Color { get; set; } = Color.Blue;
 
+		/// <summary>
+		/// Indicates the <see cref="DashStyle"/> of the <see cref="Line"/>
+		/// </summary>
 		public DashStyle Style { get; set; } = DashStyle.Solid;
 
+		/// <summary>
+		/// The <see cref="List{CanvasPoint}"/> represented by this <see cref="Line"/>
+		/// </summary>
 		[XmlIgnore]
 		protected List<CanvasPoint> Points { get; set; } = new List<CanvasPoint>();
 
+		/// <summary>
+		/// Creates the <see cref="GraphicsPath"/> represented by <see cref="Points"/>
+		/// </summary>
 		protected GraphicsPath Path
 		{
 			get
@@ -47,14 +69,12 @@ namespace TNT.Drawing.Objects
 				Points = value.ToList();
 				var ctrlPoints = Points.ToList().FindAll(p => p is ControlPoint);
 				var vertices = Points.ToList().FindAll(p => p is Vertex);
-				ctrlPoints.ForEach(p =>
-				{
-					var linkedPoints = p.LinkedPointIds.Select(s => vertices.Find(v => v.Id == s));
-					p.AddLinkedPoints(linkedPoints.ToArray());
-				});
 			}
 		}
 
+		/// <summary>
+		/// Represents the <see cref="Pen"/> used when generating this <see cref="Line"/>
+		/// </summary>
 		public Pen Pen
 		{
 			get
@@ -66,19 +86,28 @@ namespace TNT.Drawing.Objects
 			}
 		}
 
+		/// <summary>
+		/// Default constructor
+		/// </summary>
 		public Line() : base() { }
 
+		/// <summary>
+		/// Copy constructor
+		/// </summary>
 		public Line(Line line) : this() { Width = line.Width; Color = line.Color; }
 
+		/// <summary>
+		/// Adds a <see cref="Vertex"/> to this line
+		/// </summary>
 		public void AddVertex(Vertex vertex)
 		{
-			vertex.Parent = this;
+			vertex.OnPointMoved = OnPointMoved;
 
 			if (Points.Count > 0)
 			{
 				var p1 = Points.Last(p => p is Vertex) as Vertex;
-				var c1 = new ControlPoint(p1) { Parent = this };
-				var c2 = new ControlPoint(vertex) { Parent = this };
+				var c1 = new ControlPoint(p1.ToPoint) { OnPointMoved = OnPointMoved, IsVisible = IsControlPointVisible };
+				var c2 = new ControlPoint(vertex.ToPoint) { OnPointMoved = OnPointMoved, IsVisible = IsControlPointVisible };
 
 				Points.Add(c1);
 				Points.Add(c2);
@@ -86,18 +115,72 @@ namespace TNT.Drawing.Objects
 			Points.Add(vertex);
 		}
 
-		public void RemoveVertex(Vertex vertex)
+		/// <summary>
+		/// Indicates if <paramref name="ctrlPoint"/> is visible
+		/// </summary>
+		/// <returns>True if <paramref name="ctrlPoint"/> is visible, false otherwise</returns>
+		private bool IsControlPointVisible(ControlPoint ctrlPoint)
 		{
-			vertex.LinkedPointIds.ForEach(id => Points.RemoveAll(p => p.Id == id));
-			Points.Remove(vertex);
-			var lastPoint = Points.LastOrDefault();
-			if (lastPoint is ControlPoint)
+			// Find the vertex next to control point
+			var adjacent = Points.AdjacentTo(ctrlPoint);
+			var vertex = adjacent.Find(p => p is Vertex);
+			return !(vertex.X == ctrlPoint.X && vertex.Y == ctrlPoint.Y);
+		}
+
+		/// <summary>
+		/// Called when the <paramref name="canvasPoint"/> is moved
+		/// </summary>
+		private void OnPointMoved(CanvasPoint canvasPoint, int dx, int dy, Keys modifierKeys)
+		{
+			if (canvasPoint is ControlPoint)
 			{
-				lastPoint.LinkedPoints.ForEach(p => p.RemovedLinkedPoints(lastPoint));
-				Points.Remove(lastPoint);
+				if (modifierKeys == Keys.Shift)
+				{
+					// Find the Vertex adjacent to ControlPoint
+					var index = Points.IndexOf(canvasPoint);
+					var vertexIndex = Points[index - 1] is Vertex ? index - 1 : index + 1;
+					var vertex = Points.ElementAtOrDefault(vertexIndex);
+
+					// Get the opposite control point
+					var oppositeIndex = vertexIndex < index ? vertexIndex - 1 : vertexIndex + 1;
+					var opposite = Points.ElementAtOrDefault(oppositeIndex);
+
+					var offset = vertex.ToPoint.Subtract(canvasPoint.ToPoint);
+					var newPoint = vertex.ToPoint.Add(offset);
+					opposite?.MoveTo(newPoint, modifierKeys, true);
+				}
+			}
+			else if (canvasPoint is Vertex)
+			{
+				// Find ControlPoints adjacent to this Vertex
+				var vertexIndex = Points.IndexOf(canvasPoint);
+				var ctrlPoints = new List<CanvasPoint>();
+				ctrlPoints.AddNotNull(Points.ElementAtOrDefault(vertexIndex - 1));
+				ctrlPoints.AddNotNull(Points.ElementAtOrDefault(vertexIndex + 1));
+				ctrlPoints.ForEach(cp => cp.MoveBy(dx, dy, Keys.None, true));
 			}
 		}
 
+		/// <summary>
+		/// Removes a <see cref="Vertex"/> from this <see cref=" Line"/>
+		/// </summary>
+		public void RemoveVertex(Vertex vertex)
+		{
+			var vertexIndex = Points.IndexOf(vertex);
+			var count = vertexIndex == 0 || vertexIndex == Points.Count - 1 ? 2 : 3;
+
+			// Remove vertex and associated ControlPoints
+			Points.RemoveRange(Math.Max(0, vertexIndex - 1), count);
+
+			// Remove ControlPoints that might be at the start or end that are no longer needed
+			var orphanedCtrlPoint = Points.FirstOrDefault() as ControlPoint ?? Points.LastOrDefault() as ControlPoint;
+			orphanedCtrlPoint?.Let(p => Points.Remove(p));
+		}
+
+		/// <summary>
+		/// TODO
+		/// </summary>
+		/// <returns></returns>
 		public override CanvasObject OnMouseDown(Point location, Keys modifierKeys)
 		{
 			activeObject = this;
@@ -123,7 +206,7 @@ namespace TNT.Drawing.Objects
 
 				if (point == null && modifierKeys == (Keys.Control | Keys.Shift))
 				{
-					TryAddPoint(location);
+					TryAddVertex(location);
 				}
 
 				activeObject = point ?? activeObject;
@@ -132,7 +215,10 @@ namespace TNT.Drawing.Objects
 			return activeObject;
 		}
 
-		private void TryAddPoint(Point location)
+		/// <summary>
+		/// Tries to add a <see cref="Vertex"/> at <paramref name="location"/> from <see cref="Line"/>
+		/// </summary>
+		private void TryAddVertex(Point location)
 		{
 			var path = new GraphicsPath();
 			var pen = new Pen(Color.Black, 10);
@@ -150,13 +236,17 @@ namespace TNT.Drawing.Objects
 
 			if (insertIndex != null)
 			{
-				var vertex = new Vertex(location.X, location.Y) { Parent = this };
-				var c1 = new ControlPoint(vertex) { Parent = this };
-				var c2 = new ControlPoint(vertex) { Parent = this };
+				var vertex = new Vertex(location.X, location.Y) { OnPointMoved = OnPointMoved };
+				var c1 = new ControlPoint(vertex.ToPoint) { OnPointMoved = OnPointMoved, IsVisible = IsControlPointVisible };
+				var c2 = new ControlPoint(vertex.ToPoint) { OnPointMoved = OnPointMoved, IsVisible = IsControlPointVisible };
 				Points.InsertRange((int)insertIndex, new List<CanvasPoint>() { c1, vertex, c2 });
 			}
 		}
 
+		/// <summary>
+		/// Deletes the <paramref name="point"/> from <see cref="Line"/>
+		/// </summary>
+		/// <param name="point"></param>
 		private void DeletePoint(CanvasPoint point)
 		{
 			if (point is Vertex vertex)
@@ -171,13 +261,23 @@ namespace TNT.Drawing.Objects
 			else if (point is ControlPoint ctrlPoint)
 			{
 				// Reset position of ControlPoint
-				var canvasPoint = ctrlPoint.LinkedPoints.FirstOrDefault(p => p is Vertex);
-				ctrlPoint.MoveTo(canvasPoint.ToPoint);
+				var ctrlPointIndex = Points.IndexOf(point);
+				var canvasPoint = Points.ElementAtOrDefault(ctrlPointIndex - 1) as Vertex ?? Points.ElementAtOrDefault(ctrlPointIndex + 1) as Vertex;
+				ctrlPoint.MoveTo(canvasPoint.ToPoint, Keys.None);
 			}
 		}
 
+		/// <summary>
+		/// Copies this <see cref="Line"/>
+		/// </summary>
+		/// <returns></returns>
 		public override CanvasObject Copy() => new Line(this);
 
+		/// <summary>
+		/// Checks if <paramref name="mousePosition"/> is over any part of this <see cref="Line"/> and return the 
+		/// <see cref="CanvasObject"/> within the line that it is over
+		/// </summary>
+		/// <returns><see cref="CanvasObject"/> within the line that it is over</returns>
 		public override CanvasObject MouseOver(Point mousePosition, Keys modifierKeys)
 		{
 			CanvasObject objUnderMouse = null;
@@ -197,6 +297,11 @@ namespace TNT.Drawing.Objects
 			return objUnderMouse;
 		}
 
+		/// <summary>
+		/// Gets a <see cref="Cursor"/> representing the state of the <see cref="Line"/> that is represented
+		/// by <paramref name="location"/>
+		/// </summary>
+		/// <returns><see cref="Cursor"/> represented by <paramref name="location"/></returns>
 		public override Cursor GetCursor(Point location, Keys keys)
 		{
 			var cursor = Cursors.Hand;
@@ -235,13 +340,31 @@ namespace TNT.Drawing.Objects
 			return cursor;
 		}
 
+		/// <summary>
+		/// Draws <see cref="Line"/>
+		/// </summary>
 		public override void Draw(Graphics graphics)
 		{
 			graphics.DrawPath(Pen, Path);
-			if (IsSelected) Points.ForEach(v => v.Draw(graphics));
+			if (IsSelected)
+			{
+				Pen pen = new Pen(Color.FromArgb(100, Color.Black));
+				Points.ForEach(v => v.Draw(graphics));
+				var vertices = Points.FindAll(p => p is Vertex);
+				vertices.ForEach(v =>
+				{
+					Points.AdjacentTo(v).ForEach(a =>
+					{
+						graphics.DrawLine(pen, v.ToPoint, a.ToPoint);
+					});
+				});
+			}
 		}
 
-		public override void MoveBy(int dx, int dy, Keys modifierKeys)
+		/// <summary>
+		/// Moves <see cref="Line"/> by <paramref name="dx"/> and <paramref name="dy"/>
+		/// </summary>
+		public override void MoveBy(int dx, int dy, Keys modifierKeys, bool supressCallback = false)
 		{
 			if (activeObject == this)
 			{
@@ -253,6 +376,9 @@ namespace TNT.Drawing.Objects
 			}
 		}
 
+		/// <summary>
+		/// Aligns <see cref="Line"/> to the <paramref name="alignInterval"/>
+		/// </summary>
 		public override void Align(int alignInterval) => Points.ForEach(p => p.Align(alignInterval));
 	}
 }

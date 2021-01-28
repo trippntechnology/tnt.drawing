@@ -1,16 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Xml.Serialization;
 using TNT.Drawing.Objects;
 
 namespace TNT.Drawing.Layers
 {
+	/// <summary>
+	/// Represents a layer managed by the <see cref="Canvas"/>
+	/// </summary>
 	[Serializable]
 	public class CanvasLayer
 	{
+		/// <summary>
+		/// Backing fields for properties
+		/// </summary>
 		protected BackingFields BackingFields = new BackingFields();
+
+		/// <summary>
+		/// Reference the <see cref="Canvas"/>
+		/// </summary>
 		protected Canvas Canvas = null;
 
 		/// <summary>
@@ -75,8 +84,16 @@ namespace TNT.Drawing.Layers
 			BackingFields.OnFieldChanged = (_, __) => IsInvalid = true;
 		}
 
+		/// <summary>
+		/// Gets the selected <see cref="CanvasObject"/>
+		/// </summary>
+		/// <returns>Selected <see cref="CanvasObject"/></returns>
 		public virtual List<CanvasObject> GetSelected() => CanvasObjects.FindAll(o => o.IsSelected);
 
+		/// <summary>
+		/// Override to return the <see cref="Name"/>
+		/// </summary>
+		/// <returns><see cref="Name"/></returns>
 		public override string ToString() => Name;
 
 		/// <summary>
@@ -91,6 +108,9 @@ namespace TNT.Drawing.Layers
 			CanvasObjects?.ForEach(o => { if (!o.IsSelected) o.Draw(graphics); });
 		}
 
+		/// <summary>
+		/// Sets <see cref="IsInvalid"/> to true
+		/// </summary>
 		public void Invalidate() => IsInvalid = true;
 	}
 }

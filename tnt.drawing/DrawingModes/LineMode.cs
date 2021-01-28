@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Drawing;
+﻿using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using TNT.Drawing.Layers;
@@ -8,16 +6,28 @@ using TNT.Drawing.Objects;
 
 namespace TNT.Drawing.DrawingModes
 {
+	/// <summary>
+	/// <see cref="DrawingMode"/> to draw a line
+	/// </summary>
 	public class LineMode : DrawingMode
 	{
 		private Line ActiveLine = null;
 		private Vertex ActiveVertex = null;
 		private CanvasPoint Marker = null;
 
+		/// <summary>
+		/// The <see cref="Line"/> that gets created by default
+		/// </summary>
 		public override CanvasObject DefaultObject { get; } = new Line();
 
+		/// <summary>
+		/// Initialization constructor
+		/// </summary>
 		public LineMode(CanvasLayer layer) : base(layer) { }
 
+		/// <summary>
+		/// Clears the state maintained by <see cref="LineMode"/>
+		/// </summary>
 		public override void Reset()
 		{
 			ActiveLine = null;
@@ -26,6 +36,9 @@ namespace TNT.Drawing.DrawingModes
 			base.Reset();
 		}
 
+		/// <summary>
+		/// Creates a new line segment
+		/// </summary>
 		public override void OnMouseClick(MouseEventArgs e, Keys modifierKeys)
 		{
 			base.OnMouseClick(e, modifierKeys);
@@ -65,6 +78,9 @@ namespace TNT.Drawing.DrawingModes
 			}
 		}
 
+		/// <summary>
+		/// Completes the <see cref="Line"/> and adds it to the <see cref="Canvas"/>
+		/// </summary>
 		public override void OnMouseDoubleClick(MouseEventArgs e)
 		{
 			base.OnMouseDoubleClick(e);
@@ -81,15 +97,13 @@ namespace TNT.Drawing.DrawingModes
 			}
 		}
 
-		public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
-		{
-			base.OnMouseDown(e, modifierKeys);
-		}
-
+		/// <summary>
+		/// Moves the <see cref="ActiveVertex"/> or <see cref="Marker"/>
+		/// </summary>
 		public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
 		{
 			base.OnMouseMove(e, modifierKeys);
-			var location = Canvas.SnapToInterval?  e.Location.Snap(Canvas.SnapInterval) : e.Location;
+			var location = Canvas.SnapToInterval ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
 
 			if (ActiveVertex != null)
 			{
@@ -99,20 +113,20 @@ namespace TNT.Drawing.DrawingModes
 			else
 			{
 				if (Marker == null) Marker = new CanvasPoint();
-				Marker.MoveTo(location);
+				Marker.MoveTo(location, modifierKeys);
 			}
 			Invalidate();
 		}
+
+		/// <summary>
+		///  Draws the <see cref="Marker"/> or <see cref="ActiveLine"/>
+		/// </summary>
+		/// <param name="e"></param>
 		public override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
 			Marker?.Draw(e.Graphics);
 			ActiveLine?.Draw(e.Graphics);
-		}
-
-		public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
-		{
-			base.OnMouseUp(e, modifierKeys);
 		}
 	}
 }

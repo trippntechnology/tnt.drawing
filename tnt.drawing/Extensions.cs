@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 
 namespace TNT.Drawing
 {
@@ -18,6 +20,9 @@ namespace TNT.Drawing
 			return block(value);
 		}
 
+		/// <summary>
+		/// Variation of Kotlin let that doesn't require returning a value
+		/// </summary>
 		public static void Let<T>(this T value, Action<T> block)
 		{
 			if (value == null) return;
@@ -57,12 +62,19 @@ namespace TNT.Drawing
 		}
 
 		/// <summary>
-		/// Subtracts the <see cref="Point"/> p2 from <see cref="Point"/> p1
+		/// Subtracts <see cref="Point"/> p2 from <see cref="Point"/> p1
 		/// </summary>
 		public static Point Subtract(this Point p1, Point p2) => new Point(p1.X - p2.X, p1.Y - p2.Y);
 
+		/// <summary>
+		/// Adds <see cref="Point"/> p2 to <see cref="Point"/> p1
+		/// </summary>
 		public static Point Add(this Point p1, Point p2) => new Point(p1.X + p2.X, p1.Y + p2.Y);
 
+		/// <summary>
+		/// Returns a new <see cref="Point"/> that is adjusted to the <paramref name="snapInterval"/>
+		/// </summary>
+		/// <returns>A new <see cref="Point"/> that is adjusted to the <paramref name="snapInterval"/></returns>
 		public static Point Snap(this Point point, int snapInterval)
 		{
 			var modX = point.X % snapInterval;
@@ -74,16 +86,46 @@ namespace TNT.Drawing
 			return point;
 		}
 
+		/// <summary>
+		/// Deconstructs the <see cref="Point"/> into its X and Y components
+		/// </summary>
+		/// <returns>Deconstructed components of a <see cref="Point"/></returns>
 		public static (int, int) Deconstruct(this Point point) => (point.X, point.Y);
 
-		public static void RunNotNull<A>(A arg1, Action<A> callback)
+		/// <summary>
+		/// Runs <paramref name="callback"/> when <paramref name="v1"/> and <paramref name="v2"/> are not
+		/// null
+		/// </summary>
+		public static void RunNotNull<T1, T2>(T1 v1, T2 v2, Action<T1, T2> callback = null)
 		{
-			if (arg1 != null) callback(arg1);
+			if (v1 != null && v2 != null) callback(v1, v2);
 		}
 
-		public static void RunNotNull<A, B>(A arg1, B arg2, Action<A, B> callback)
+		/// <summary>
+		/// Runs <paramref name="callback"/> when <paramref name="v1"/>, <paramref name="v2"/> and <paramref name="v3"/>
+		/// are not null
+		/// </summary>
+		public static void RunNotNull<T1, T2, T3>(T1 v1, T2 v2, T3 v3, Action<T1, T2, T3> callback = null)
 		{
-			if (arg1 != null && arg2 != null) callback(arg1, arg2);
+			if (v1 != null && v2 != null && v3 != null) callback(v1, v2, v3);
+		}
+
+		/// <summary>
+		/// Adds <paramref name="value"/> to <paramref name="list"/> if <paramref name="value"/> is not null
+		/// </summary>
+		public static void AddNotNull<T>(this List<T> list, T value)
+		{
+			if (value != null) list.Add(value);
+		}
+
+		/// <summary>
+		/// Finds the elements in <paramref name="list"/> adjacent to <paramref name="element"/>
+		/// </summary>
+		/// <returns>The elements in <paramref name="list"/> adjacent to <paramref name="element"/></returns>
+		public static List<T> AdjacentTo<T>(this List<T> list, T element)
+		{
+			var elementIndex = list.IndexOf(element);
+			return list.Where((_, index) => index == elementIndex - 1 || index == elementIndex + 1).ToList();
 		}
 	}
 }

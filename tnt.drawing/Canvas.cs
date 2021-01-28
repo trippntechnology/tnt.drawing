@@ -16,6 +16,10 @@ namespace TNT.Drawing
 	/// </summary>
 	public class Canvas : Control
 	{
+		/// <summary>
+		/// Delegate that is called to signal that one or more <see cref="object"/> have been
+		/// selected within the <see cref="Canvas"/>
+		/// </summary>
 		public Action<List<object>> OnSelected = (_) => { };
 
 		private const int MINIMUM_PADDING = 1000;
@@ -46,12 +50,18 @@ namespace TNT.Drawing
 			}
 		}
 
+		/// <summary>
+		/// <see cref="DrawingMode"/> interacting with the <see cref="Canvas"/>
+		/// </summary>
 		public DrawingMode DrawingMode
 		{
 			get { return _DrawingMode; }
 			set { _DrawingMode = value; _DrawingMode.Canvas = this; }
 		}
 
+		/// <summary>
+		/// <see cref="List{CanvasLayer}"/> managed by the <see cref="Canvas"/>
+		/// </summary>
 		public List<CanvasLayer> Layers { get { return _Layers; } set { _Layers = value; Refresh(); } }
 
 		/// <summary>
@@ -92,8 +102,14 @@ namespace TNT.Drawing
 			}
 		}
 
+		/// <summary>
+		/// Snap interval
+		/// </summary>
 		public int SnapInterval { get; set; } = 10;
 
+		/// <summary>
+		/// Indicates whether movement should be snapped to <see cref="SnapInterval"/>
+		/// </summary>
 		public bool SnapToInterval { get; set; }
 
 		/// <summary>
@@ -150,6 +166,9 @@ namespace TNT.Drawing
 			ScrollableParent.AutoScrollPosition = position;
 		}
 
+		/// <summary>
+		/// Aligns all selected objects to the <see cref="SnapInterval"/>
+		/// </summary>
 		public void AlignToInterval()
 		{
 			var selectedObjects = Layers.SelectMany(l => l.GetSelected()).ToList();
@@ -186,6 +205,9 @@ namespace TNT.Drawing
 			base.OnPaint(e);
 		}
 
+		/// <summary>
+		/// Repositions the <see cref="Canvas"/> to keep the mouse at the same postion within the <see cref="Canvas"/>
+		/// </summary>
 		private void RepositionToAlignWithMouse(Point previousPosition, Point currentPosition)
 		{
 			var min = 0;
@@ -257,12 +279,19 @@ namespace TNT.Drawing
 			base.OnMouseMove(e);
 		}
 
+		/// <summary>
+		/// Forces control to immediately redraw itself
+		/// </summary>
 		public void Refresh(CanvasLayer layer)
 		{
 			layer?.Invalidate();
 			base.Refresh();
 		}
 
+		/// <summary>
+		/// Invalidates the control to redraw itself
+		/// </summary>
+		/// <param name="layer"></param>
 		public void Invalidate(CanvasLayer layer)
 		{
 			layer?.Invalidate();
@@ -295,6 +324,9 @@ namespace TNT.Drawing
 			DrawingMode.OnKeyUp(e);
 		}
 
+		/// <summary>
+		/// Relays the OnMouseClick to the <see cref="DrawingMode"/>
+		/// </summary>
 		protected override void OnMouseClick(MouseEventArgs e)
 		{
 			var graphics = CreateTransformedGraphics();
@@ -302,12 +334,18 @@ namespace TNT.Drawing
 			DrawingMode.OnMouseClick(mea, ModifierKeys);
 		}
 
+		/// <summary>
+		/// Relays the OnMouseDoubleClick to the <see cref="DrawingMode"/>
+		/// </summary>
 		protected override void OnMouseDoubleClick(MouseEventArgs e)
 		{
 			base.OnMouseDoubleClick(e);
 			DrawingMode.OnMouseDoubleClick(e);
 		}
 
+		/// <summary>
+		/// Relays the OnMouseDown to the <see cref="DrawingMode"/>
+		/// </summary>
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			MouseEventArgs mea = Transform(e);
@@ -315,6 +353,10 @@ namespace TNT.Drawing
 			base.OnMouseDown(e);
 		}
 
+		/// <summary>
+		/// Transforms the location within the <see cref="MouseEventArgs"/> using the <paramref name="graphics"/>
+		/// </summary>
+		/// <returns><see cref="MouseEventArgs"/> with the transformed location</returns>
 		private MouseEventArgs Transform(MouseEventArgs e, Graphics graphics = null)
 		{
 			graphics = graphics ?? CreateTransformedGraphics();
@@ -322,6 +364,9 @@ namespace TNT.Drawing
 			return new MouseEventArgs(e.Button, e.Clicks, layerPoint.X, layerPoint.Y, e.Delta);
 		}
 
+		/// <summary>
+		/// Relays the OnMouseUp to the <see cref="DrawingMode"/>
+		/// </summary>
 		protected override void OnMouseUp(MouseEventArgs e)
 		{
 			base.OnMouseUp(e);
@@ -359,6 +404,9 @@ namespace TNT.Drawing
 		/// </summary>
 		private void OnParentResize(object sender, EventArgs e) => Refresh();
 
+		/// <summary>
+		/// Called when objects have been selected
+		/// </summary>
 		public void OnObjectsSelected(List<object> objs)
 		{
 			var selected = objs.Count == 0 ? new List<Object>() { Properties } : objs;
