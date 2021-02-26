@@ -181,9 +181,10 @@ namespace TNT.Drawing.Objects
 		/// TODO
 		/// </summary>
 		/// <returns></returns>
-		public override CanvasObject OnMouseDown(Point location, Keys modifierKeys)
+		public override CanvasObject OnMouseDown(Point location, Keys modifierKeys, out bool allowMove)
 		{
 			activeObject = this;
+			allowMove = true;
 
 			if (IsSelected)
 			{
@@ -196,7 +197,7 @@ namespace TNT.Drawing.Objects
 				{
 					// Delete point
 					DeletePoint(point);
-
+					allowMove = false;
 				}
 				else if (ctrlPoint != null && modifierKeys == Keys.Shift)
 				{
@@ -207,6 +208,7 @@ namespace TNT.Drawing.Objects
 				if (point == null && modifierKeys == (Keys.Control | Keys.Shift))
 				{
 					TryAddVertex(location);
+					allowMove = false;
 				}
 
 				activeObject = point ?? activeObject;

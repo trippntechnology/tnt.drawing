@@ -62,7 +62,11 @@ namespace TNT.Drawing.Objects
 		/// Called when a button press event occurs over an object
 		/// </summary>
 		/// <returns><see cref="CanvasObject"/> under mouse at the time of the button press</returns>
-		public virtual CanvasObject OnMouseDown(Point location, Keys modifierKeys) => null;
+		public virtual CanvasObject OnMouseDown(Point location, Keys modifierKeys, out bool allowMove)
+		{
+			allowMove = true;
+			return null;
+		}
 
 		/// <summary>
 		/// Implement to return a <see cref="Cursor"/> indicating the state of the object

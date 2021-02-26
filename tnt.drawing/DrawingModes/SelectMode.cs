@@ -12,6 +12,7 @@ namespace TNT.Drawing.DrawingModes
 	/// </summary>
 	public class SelectMode : DrawingMode
 	{
+		private bool allowMove = false;
 		private Point previousMouseLocation = Point.Empty;
 		private List<CanvasObject> selectedObjects = new List<CanvasObject>();
 		private CanvasObject objectUnderMouse = null;
@@ -35,7 +36,7 @@ namespace TNT.Drawing.DrawingModes
 		/// </summary>
 		public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
 		{
-			var activeObject = objectUnderMouse?.OnMouseDown(e.Location, modifierKeys);
+			var activeObject = objectUnderMouse?.OnMouseDown(e.Location, modifierKeys, out allowMove);
 
 			if (activeObject != null && objectUnderMouse != activeObject) selectedObjects.Clear();
 
@@ -100,7 +101,7 @@ namespace TNT.Drawing.DrawingModes
 			objectUnderMouse = FindObjectAt(Layer.CanvasObjects, e.Location, modifierKeys);
 			Log($"dx: {dx} dy: {dy} e.X: {location.X} e.Y: {location.Y} Location: {location} objUnderMouse: {objectUnderMouse}");
 
-			if (IsMouseDown) selectedObjects.ForEach(o => o.MoveBy(dx, dy, modifierKeys));
+			if (IsMouseDown && allowMove) selectedObjects.ForEach(o => o.MoveBy(dx, dy, modifierKeys));
 
 			Canvas.Cursor = objectUnderMouse?.GetCursor(e.Location, modifierKeys) ?? Cursors.Default;
 			Refresh();
