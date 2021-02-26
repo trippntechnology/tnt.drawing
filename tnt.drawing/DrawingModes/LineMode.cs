@@ -68,7 +68,6 @@ namespace TNT.Drawing.DrawingModes
 			{
 				ActiveLine.RemoveVertex(ActiveVertex);
 				ActiveVertex = ActiveLine.PointsArray.Last() as Vertex;
-				Debug.WriteLine($"ActiveVertex: {ActiveVertex}");
 				if (ActiveLine.PointsArray.Length < 2)
 				{
 					ActiveLine = null;

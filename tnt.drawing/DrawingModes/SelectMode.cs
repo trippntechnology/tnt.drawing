@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using TNT.Drawing.Layers;
 using TNT.Drawing.Objects;
+using TNT.Drawing.Resource;
 
 namespace TNT.Drawing.DrawingModes
 {
@@ -73,7 +74,8 @@ namespace TNT.Drawing.DrawingModes
 		/// </summary>
 		public override void OnKeyDown(KeyEventArgs e)
 		{
-			Canvas.Cursor = objectUnderMouse?.GetCursor(previousMouseLocation, e.Modifiers) ?? Cursors.Default;
+			var feedback = objectUnderMouse?.GetFeedback(previousMouseLocation, e.Modifiers) ?? new Feedback(Cursors.Default, string.Empty);
+			Canvas.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
 			base.OnKeyDown(e);
 		}
 
@@ -83,7 +85,8 @@ namespace TNT.Drawing.DrawingModes
 		/// <param name="e"></param>
 		public override void OnKeyUp(KeyEventArgs e)
 		{
-			Canvas.Cursor = objectUnderMouse?.GetCursor(previousMouseLocation, e.Modifiers) ?? Cursors.Default;
+			var feedback = objectUnderMouse?.GetFeedback(previousMouseLocation, e.Modifiers) ?? new Feedback(Cursors.Default, string.Empty);
+			Canvas.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
 			base.OnKeyUp(e);
 		}
 
@@ -99,11 +102,12 @@ namespace TNT.Drawing.DrawingModes
 			previousMouseLocation = location;
 
 			objectUnderMouse = FindObjectAt(Layer.CanvasObjects, e.Location, modifierKeys);
-			Log($"dx: {dx} dy: {dy} e.X: {location.X} e.Y: {location.Y} Location: {location} objUnderMouse: {objectUnderMouse}");
 
 			if (IsMouseDown && allowMove) selectedObjects.ForEach(o => o.MoveBy(dx, dy, modifierKeys));
 
-			Canvas.Cursor = objectUnderMouse?.GetCursor(e.Location, modifierKeys) ?? Cursors.Default;
+			var feedback = objectUnderMouse?.GetFeedback(e.Location, modifierKeys) ?? new Feedback(Cursors.Default, string.Empty);
+			Canvas.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
+
 			Refresh();
 			base.OnMouseMove(e, modifierKeys);
 		}

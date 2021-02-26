@@ -29,7 +29,6 @@ namespace TNT.Drawing
 		/// </summary>
 		public void Set<T>(T value, [CallerMemberName] string propertyName = null)
 		{
-			Debug.WriteLine($"Set({value}, {propertyName})");
 			var setValue = false;
 
 			if (_BackingFields.TryGetValue(propertyName, out object currentValue))
@@ -67,7 +66,6 @@ namespace TNT.Drawing
 		/// </summary>
 		public static void Set(object obj, string propertyName, object value)
 		{
-			Debug.WriteLine($"Set({propertyName}, {value})");
 			var propInfo = obj.GetType().GetProperty(propertyName);
 			propInfo?.SetValue(obj, value);
 		}

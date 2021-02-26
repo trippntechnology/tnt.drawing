@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using TNT.Drawing.Resource;
 
 namespace TNT.Drawing.Objects
 {
@@ -69,9 +70,16 @@ namespace TNT.Drawing.Objects
 		}
 
 		/// <summary>
-		/// Implement to return a <see cref="Cursor"/> indicating the state of the object
+		/// Called when a button press event occurs over an object
 		/// </summary>
-		/// <returns><see cref="Cursor"/> indicating the state of the object</returns>
-		public virtual Cursor GetCursor(Point location, Keys keys) => Cursors.Default;
+		/// <returns><see cref="CanvasObject"/> under mouse at the time of the button press</returns>
+		public virtual CanvasObject OnMouseUp(Point location, Keys modifierKeys) => null;
+
+		/// <summary>
+		/// Implement to return a <see cref="Feedback"/> indicating the <see cref="Cursor"/> and hint
+		/// to display
+		/// </summary>
+		/// <returns><see cref="Feedback"/> indicating the <see cref="Cursor"/> and hint to display</returns>
+		public virtual Feedback GetFeedback(Point location, Keys keys) => new Feedback(Cursors.Default, string.Empty);
 	}
 }

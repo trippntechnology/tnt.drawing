@@ -81,9 +81,13 @@ namespace TNT.Drawing.Sample
 				{
 				}
 			};
-		}
 
-		//private void _MyControl_MouseMove(object sender, MouseEventArgs e) => toolStripStatusLabel1.Text = $"{e.X}, {e.Y}";
+			_Canvas.OnFeedbackChanged = (cursor, hint) =>
+			{
+				Cursor = cursor;
+				toolStripStatusLabel1.Text = hint;
+			};
+		}
 
 		private void fitToolStripMenuItem_Click(object sender, System.EventArgs e) => _Canvas.Fit();
 

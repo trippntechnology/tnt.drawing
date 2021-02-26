@@ -102,10 +102,12 @@ namespace TNT.Drawing.Objects
 		/// <returns><see cref="CanvasPoint"/> when mouse is over the this</returns>
 		public override CanvasObject MouseOver(Point mousePosition, Keys modifierKeys)
 		{
-			var imageCenter = new Point(Image.Width / 2, Image.Height / 2);
-			var topLeftPoint = ToPoint.Subtract(imageCenter);
+			var width = Image.Width;
+			var height = Image.Height;
+
+			var topLeftPoint = ToPoint.Subtract(new Point(width / 2, height / 2));
 			var path = new GraphicsPath();
-			path.AddEllipse(topLeftPoint.X, topLeftPoint.Y, Image.Width, Image.Height);
+			path.AddEllipse(topLeftPoint.X, topLeftPoint.Y, width, height);
 			return path.IsVisible(mousePosition) ? this : null;
 		}
 

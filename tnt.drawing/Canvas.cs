@@ -20,7 +20,12 @@ namespace TNT.Drawing
 		/// Delegate that is called to signal that one or more <see cref="object"/> have been
 		/// selected within the <see cref="Canvas"/>
 		/// </summary>
-		public Action<List<object>> OnSelected = (_) => { };
+		public Action<List<object>> OnSelected = (obj) => { };
+
+		/// <summary>
+		/// Delegated that is called when the <see cref="Cursor"/> and/or hint changes
+		/// </summary>
+		public Action<Cursor, String> OnFeedbackChanged = (cursor, hint) => { };
 
 		private const int MINIMUM_PADDING = 1000;
 		private const int PADDING = 20;
@@ -370,7 +375,7 @@ namespace TNT.Drawing
 		protected override void OnMouseUp(MouseEventArgs e)
 		{
 			base.OnMouseUp(e);
-			DrawingMode.OnMouseUp(null, ModifierKeys);
+			DrawingMode.OnMouseUp(e, ModifierKeys);
 		}
 
 		/// <summary>

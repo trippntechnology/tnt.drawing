@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace TNT.Drawing.Objects
 	public class Line : CanvasObject
 	{
 		private CanvasObject activeObject = null;
-		private Pen _Pen = new Pen(Color.Black, 1);
+		private Pen pen = new Pen(Color.Black, 1);
 
 		/// <summary>
 		/// Indicates the width of the <see cref="Line"/>
@@ -75,14 +76,14 @@ namespace TNT.Drawing.Objects
 		/// <summary>
 		/// Represents the <see cref="Pen"/> used when generating this <see cref="Line"/>
 		/// </summary>
-		public Pen Pen
+		private Pen Pen
 		{
 			get
 			{
-				_Pen.Color = Color;
-				_Pen.Width = Width;
-				_Pen.DashStyle = Style;
-				return _Pen;
+				pen.Color = Color;
+				pen.Width = Width;
+				pen.DashStyle = Style;
+				return pen;
 			}
 		}
 
@@ -304,13 +305,16 @@ namespace TNT.Drawing.Objects
 		/// by <paramref name="location"/>
 		/// </summary>
 		/// <returns><see cref="Cursor"/> represented by <paramref name="location"/></returns>
-		public override Cursor GetCursor(Point location, Keys keys)
+		public override Feedback GetFeedback(Point location, Keys keys)
 		{
 			var cursor = Cursors.Hand;
+			var hint = "Click to select. SHIFT for multiple objects.";
 
 			// Check if over any points
 			if (IsSelected)
 			{
+				cursor = Cursors.Hand;
+				hint = "CTRL and SHIFT to add point.";
 				var vertex = Points.FirstOrDefault(p => p is Vertex && p.MouseOver(location, keys) != null);
 				var ctrlPoint = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, keys) != null);
 				CanvasPoint point = vertex ?? ctrlPoint;
@@ -328,6 +332,7 @@ namespace TNT.Drawing.Objects
 					else
 					{
 						cursor = Resources.Cursors.MovePoint;
+						hint = "CTRL and SHIFT to remove. SHIFT to curve.";
 					}
 				}
 				else
@@ -335,11 +340,12 @@ namespace TNT.Drawing.Objects
 					if (keys == (Keys.Control | Keys.Shift))
 					{
 						cursor = Resources.Cursors.AddPoint;
+						hint = "Click to add point";
 					}
 				}
 			}
 
-			return cursor;
+			return new Feedback(cursor, hint);
 		}
 
 		/// <summary>

@@ -69,6 +69,7 @@
     <Compile Include="Objects\Vertex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BackingFields.cs" />
+    <Compile Include="Resource\Feedback.cs" />
     <Compile Include="Resource\Resources.cs" />
   </ItemGroup>
   <ItemGroup>
