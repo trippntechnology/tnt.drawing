@@ -28,7 +28,7 @@ namespace TNT.Drawing
 		public Action<Cursor, String> OnFeedbackChanged = (cursor, hint) => { };
 
 		private const int MINIMUM_PADDING = 1000;
-		private const int PADDING = 20;
+		private const int PADDING = 50;
 
 		private DrawingMode _DrawingMode;
 		private Rectangle _LayerRect = Rectangle.Empty;
