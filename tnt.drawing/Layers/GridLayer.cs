@@ -22,6 +22,11 @@ namespace TNT.Drawing.Layers
 		public Color ShadowColor { get => BackingFields.Get(_ShadowBrush.Color); set => BackingFields.Set(value); }
 
 		/// <summary>
+		/// Default constructor
+		/// </summary>
+		public GridLayer() : base(null) { }
+
+		/// <summary>
 		/// Copy constructor
 		/// </summary>
 		public GridLayer(Canvas canvas) : base(canvas) { }

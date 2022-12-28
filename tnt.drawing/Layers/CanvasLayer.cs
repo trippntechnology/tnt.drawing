@@ -74,6 +74,13 @@ namespace TNT.Drawing.Layers
 		/// </summary>
 		public string Name { get; set; }
 
+		/// <summary>
+		/// Default constructor
+		/// </summary>
+		public CanvasLayer() : this(null)
+		{
+
+		}
 
 		/// <summary>
 		/// Default constructor

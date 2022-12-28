@@ -52,7 +52,7 @@ namespace TNT.Drawing.Objects
 		/// <summary>
 		/// Implement by subclass to indicate mouse is over object. Should return the object that is under mouse.
 		/// </summary>
-		public abstract CanvasObject MouseOver(Point mousePosition, Keys modifierKeys);
+		public abstract CanvasObject? MouseOver(Point mousePosition, Keys modifierKeys);
 
 		/// <summary>
 		/// Implement by subclass to move the object by <paramref name="dx"/> and <paramref name="dy"/>
@@ -73,7 +73,7 @@ namespace TNT.Drawing.Objects
 		/// Called when a button press event occurs over an object
 		/// </summary>
 		/// <returns><see cref="CanvasObject"/> under mouse at the time of the button press</returns>
-		public virtual CanvasObject OnMouseUp(Point location, Keys modifierKeys) => null;
+		public virtual CanvasObject? OnMouseUp(Point location, Keys modifierKeys) => null;
 
 		/// <summary>
 		/// Implement to return a <see cref="Feedback"/> indicating the <see cref="Cursor"/> and hint

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Xml.Serialization;
 using TNT.Drawing.Resource;
 
 namespace TNT.Drawing.Objects
@@ -13,6 +14,7 @@ namespace TNT.Drawing.Objects
 		/// <see cref="Func{ControlPoint, Boolean}"/> delegate called to see if this <see cref="ControlPoint"/>
 		/// should be visible or not
 		/// </summary>
+		[XmlIgnore]
 		public Func<ControlPoint, bool> IsVisible { get; set; } = (_) => { return false; };
 
 		/// <summary>
@@ -23,6 +25,7 @@ namespace TNT.Drawing.Objects
 		/// <summary>
 		/// Indicates whether the <see cref="ControlPoint"/> is visible or not
 		/// </summary>
+		[XmlIgnore]
 		public override bool Visible => IsVisible(this);
 
 		/// <summary>

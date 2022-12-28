@@ -85,13 +85,13 @@ namespace TNT.Drawing.DrawingModes
 		/// <summary>
 		/// Calls <see cref="Canvas.Refresh(CanvasLayer)"/>
 		/// </summary>
-		protected virtual void Refresh(CanvasLayer layer = null) => Canvas?.Refresh(layer);
+		protected virtual void Refresh(CanvasLayer? layer = null) => Canvas?.Refresh(layer);
 
 		/// <summary>
 		/// Calls <see cref="Canvas.Invalidate(CanvasLayer)"/>
 		/// </summary>
 		/// <param name="layer"></param>
-		protected virtual void Invalidate(CanvasLayer layer = null) => Canvas?.Invalidate(layer);
+		protected virtual void Invalidate(CanvasLayer? layer = null) => Canvas?.Invalidate(layer);
 
 		/// <summary>
 		/// Called to log to <see cref="Debug"/>

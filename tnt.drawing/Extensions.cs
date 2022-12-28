@@ -11,33 +11,6 @@ namespace TNT.Drawing
 	/// </summary>
 	public static class Extensions
 	{
-		/// <summary>
-		/// Kotlin let
-		/// </summary>
-		public static R Let<T, R>(this T value, Func<T, R> block)
-		{
-			if (value == null) return default;
-			return block(value);
-		}
-
-		/// <summary>
-		/// Variation of Kotlin let that doesn't require returning a value
-		/// </summary>
-		public static void Let<T>(this T value, Action<T> block)
-		{
-			if (value == null) return;
-			block(value);
-		}
-
-		/// <summary>
-		/// Kotlin also
-		/// </summary>
-		public static T Also<T>(this T value, Action<T> block)
-		{
-			if (value == null) return default;
-			block(value);
-			return value;
-		}
 
 		/// <summary>
 		/// Transforms a <see cref="Point"/> from <see cref="CoordinateSpace.Page"/> to <see cref="CoordinateSpace.World"/>
@@ -96,7 +69,7 @@ namespace TNT.Drawing
 		/// Runs <paramref name="callback"/> when <paramref name="v1"/> and <paramref name="v2"/> are not
 		/// null
 		/// </summary>
-		public static void RunNotNull<T1, T2>(T1 v1, T2 v2, Action<T1, T2> callback = null)
+		public static void RunNotNull<T1, T2>(T1 v1, T2 v2, Action<T1, T2>? callback = null)
 		{
 			if (v1 != null && v2 != null) callback(v1, v2);
 		}
@@ -105,7 +78,7 @@ namespace TNT.Drawing
 		/// Runs <paramref name="callback"/> when <paramref name="v1"/>, <paramref name="v2"/> and <paramref name="v3"/>
 		/// are not null
 		/// </summary>
-		public static void RunNotNull<T1, T2, T3>(T1 v1, T2 v2, T3 v3, Action<T1, T2, T3> callback = null)
+		public static void RunNotNull<T1, T2, T3>(T1 v1, T2 v2, T3 v3, Action<T1, T2, T3>? callback = null)
 		{
 			if (v1 != null && v2 != null && v3 != null) callback(v1, v2, v3);
 		}

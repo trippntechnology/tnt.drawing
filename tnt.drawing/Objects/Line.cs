@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using TNT.Drawing.Resource;
+using TNT.Utilities;
 
 namespace TNT.Drawing.Objects
 {
@@ -281,9 +282,9 @@ namespace TNT.Drawing.Objects
 		/// <see cref="CanvasObject"/> within the line that it is over
 		/// </summary>
 		/// <returns><see cref="CanvasObject"/> within the line that it is over</returns>
-		public override CanvasObject MouseOver(Point mousePosition, Keys modifierKeys)
+		public override CanvasObject? MouseOver(Point mousePosition, Keys modifierKeys)
 		{
-			CanvasObject objUnderMouse = null;
+			CanvasObject? objUnderMouse = null;
 
 			if (Points.Count > 3)
 			{

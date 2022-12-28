@@ -38,7 +38,7 @@ namespace TNT.Drawing.Objects
 			throw new NotImplementedException();
 		}
 
-		public override CanvasObject MouseOver(Point mousePosition, Keys modifierKeys)
+		public override CanvasObject? MouseOver(Point mousePosition, Keys modifierKeys)
 		{
 			var path = new GraphicsPath();
 			path.AddRectangle(new Rectangle(X, Y, Width, Width));

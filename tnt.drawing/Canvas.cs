@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows.Forms;
 using TNT.Drawing.DrawingModes;
 using TNT.Drawing.Layers;
+using TNT.Utilities;
 
 namespace TNT.Drawing
 {
@@ -362,7 +363,7 @@ namespace TNT.Drawing
 		/// Transforms the location within the <see cref="MouseEventArgs"/> using the <paramref name="graphics"/>
 		/// </summary>
 		/// <returns><see cref="MouseEventArgs"/> with the transformed location</returns>
-		private MouseEventArgs Transform(MouseEventArgs e, Graphics graphics = null)
+		private MouseEventArgs Transform(MouseEventArgs e, Graphics? graphics = null)
 		{
 			graphics = graphics ?? CreateTransformedGraphics();
 			var layerPoint = e.Location.ToGridCoordinates(graphics); //.Snap(10);
@@ -421,7 +422,7 @@ namespace TNT.Drawing
 		/// <summary>
 		/// Returns a <see cref="Graphics"/> that has been transformed
 		/// </summary>
-		private Graphics CreateTransformedGraphics(Graphics graphics = null)
+		private Graphics CreateTransformedGraphics(Graphics? graphics = null)
 		{
 			graphics = graphics ?? CreateGraphics();
 			graphics.SmoothingMode = SmoothingMode.AntiAlias;

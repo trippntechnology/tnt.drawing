@@ -4,6 +4,7 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using TNT.Drawing.Resource;
+using TNT.Utilities;
 
 namespace TNT.Drawing.Objects
 {
@@ -21,6 +22,7 @@ namespace TNT.Drawing.Objects
 		/// <see cref="Action{CanvasPoint, Int, Int, Keys}"/> delegate that is called when the <see cref="CanvasPoint"/>
 		/// moves
 		/// </summary>
+		[XmlIgnore]
 		public Action<CanvasPoint, int, int, Keys> OnPointMoved = (canvasPoint, dx, dy, modifierKeys) => { };
 
 		/// <summary>
@@ -71,9 +73,13 @@ namespace TNT.Drawing.Objects
 		public override void Draw(Graphics graphics)
 		{
 			if (!Visible) return;
-			var imageCenter = new Point(Image.Width / 2, Image.Height / 2);
-			var topLeftPoint = ToPoint.Subtract(imageCenter);
-			graphics.DrawImage(Image, topLeftPoint);
+			Image?.Let(image =>
+			{
+				var imageCenter = new Point(Image.Width / 2, Image.Height / 2);
+				var topLeftPoint = ToPoint.Subtract(imageCenter);
+				graphics.DrawImage(Image, topLeftPoint);
+				return 0;
+			});
 		}
 
 		/// <summary>
@@ -100,8 +106,9 @@ namespace TNT.Drawing.Objects
 		/// Call to check if the mouse is over this <see cref="CanvasPoint"/>
 		/// </summary>
 		/// <returns><see cref="CanvasPoint"/> when mouse is over the this</returns>
-		public override CanvasObject MouseOver(Point mousePosition, Keys modifierKeys)
+		public override CanvasObject? MouseOver(Point mousePosition, Keys modifierKeys)
 		{
+			if (Image == null) return null;
 			var width = Image.Width;
 			var height = Image.Height;
 
@@ -124,7 +131,7 @@ namespace TNT.Drawing.Objects
 		/// Equal operator
 		/// </summary>
 		/// <returns>True if equal, false if otherwise</returns>
-		public override bool Equals(object obj) => obj is CanvasPoint point && Id == point.Id;
+		public override bool Equals(object? obj) => obj is CanvasPoint point && Id == point.Id;
 
 		/// <summary>
 		/// Hashcode
