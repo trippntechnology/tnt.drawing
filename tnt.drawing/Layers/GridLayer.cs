@@ -24,7 +24,7 @@ namespace TNT.Drawing.Layers
 		/// <summary>
 		/// Default constructor
 		/// </summary>
-		public GridLayer() : base(null) { }
+		//public GridLayer() : base(null) { }
 
 		/// <summary>
 		/// Copy constructor
