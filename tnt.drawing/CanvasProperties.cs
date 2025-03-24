@@ -37,7 +37,7 @@ public class CanvasProperties : LiveProperties
 	/// Serializable for <see cref="BackColor"/>
 	/// </summary>
 	[Browsable(false)]
-	public int _BackColor { get { return BackColor.ToArgb(); } set { BackColor = Color.FromArgb(value); } }
+	public int SerializableBackColor { get { return BackColor.ToArgb(); } set { BackColor = Color.FromArgb(value); } }
 
 	/// <summary>
 	/// </summary>

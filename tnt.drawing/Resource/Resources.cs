@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
+using TNT.Reactive;
 
 namespace TNT.Drawing.Resource
 {
@@ -65,6 +66,7 @@ namespace TNT.Drawing.Resource
     public static Image ResourceToImage(string resource)
     {
       var assembly = Assembly.GetCallingAssembly();
+      var resourceName = assembly.GetManifestResourceNames();
       var resourceStream = assembly.GetManifestResourceStream(resource);
       var image = resourceStream == null ? null : new Bitmap(resourceStream);
       if (image == null) throw new Exception($"Resource {resource} not found");

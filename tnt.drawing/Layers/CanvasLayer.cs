@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Xml.Serialization;
 using TNT.Drawing.Objects;
+using TNT.Reactive;
 
 namespace TNT.Drawing.Layers
 {

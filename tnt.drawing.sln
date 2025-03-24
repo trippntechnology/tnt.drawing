@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35913.81 d17.13
+VisualStudioVersion = 17.13.35913.81
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tnt.drawing", "tnt.drawing\tnt.drawing.csproj", "{AC49554D-BFC4-40BA-8A7B-B8DEDEDB63F5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TNT.Drawing", "tnt.drawing\TNT.Drawing.csproj", "{AC49554D-BFC4-40BA-8A7B-B8DEDEDB63F5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnitTests", "NUnitTests\NUnitTests.csproj", "{33D7DE89-9B2E-4886-8A7F-478A7C2B207E}"
 EndProject

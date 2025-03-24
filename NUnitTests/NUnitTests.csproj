@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\tnt.drawing\tnt.drawing.csproj" />
+    <ProjectReference Include="..\tnt.drawing\TNT.Drawing.csproj" />
   </ItemGroup>
 
   <ItemGroup>

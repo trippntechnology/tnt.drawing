@@ -86,9 +86,9 @@ public partial class Form1 : Form
     };
   }
 
-  private void fitToolStripMenuItem_Click(object sender, System.EventArgs e) => _Canvas?.Fit();
+  private void FitToolStripMenuItem_Click(object sender, System.EventArgs e) => _Canvas?.Fit();
 
-  private void saveToolStripMenuItem_Click(object sender, System.EventArgs e)
+  private void SaveToolStripMenuItem_Click(object sender, System.EventArgs e)
   {
     using (var sfd = new System.Windows.Forms.SaveFileDialog())
     {
@@ -105,7 +105,7 @@ public partial class Form1 : Form
     }
   }
 
-  private void openToolStripMenuItem_Click(object sender, System.EventArgs e)
+  private void OpenToolStripMenuItem_Click(object sender, System.EventArgs e)
   {
     using (var ofd = new System.Windows.Forms.OpenFileDialog())
     {
@@ -126,7 +126,7 @@ public partial class Form1 : Form
     }
   }
 
-  private void lineToolStripMenuItem_Click(object sender, System.EventArgs e)
+  private void LineToolStripMenuItem_Click(object sender, System.EventArgs e)
   {
     if (sender is ToolStripMenuItem menuItem)
     {
@@ -139,6 +139,6 @@ public partial class Form1 : Form
     }
   }
 
-  private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e) => _Canvas.DrawingMode?.Layer?.Also(layer => _Canvas.Refresh(layer));
-  private void alignToolStripMenuItem_Click(object sender, System.EventArgs e) => _Canvas.AlignToInterval();
+  private void PropertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e) => _Canvas.DrawingMode?.Layer?.Also(layer => _Canvas.Refresh(layer));
+  private void AlignToolStripMenuItem_Click(object sender, System.EventArgs e) => _Canvas.AlignToInterval();
 }

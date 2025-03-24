@@ -96,21 +96,21 @@ partial class Form1
 		this.fitToolStripMenuItem1.Name = "fitToolStripMenuItem1";
 		this.fitToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
 		this.fitToolStripMenuItem1.Text = "Fit";
-		this.fitToolStripMenuItem1.Click += new System.EventHandler(this.fitToolStripMenuItem_Click);
+		this.fitToolStripMenuItem1.Click += new System.EventHandler(this.FitToolStripMenuItem_Click);
 		// 
 		// saveToolStripMenuItem1
 		// 
 		this.saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
 		this.saveToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
 		this.saveToolStripMenuItem1.Text = "Save";
-		this.saveToolStripMenuItem1.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
+		this.saveToolStripMenuItem1.Click += new System.EventHandler(this.SaveToolStripMenuItem_Click);
 		// 
 		// openToolStripMenuItem1
 		// 
 		this.openToolStripMenuItem1.Name = "openToolStripMenuItem1";
 		this.openToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
 		this.openToolStripMenuItem1.Text = "Open";
-		this.openToolStripMenuItem1.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
+		this.openToolStripMenuItem1.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
 		// 
 		// modeToolStripMenuItem
 		// 
@@ -126,14 +126,14 @@ partial class Form1
 		this.lineToolStripMenuItem.Name = "lineToolStripMenuItem";
 		this.lineToolStripMenuItem.Size = new System.Drawing.Size(105, 22);
 		this.lineToolStripMenuItem.Text = "Line";
-		this.lineToolStripMenuItem.Click += new System.EventHandler(this.lineToolStripMenuItem_Click);
+		this.lineToolStripMenuItem.Click += new System.EventHandler(this.LineToolStripMenuItem_Click);
 		// 
 		// selectToolStripMenuItem
 		// 
 		this.selectToolStripMenuItem.Name = "selectToolStripMenuItem";
 		this.selectToolStripMenuItem.Size = new System.Drawing.Size(105, 22);
 		this.selectToolStripMenuItem.Text = "Select";
-		this.selectToolStripMenuItem.Click += new System.EventHandler(this.lineToolStripMenuItem_Click);
+		this.selectToolStripMenuItem.Click += new System.EventHandler(this.LineToolStripMenuItem_Click);
 		// 
 		// layerToolStripMenuItem
 		// 
@@ -148,7 +148,7 @@ partial class Form1
 		this.propertyGrid1.Name = "propertyGrid1";
 		this.propertyGrid1.Size = new System.Drawing.Size(231, 666);
 		this.propertyGrid1.TabIndex = 3;
-		this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
+		this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.PropertyGrid1_PropertyValueChanged);
 		// 
 		// statusStrip1
 		// 
@@ -171,7 +171,7 @@ partial class Form1
 		this.alignToolStripMenuItem.Name = "alignToolStripMenuItem";
 		this.alignToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 		this.alignToolStripMenuItem.Text = "Align";
-		this.alignToolStripMenuItem.Click += new System.EventHandler(this.alignToolStripMenuItem_Click);
+		this.alignToolStripMenuItem.Click += new System.EventHandler(this.AlignToolStripMenuItem_Click);
 		// 
 		// Form1
 		// 
