@@ -7,6 +7,42 @@ namespace NUnitTests.Extensions;
 [ExcludeFromCodeCoverage]
 internal class PointExtTests
 {
+  private Graphics graphics;
+
+  [SetUp]
+  public void SetUp()
+  {
+    // Create a bitmap to get a Graphics object
+    Bitmap bitmap = new Bitmap(100, 100);
+    graphics = Graphics.FromImage(bitmap);
+
+    // Set up a transformation for testing
+    graphics.TranslateTransform(10, 20);
+    graphics.ScaleTransform(2, 2);
+  }
+
+  [TearDown]
+  public void TearDown()
+  {
+    graphics.Dispose();
+  } 
+
+  [Test]
+  public void ToGridCoordinates_TransformsPointCorrectly()
+  {
+    Point originalPoint = new Point(30, 40);
+    Point transformedPoint = originalPoint.ToGridCoordinates(graphics);
+    Assert.That(transformedPoint, Is.EqualTo(new Point(10, 10)));
+  }
+
+  [Test]
+  public void ToCanvasCoordinates_TransformsPointCorrectly()
+  {
+    Point originalPoint = new Point(10, 10);
+    Point transformedPoint = originalPoint.ToCanvasCoordinates(graphics);
+    Assert.That(transformedPoint, Is.EqualTo(new Point(30, 40)));
+  }
+
   [Test]
   public void PointSubstract()
   {
