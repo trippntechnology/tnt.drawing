@@ -1,12 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using TNT.Commons;
-using TNT.Drawing;
+using TNT.Drawing.Extentions;
 
-namespace NUnitTests;
+namespace NUnitTests.Extensions;
 
 [ExcludeFromCodeCoverage]
-public class ExtensionsTests
+internal class PointExtTests
 {
   [Test]
   public void PointSubstract()
@@ -55,13 +54,5 @@ public class ExtensionsTests
     v1 = 1;
     list.AddNotNull(v1);
     Assert.That(list.Count, Is.EqualTo(1));
-  }
-
-  [Test]
-  public void AdjacentTo()
-  {
-    var sut = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-    var result = sut.AdjacentTo(5);
-    Assert.That(result, Is.EqualTo(new List<int>() { 4, 6 }).AsCollection);
   }
 }

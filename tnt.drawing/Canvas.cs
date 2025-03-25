@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows.Forms;
 using TNT.Commons;
 using TNT.Drawing.DrawingModes;
+using TNT.Drawing.Extentions;
 using TNT.Drawing.Layers;
 
 namespace TNT.Drawing
