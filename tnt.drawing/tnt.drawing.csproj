@@ -9,11 +9,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resource\Cursor\AddCurve.cur" />
+    <None Remove="Resource\Cursor\AddPoint.cur" />
+    <None Remove="Resource\Cursor\Curve.cur" />
+    <None Remove="Resource\Cursor\MovePoint.cur" />
+    <None Remove="Resource\Cursor\RemovePoint.cur" />
     <None Remove="Resource\Image\ControlPoint.png" />
     <None Remove="Resource\Image\Vertex.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resource\Cursor\AddCurve.cur" />
+    <EmbeddedResource Include="Resource\Cursor\AddPoint.cur" />
+    <EmbeddedResource Include="Resource\Cursor\Curve.cur" />
+    <EmbeddedResource Include="Resource\Cursor\MovePoint.cur" />
+    <EmbeddedResource Include="Resource\Cursor\RemovePoint.cur" />
     <EmbeddedResource Include="Resource\Image\ControlPoint.png" />
     <EmbeddedResource Include="Resource\Image\Vertex.png" />
   </ItemGroup>
