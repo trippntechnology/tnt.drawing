@@ -62,7 +62,7 @@ public static class PointExt
   /// <summary>
   /// Adds <paramref name="value"/> to <paramref name="list"/> if <paramref name="value"/> is not null
   /// </summary>
-  public static void AddNotNull<T>(this List<T> list, T value)
+  public static void AddNotNull<T>(this List<T> list, T? value)
   {
     if (value != null) list.Add(value);
   }

@@ -141,29 +141,31 @@ public class Line : CanvasObject
     {
       if (modifierKeys == Keys.Shift)
       {
-        // Find the vertex index adjacent to ControlPoint
-        var index = Points.IndexOf(canvasPoint);
-        var vertexIndex = Points[index - 1] is Vertex ? index - 1 : index + 1;
+        // Find the Vertex adjacent to canvasPoint
+        var canvasPointIndex = Points.IndexOf(canvasPoint);
+        var adjacentIndex = Points[canvasPointIndex - 1] is Vertex ? canvasPointIndex - 1 : canvasPointIndex + 1;
+        //var adjacentVertex = Points.ElementAtOrDefault(adjacentIndex);
 
-        // Find the vertex index opposite to ControlPoint
-        var oppositeIndex = vertexIndex < index ? vertexIndex - 1 : vertexIndex + 1;
+        // Get the opposite control point
+        var oppositeIndex = adjacentIndex < canvasPointIndex ? adjacentIndex - 1 : adjacentIndex + 1;
+        //var oppositeVertex = Points.ElementAtOrDefault(oppositeIndex);
 
-        CommonsExtensions.RunNotNull(Points.ElementAt(vertexIndex) as Vertex, Points.ElementAt(oppositeIndex) as Vertex, (vertex, opposite) =>
-         {
-           var offset = vertex.ToPoint.Subtract(canvasPoint.ToPoint);
-           var newPoint = vertex.ToPoint.Add(offset);
-           opposite.MoveTo(newPoint, modifierKeys, true);
-         });
+        CommonsExtensions.RunNotNull(Points.ElementAtOrDefault(adjacentIndex), Points.ElementAtOrDefault(oppositeIndex), (adjacentVertex, oppositeVertex) =>
+        {
+          var offset = adjacentVertex.ToPoint.Subtract(canvasPoint.ToPoint);
+          var newPoint = adjacentVertex.ToPoint.Add(offset);
+          oppositeVertex?.MoveTo(newPoint, modifierKeys, true);
+        });
       }
     }
     else if (canvasPoint is Vertex)
     {
       // Find ControlPoints adjacent to this Vertex
       var vertexIndex = Points.IndexOf(canvasPoint);
-      var ctrlPoints = new List<CanvasPoint?>();
+      var ctrlPoints = new List<CanvasPoint>();
       ctrlPoints.AddNotNull(Points.ElementAtOrDefault(vertexIndex - 1));
       ctrlPoints.AddNotNull(Points.ElementAtOrDefault(vertexIndex + 1));
-      ctrlPoints.ForEach(cp => cp?.MoveBy(dx, dy, Keys.None, true));
+      ctrlPoints.ForEach(cp => cp.MoveBy(dx, dy, Keys.None, true));
     }
   }
 
