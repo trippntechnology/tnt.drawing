@@ -7,135 +7,134 @@ using TNT.Drawing.Layers;
 using TNT.Drawing.Objects;
 using TNT.Drawing.Resource;
 
-namespace TNT.Drawing.DrawingModes
+namespace TNT.Drawing.DrawingModes;
+
+/// <summary>
+/// Select <see cref="DrawingMode"/>
+/// </summary>
+public class SelectMode : DrawingMode
 {
+  private bool allowMove = false;
+  private Point previousMouseLocation = Point.Empty;
+  private List<CanvasObject> selectedObjects = new List<CanvasObject>();
+  private CanvasObject? objectUnderMouse = null;
+
   /// <summary>
-  /// Select <see cref="DrawingMode"/>
+  /// Initializes with a <paramref name="layer"/>
   /// </summary>
-  public class SelectMode : DrawingMode
+  public SelectMode(CanvasLayer layer) : base(layer) { }
+
+  /// <summary>
+  /// Resets the <see cref="DrawingMode"/> and <see cref="DrawingMode.Layer"/>
+  /// </summary>
+  public override void Reset()
   {
-    private bool allowMove = false;
-    private Point previousMouseLocation = Point.Empty;
-    private List<CanvasObject> selectedObjects = new List<CanvasObject>();
-    private CanvasObject? objectUnderMouse = null;
+    Layer.CanvasObjects.ForEach(o => o.IsSelected = false);
+    base.Reset();
+  }
 
-    /// <summary>
-    /// Initializes with a <paramref name="layer"/>
-    /// </summary>
-    public SelectMode(CanvasLayer layer) : base(layer) { }
+  /// <summary>
+  /// TODO
+  /// </summary>
+  public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
+  {
+    var activeObject = objectUnderMouse?.OnMouseDown(e.Location, modifierKeys, out allowMove);
 
-    /// <summary>
-    /// Resets the <see cref="DrawingMode"/> and <see cref="DrawingMode.Layer"/>
-    /// </summary>
-    public override void Reset()
+    if (activeObject != null && objectUnderMouse != activeObject) selectedObjects.Clear();
+
+    if (objectUnderMouse == null)
     {
-      Layer.CanvasObjects.ForEach(o => o.IsSelected = false);
-      base.Reset();
+      selectedObjects.Clear();
+    }
+    else if (modifierKeys == Keys.Shift && selectedObjects.Contains(objectUnderMouse))
+    {
+      selectedObjects.Remove(objectUnderMouse);
+    }
+    else if (modifierKeys == Keys.Shift && !selectedObjects.Contains(objectUnderMouse))
+    {
+      selectedObjects.Add(objectUnderMouse);
+    }
+    else if (!selectedObjects.Contains(objectUnderMouse))
+    {
+      selectedObjects.Clear();
+      selectedObjects.Add(objectUnderMouse);
     }
 
-    /// <summary>
-    /// TODO
-    /// </summary>
-    public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
-    {
-      var activeObject = objectUnderMouse?.OnMouseDown(e.Location, modifierKeys, out allowMove);
+    Canvas?.OnObjectsSelected(selectedObjects.Select(o => o as object).ToList());
 
-      if (activeObject != null && objectUnderMouse != activeObject) selectedObjects.Clear();
+    // Select/unselect objects
+    Layer.CanvasObjects.ForEach(o => o.IsSelected = selectedObjects.Contains(o));
 
-      if (objectUnderMouse == null)
-      {
-        selectedObjects.Clear();
-      }
-      else if (modifierKeys == Keys.Shift && selectedObjects.Contains(objectUnderMouse))
-      {
-        selectedObjects.Remove(objectUnderMouse);
-      }
-      else if (modifierKeys == Keys.Shift && !selectedObjects.Contains(objectUnderMouse))
-      {
-        selectedObjects.Add(objectUnderMouse);
-      }
-      else if (!selectedObjects.Contains(objectUnderMouse))
-      {
-        selectedObjects.Clear();
-        selectedObjects.Add(objectUnderMouse);
-      }
+    Refresh(Layer);
 
-      Canvas?.OnObjectsSelected(selectedObjects.Select(o => o as object).ToList());
+    base.OnMouseDown(e, modifierKeys);
+  }
 
-      // Select/unselect objects
-      Layer.CanvasObjects.ForEach(o => o.IsSelected = selectedObjects.Contains(o));
+  /// <summary>
+  /// Sets the <see cref="Canvas"/> cursor associated with the object under mouse
+  /// </summary>
+  public override void OnKeyDown(KeyEventArgs e)
+  {
+    var feedback = objectUnderMouse?.GetFeedback(previousMouseLocation, e.Modifiers) ?? new Feedback(Cursors.Default, string.Empty);
+    Canvas?.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
+    base.OnKeyDown(e);
+  }
 
-      Refresh(Layer);
+  /// <summary>
+  /// Sets the <see cref="Canvas"/> cursor associated with the object under mouse
+  /// </summary>
+  /// <param name="e"></param>
+  public override void OnKeyUp(KeyEventArgs e)
+  {
+    var feedback = objectUnderMouse?.GetFeedback(previousMouseLocation, e.Modifiers) ?? new Feedback(Cursors.Default, string.Empty);
+    Canvas?.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
+    base.OnKeyUp(e);
+  }
 
-      base.OnMouseDown(e, modifierKeys);
-    }
+  /// <summary>
+  /// TODO
+  /// </summary>
+  public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
+  {
+    var location = Canvas?.SnapToInterval == true && (modifierKeys & Keys.Control) != Keys.Control ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
 
-    /// <summary>
-    /// Sets the <see cref="Canvas"/> cursor associated with the object under mouse
-    /// </summary>
-    public override void OnKeyDown(KeyEventArgs e)
-    {
-      var feedback = objectUnderMouse?.GetFeedback(previousMouseLocation, e.Modifiers) ?? new Feedback(Cursors.Default, string.Empty);
-      Canvas?.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
-      base.OnKeyDown(e);
-    }
+    var dx = location.X - previousMouseLocation.X;
+    var dy = location.Y - previousMouseLocation.Y;
+    previousMouseLocation = location;
 
-    /// <summary>
-    /// Sets the <see cref="Canvas"/> cursor associated with the object under mouse
-    /// </summary>
-    /// <param name="e"></param>
-    public override void OnKeyUp(KeyEventArgs e)
-    {
-      var feedback = objectUnderMouse?.GetFeedback(previousMouseLocation, e.Modifiers) ?? new Feedback(Cursors.Default, string.Empty);
-      Canvas?.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
-      base.OnKeyUp(e);
-    }
+    objectUnderMouse = FindObjectAt(Layer.CanvasObjects, e.Location, modifierKeys);
 
-    /// <summary>
-    /// TODO
-    /// </summary>
-    public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
-    {
-      var location = Canvas?.SnapToInterval == true && (modifierKeys & Keys.Control) != Keys.Control ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
+    if (IsMouseDown && allowMove) selectedObjects.ForEach(o => o.MoveBy(dx, dy, modifierKeys));
 
-      var dx = location.X - previousMouseLocation.X;
-      var dy = location.Y - previousMouseLocation.Y;
-      previousMouseLocation = location;
+    var feedback = objectUnderMouse?.GetFeedback(e.Location, modifierKeys) ?? new Feedback(Cursors.Default, string.Empty);
+    Canvas?.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
 
-      objectUnderMouse = FindObjectAt(Layer.CanvasObjects, e.Location, modifierKeys);
+    Refresh();
+    base.OnMouseMove(e, modifierKeys);
+  }
 
-      if (IsMouseDown && allowMove) selectedObjects.ForEach(o => o.MoveBy(dx, dy, modifierKeys));
+  /// <summary>
+  /// Draws the selected objects
+  /// </summary>
+  public override void OnPaint(PaintEventArgs e)
+  {
+    // Draw selected objects
+    Layer.CanvasObjects.FindAll(o => o.IsSelected).ForEach(o => o.Draw(e.Graphics));
+    base.OnPaint(e);
+  }
 
-      var feedback = objectUnderMouse?.GetFeedback(e.Location, modifierKeys) ?? new Feedback(Cursors.Default, string.Empty);
-      Canvas?.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
-
-      Refresh();
-      base.OnMouseMove(e, modifierKeys);
-    }
-
-    /// <summary>
-    /// Draws the selected objects
-    /// </summary>
-    public override void OnPaint(PaintEventArgs e)
-    {
-      // Draw selected objects
-      Layer.CanvasObjects.FindAll(o => o.IsSelected).ForEach(o => o.Draw(e.Graphics));
-      base.OnPaint(e);
-    }
-
-    /// <summary>
-    /// Finds a <see cref="CanvasObject"/> at <paramref name="mouseLocation"/>
-    /// </summary>
-    /// <param name="objs"></param>
-    /// <param name="mouseLocation"></param>
-    /// <param name="modifierKeys"></param>
-    /// <returns><see cref="CanvasObject"/> if found, otherwise false</returns>
-    protected CanvasObject? FindObjectAt(List<CanvasObject> objs, Point mouseLocation, Keys modifierKeys)
-    {
-      // See if where over a selected object first just in case the selected object is in the list
-      // after another object in the same place
-      return selectedObjects.FirstOrDefault(o => o.MouseOver(mouseLocation, modifierKeys) != null) ??
-        objs.FirstOrDefault(o => o.MouseOver(mouseLocation, modifierKeys) != null);
-    }
+  /// <summary>
+  /// Finds a <see cref="CanvasObject"/> at <paramref name="mouseLocation"/>
+  /// </summary>
+  /// <param name="objs"></param>
+  /// <param name="mouseLocation"></param>
+  /// <param name="modifierKeys"></param>
+  /// <returns><see cref="CanvasObject"/> if found, otherwise false</returns>
+  protected CanvasObject? FindObjectAt(List<CanvasObject> objs, Point mouseLocation, Keys modifierKeys)
+  {
+    // See if where over a selected object first just in case the selected object is in the list
+    // after another object in the same place
+    return selectedObjects.FirstOrDefault(o => o.MouseOver(mouseLocation, modifierKeys) != null) ??
+      objs.FirstOrDefault(o => o.MouseOver(mouseLocation, modifierKeys) != null);
   }
 }
