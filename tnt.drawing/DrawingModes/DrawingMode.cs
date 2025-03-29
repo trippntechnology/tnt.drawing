@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using TNT.Drawing.Layers;
@@ -72,12 +71,12 @@ public class DrawingMode
   /// <summary>
   /// Called when a key is pressed
   /// </summary>
-  public virtual void OnKeyDown(KeyEventArgs e) => Log();
+  public virtual void OnKeyDown(KeyEventArgs e) => Log($"{e.KeyCode}");
 
   /// <summary>
   /// Called when a key is released
   /// </summary>
-  public virtual void OnKeyUp(KeyEventArgs e) => Log();
+  public virtual void OnKeyUp(KeyEventArgs e) => Log($"{e.KeyCode}");
 
   /// <summary>
   /// Called when the <see cref="Canvas"/> is being painted
@@ -98,5 +97,5 @@ public class DrawingMode
   /// <summary>
   /// Called to log to <see cref="Debug"/>
   /// </summary>
-  protected virtual void Log(string msg = "", [CallerMemberName] string callingMethod = "") => Debug.WriteLine($"{DateTime.Now} [{callingMethod}] {msg}");
+  protected virtual void Log(string msg = "", [CallerMemberName] string callingMethod = "") => TNTLogger.I(msg, callingMethod);
 }

@@ -109,7 +109,7 @@ public class SelectMode : DrawingMode
     var feedback = objectUnderMouse?.GetFeedback(e.Location, modifierKeys) ?? new Feedback(Cursors.Default, string.Empty);
     Canvas?.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
 
-    Refresh(this.Layer);
+    if (e.HasButtonDown()) Refresh(this.Layer);
     base.OnMouseMove(e, modifierKeys);
   }
 

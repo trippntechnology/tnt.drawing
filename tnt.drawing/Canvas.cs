@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -288,7 +287,8 @@ namespace TNT.Drawing
     {
       var graphics = CreateTransformedGraphics();
       var mea = Transform(e, graphics);
-      DrawingMode?.OnMouseMove(mea, ModifierKeys);
+
+      if (keyEventArgs?.KeyCode != Keys.Space) DrawingMode?.OnMouseMove(mea, ModifierKeys);
 
       var currentCursorPosition = Cursor.Position;
       var mousePosition = new Point(e.X, e.Y);
@@ -335,8 +335,10 @@ namespace TNT.Drawing
         case Keys.Space:
           Cursor = Cursors.Hand;
           break;
+        default:
+          DrawingMode?.OnKeyDown(e);
+          break;
       }
-      DrawingMode?.OnKeyDown(e);
     }
 
     /// <summary>
@@ -344,7 +346,6 @@ namespace TNT.Drawing
     /// </summary>
     protected override void OnKeyUp(KeyEventArgs e)
     {
-      Debug.WriteLine($"OnKeyUp");
       keyEventArgs = null;
       Cursor = Cursors.Default;
       DrawingMode?.OnKeyUp(e);
