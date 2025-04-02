@@ -310,7 +310,6 @@ namespace TNT.Drawing
     /// </summary>
     public void Refresh(CanvasLayer layer)
     {
-      layer?.Invalidate();
       base.Refresh();
     }
 
@@ -320,7 +319,6 @@ namespace TNT.Drawing
     /// <param name="layer"></param>
     public void Invalidate(CanvasLayer layer)
     {
-      layer?.Invalidate();
       base.Invalidate();
     }
 
