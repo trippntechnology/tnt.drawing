@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using TNT.Drawing.Extentions;
+using TNT.Drawing.Extensions;
 using TNT.Drawing.Layers;
 using TNT.Drawing.Objects;
 using TNT.Drawing.Resource;

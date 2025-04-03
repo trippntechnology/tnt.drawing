@@ -6,7 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using TNT.Commons;
-using TNT.Drawing.Extentions;
+using TNT.Drawing.Extensions;
 using TNT.Drawing.Resource;
 
 using CommonsExtensions = TNT.Commons.Extensions;

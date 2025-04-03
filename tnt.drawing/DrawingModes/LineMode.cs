@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Windows.Forms;
 using TNT.Commons;
-using TNT.Drawing.Extentions;
+using TNT.Drawing.Extensions;
 using TNT.Drawing.Layers;
 using TNT.Drawing.Objects;
 

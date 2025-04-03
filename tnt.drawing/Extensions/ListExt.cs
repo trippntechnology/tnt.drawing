@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace TNT.Drawing.Extentions;
+namespace TNT.Drawing.Extensions;
 
 /// <summary>
 /// Extension methods

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using TNT.Drawing.Extentions;
+using TNT.Drawing.Extensions;
 
 namespace NUnitTests.Extensions;
 

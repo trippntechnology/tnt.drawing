@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace TNT.Drawing.Extentions;
+namespace TNT.Drawing.Extensions;
 
 public static class PointExt
 {

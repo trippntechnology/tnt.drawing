@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using TNT.Drawing.Extentions;
+using TNT.Drawing.Extensions;
 
 namespace NUnitTests.Extensions;
 

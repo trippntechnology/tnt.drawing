@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace TNT.Drawing.Extentions;
+namespace TNT.Drawing.Extensions;
 
 internal static class MouseEventArgsExt
 {

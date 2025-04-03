@@ -4,7 +4,7 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using TNT.Commons;
-using TNT.Drawing.Extentions;
+using TNT.Drawing.Extensions;
 using TNT.Drawing.Resource;
 
 namespace TNT.Drawing.Objects;
