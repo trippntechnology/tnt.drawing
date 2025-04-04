@@ -12,15 +12,12 @@ public class CanvasProperties
 {
   private BackingFields _BackingFields = new BackingFields();
 
-  public Action<string, object?> OnPropertyChanged = (k, v) => { };
+  public Action<string, object?> OnPropertyChanged { get => _BackingFields.OnFieldChanged; set => _BackingFields.OnFieldChanged = value; }
 
   /// <summary>
   /// Initializes default values
   /// </summary>
-  public CanvasProperties()
-  {
-    _BackingFields.OnFieldChanged = OnPropertyChanged;
-  }
+  public CanvasProperties() { }
 
   /// <summary>
   /// Background color of the <see cref="Canvas"/>
