@@ -52,8 +52,8 @@ namespace TNT.Drawing
       set
       {
         _Properties = value;
-        _Properties.OnPropertyChanged = (prop, val) => { CanvasProperties.Set(this, prop, val); };
-        CanvasProperties.SetAll(value, this);
+        _Properties.OnPropertyChanged = (name, val) => { this.SetProperty(name, val); };
+        _Properties.SetProperties(this);
       }
     }
 
@@ -91,7 +91,7 @@ namespace TNT.Drawing
     /// </summary>
     [Category("Appearance")]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public int ScalePercentage { get => Properties.Get<int>(); set { Properties.Set(value); Invalidate(); } }
+    public int ScalePercentage { get => Properties.ScalePercentage; set { Properties.ScalePercentage = value; Invalidate(); } }
 
     /// <summary>
     /// <see cref="CanvasLayer"/> height
