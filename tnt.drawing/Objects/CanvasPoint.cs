@@ -3,9 +3,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using TNT.Commons;
 using TNT.Drawing.Extensions;
-using TNT.Drawing.Resource;
 
 namespace TNT.Drawing.Objects;
 
@@ -14,16 +12,12 @@ namespace TNT.Drawing.Objects;
 /// </summary>
 public class CanvasPoint : CanvasObject
 {
-  /// <summary>
-  /// <see cref="Image"/> that represents this point
-  /// </summary>
-  public virtual Image Image => Resources.Images.Vertex;
+  protected const int POINT_DIAMETER = 8;
 
   /// <summary>
   /// <see cref="Action{CanvasPoint, Int, Int, Keys}"/> delegate that is called when the <see cref="CanvasPoint"/>
   /// moves
   /// </summary>
-  [XmlIgnore]
   public Action<CanvasPoint, int, int, Keys> OnPointMoved = (canvasPoint, dx, dy, modifierKeys) => { };
 
   /// <summary>
@@ -60,7 +54,7 @@ public class CanvasPoint : CanvasObject
   /// <summary>
   /// Copy constructor
   /// </summary>
-  public CanvasPoint(CanvasPoint controlPoint) : this(controlPoint.X, controlPoint.Y) { }
+  public CanvasPoint(CanvasPoint canvasPoint) : this(canvasPoint.X, canvasPoint.Y) { }
 
   /// <summary>
   /// Copies this <see cref="CanvasPoint"/>
@@ -74,13 +68,9 @@ public class CanvasPoint : CanvasObject
   public override void Draw(Graphics graphics)
   {
     if (!Visible) return;
-    Image?.Let(image =>
-    {
-      var imageCenter = new Point(Image.Width / 2, Image.Height / 2);
-      var topLeftPoint = ToPoint.Subtract(imageCenter);
-      graphics.DrawImage(Image, topLeftPoint);
-      return 0;
-    });
+    var center = new Point(POINT_DIAMETER / 2, POINT_DIAMETER / 2);
+    var topLeftPoint = ToPoint.Subtract(center);
+    graphics.DrawEllipse(new Pen(Color.Black, 1), topLeftPoint.X, topLeftPoint.Y, POINT_DIAMETER, POINT_DIAMETER);
   }
 
   /// <summary>
@@ -109,13 +99,9 @@ public class CanvasPoint : CanvasObject
   /// <returns><see cref="CanvasPoint"/> when mouse is over the this</returns>
   public override CanvasObject? MouseOver(Point mousePosition, Keys modifierKeys)
   {
-    if (Image == null) return null;
-    var width = Image.Width;
-    var height = Image.Height;
-
-    var topLeftPoint = ToPoint.Subtract(new Point(width / 2, height / 2));
+    var topLeftPoint = ToPoint.Subtract(new Point(POINT_DIAMETER / 2, POINT_DIAMETER / 2));
     var path = new GraphicsPath();
-    path.AddEllipse(topLeftPoint.X, topLeftPoint.Y, width, height);
+    path.AddEllipse(topLeftPoint.X, topLeftPoint.Y, POINT_DIAMETER, POINT_DIAMETER);
     return path.IsVisible(mousePosition) ? this : null;
   }
 

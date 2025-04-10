@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using TNT.Drawing.Layers;
@@ -81,7 +82,7 @@ public class DrawingMode
   /// <summary>
   /// Called when the <see cref="Canvas"/> is being painted
   /// </summary>
-  public virtual void OnPaint(PaintEventArgs e) => Log();
+  public virtual void OnDraw(Graphics graphics) => Log();
 
   /// <summary>
   /// Calls <see cref="Canvas.Refresh(CanvasLayer)"/>
@@ -97,5 +98,5 @@ public class DrawingMode
   /// <summary>
   /// Called to log to <see cref="Debug"/>
   /// </summary>
-  protected virtual void Log(string msg = "", [CallerMemberName] string callingMethod = "") => TNTLogger.I(msg, callingMethod);
+  protected virtual void Log(string msg = "", [CallerMemberName] string callingMethod = "") => TNTLogger.Info(msg, callingMethod);
 }

@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 
 namespace TNT.Drawing;
 
 public static class TNTLogger
 {
-  public static void I(string msg = "", [CallerMemberName] string callingMethod = "") => Debug.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [{callingMethod}] {msg}");
-
+  public static void Info(string msg = "", [CallerMemberName] string callingMethod = "", [CallerFilePath] string filePath = "")
+  {
+    var fileName= Path.GetFileNameWithoutExtension(filePath);
+    Debug.WriteLine($"{DateTime.Now:HH:mm:ss.fff} [{fileName}:{callingMethod}] {msg}");
+  }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using TNT.Commons;
 using TNT.Drawing.Extensions;
@@ -127,11 +128,11 @@ public class LineMode : DrawingMode
   /// <summary>
   ///  Draws the <see cref="Marker"/> or <see cref="ActiveLine"/>
   /// </summary>
-  /// <param name="e"></param>
-  public override void OnPaint(PaintEventArgs e)
+  /// <param name="graphics"></param>
+  public override void OnDraw(Graphics graphics)
   {
-    base.OnPaint(e);
-    Marker?.Draw(e.Graphics);
-    ActiveLine?.Draw(e.Graphics);
+    base.OnDraw(graphics);
+    Marker?.Draw(graphics);
+    ActiveLine?.Draw(graphics);
   }
 }

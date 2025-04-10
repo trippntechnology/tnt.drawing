@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Xml.Serialization;
+using TNT.Drawing.Extensions;
 using TNT.Drawing.Resource;
 
 namespace TNT.Drawing.Objects
@@ -14,13 +15,7 @@ namespace TNT.Drawing.Objects
 		/// <see cref="Func{ControlPoint, Boolean}"/> delegate called to see if this <see cref="ControlPoint"/>
 		/// should be visible or not
 		/// </summary>
-		[XmlIgnore]
 		public Func<ControlPoint, bool> IsVisible { get; set; } = (_) => { return false; };
-
-		/// <summary>
-		/// <see cref="Image"/> that represents this point
-		/// </summary>
-		public override Image Image => Resources.Images.ControlPoint;
 
 		/// <summary>
 		/// Indicates whether the <see cref="ControlPoint"/> is visible or not
@@ -50,13 +45,16 @@ namespace TNT.Drawing.Objects
 		public override void Draw(Graphics graphics)
 		{
 			if (!Visible) return;
-			base.Draw(graphics);
-		}
+      var center = new Point(POINT_DIAMETER / 2, POINT_DIAMETER / 2);
+      var topLeftPoint = ToPoint.Subtract(center);
+			var bottomRightPoint = ToPoint.Add(center);
+      graphics.DrawRectangle(new Pen(Color.Black, 1), topLeftPoint.X, topLeftPoint.Y, POINT_DIAMETER, POINT_DIAMETER);
+    }
 
-		/// <summary>
-		/// Copies this <see cref="ControlPoint"/>
-		/// </summary>
-		/// <returns>Copy of this <see cref="ControlPoint"/></returns>
-		public override CanvasObject Copy() => new ControlPoint(this);
+    /// <summary>
+    /// Copies this <see cref="ControlPoint"/>
+    /// </summary>
+    /// <returns>Copy of this <see cref="ControlPoint"/></returns>
+    public override CanvasObject Copy() => new ControlPoint(this);
 	}
 }

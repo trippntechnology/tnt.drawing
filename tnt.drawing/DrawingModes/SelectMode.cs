@@ -98,6 +98,7 @@ public class SelectMode : DrawingMode
   {
     var location = Canvas?.SnapToInterval == true && (modifierKeys & Keys.Control) != Keys.Control ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
 
+    TNTLogger.Info($"location: {location}");
     var dx = location.X - previousMouseLocation.X;
     var dy = location.Y - previousMouseLocation.Y;
     previousMouseLocation = location;
@@ -116,11 +117,11 @@ public class SelectMode : DrawingMode
   /// <summary>
   /// Draws the selected objects
   /// </summary>
-  public override void OnPaint(PaintEventArgs e)
+  public override void OnDraw(Graphics graphics)
   {
     // Draw selected objects
-    Layer.CanvasObjects.FindAll(o => o.IsSelected).ForEach(o => o.Draw(e.Graphics));
-    base.OnPaint(e);
+    Layer.CanvasObjects.FindAll(o => o.IsSelected).ForEach(o => o.Draw(graphics));
+    base.OnDraw(graphics);
   }
 
   /// <summary>

@@ -222,7 +222,7 @@ namespace TNT.Drawing
         Fit();
       }
 
-      DrawingMode?.OnPaint(e); // This works with transformed graphics because e.Graphics is transformed
+      DrawingMode?.OnDraw(graphics);
 
       base.OnPaint(e);
     }
