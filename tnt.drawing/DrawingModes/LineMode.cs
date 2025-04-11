@@ -53,21 +53,22 @@ public class LineMode : DrawingMode
       if (ActiveLine == null)
       {
         var line1 = new Line();
-
-        (DefaultObject.Copy() as Line)?.Also(ActiveLine =>
-        {
-          ActiveLine.IsSelected = true;
-          ActiveLine.AddVertex(new Vertex(location));
-          ActiveVertex = new Vertex(location);
-          ActiveLine.AddVertex(ActiveVertex);
-          Refresh();
-        });
+        ActiveLine = DefaultObject.Copy() as Line;
+        ActiveLine?.Also(line =>
+          {
+            line.IsSelected = true;
+            line.AddVertex(new Vertex(location));
+            ActiveVertex = new Vertex(location);
+            line.AddVertex(ActiveVertex);
+            Refresh(Layer);
+          }
+        );
       }
       else if (ActiveVertex != null)
       {
         ActiveVertex = new Vertex(location);
         ActiveLine.AddVertex(ActiveVertex);
-        Refresh();
+        Refresh(Layer);
       }
     }
     else if (e.Button == MouseButtons.Right && ActiveVertex != null && ActiveLine != null)
@@ -79,7 +80,7 @@ public class LineMode : DrawingMode
         ActiveLine = null;
         ActiveVertex = null;
       }
-      Refresh();
+      Refresh(Layer);
     }
   }
 
@@ -122,7 +123,7 @@ public class LineMode : DrawingMode
       if (Marker == null) Marker = new CanvasPoint();
       Marker.MoveTo(location, modifierKeys);
     }
-    Invalidate();
+    Refresh(Layer);
   }
 
   /// <summary>

@@ -107,10 +107,16 @@ public class SelectMode : DrawingMode
 
     if (IsMouseDown && allowMove) selectedObjects.ForEach(o => o.MoveBy(dx, dy, modifierKeys));
 
-    var feedback = objectUnderMouse?.GetFeedback(e.Location, modifierKeys) ?? new Feedback(Cursors.Default, string.Empty);
-    Canvas?.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
+    if (e.HasButtonDown())
+    {
+      Refresh(this.Layer);
+    }
+    else
+    {
+      var feedback = objectUnderMouse?.GetFeedback(e.Location, modifierKeys) ?? new Feedback(Cursors.Default, string.Empty);
+      Canvas?.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
+    }
 
-    if (e.HasButtonDown()) Refresh(this.Layer);
     base.OnMouseMove(e, modifierKeys);
   }
 
