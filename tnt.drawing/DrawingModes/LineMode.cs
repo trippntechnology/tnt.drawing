@@ -55,7 +55,7 @@ public class LineMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, la
             line.AddVertex(new Vertex(location));
             ActiveVertex = new Vertex(location);
             line.AddVertex(ActiveVertex);
-            Refresh(Layer);
+            Canvas.Refresh();
           }
         );
       }
@@ -63,7 +63,7 @@ public class LineMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, la
       {
         ActiveVertex = new Vertex(location);
         ActiveLine.AddVertex(ActiveVertex);
-        Refresh(Layer);
+        Canvas.Refresh();
       }
     }
     else if (e.Button == MouseButtons.Right && ActiveVertex != null && ActiveLine != null)
@@ -75,7 +75,7 @@ public class LineMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, la
         ActiveLine = null;
         ActiveVertex = null;
       }
-      Refresh(Layer);
+      Canvas.Refresh();
     }
   }
 
@@ -94,7 +94,7 @@ public class LineMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, la
       Layer?.CanvasObjects?.Add(ActiveLine);
       ActiveVertex = null;
       ActiveLine = null;
-      Refresh(Layer);
+      Canvas.Refresh();
     }
   }
 
@@ -118,7 +118,7 @@ public class LineMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, la
       if (Marker == null) Marker = new CanvasPoint();
       Marker.MoveTo(location, modifierKeys);
     }
-    Refresh(Layer);
+    Canvas.Refresh();
   }
 
   /// <summary>

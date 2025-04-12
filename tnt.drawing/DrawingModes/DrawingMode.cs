@@ -37,7 +37,7 @@ public class DrawingMode(Canvas canvas, CanvasLayer layer)
   /// <summary>
   /// Refreshes the <see cref="Canvas"/> with the current <see cref="CanvasLayer"/>
   /// </summary>
-  public virtual void Reset() => Refresh(Layer);
+  public virtual void Reset() => Canvas.Refresh();
 
   /// <summary>
   /// Called when the mouse moves across the <see cref="Canvas"/>
@@ -78,11 +78,6 @@ public class DrawingMode(Canvas canvas, CanvasLayer layer)
   /// Called when the <see cref="Canvas"/> is being painted
   /// </summary>
   public virtual void OnDraw(Graphics graphics) => Log();
-
-  /// <summary>
-  /// Calls <see cref="Canvas.Refresh(CanvasLayer)"/>
-  /// </summary>
-  protected virtual void Refresh(CanvasLayer? layer = null) => CommonsExtensions.RunNotNull(Canvas, layer, (canvas, layer) => canvas.Refresh(layer));
 
   /// <summary>
   /// Called to log to <see cref="Debug"/>

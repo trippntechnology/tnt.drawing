@@ -55,12 +55,12 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
       selectedObjects.Add(objectUnderMouse);
     }
 
-    Canvas?.OnObjectsSelected(selectedObjects.Select(o => o as object).ToList());
+    Canvas.OnObjectsSelected(selectedObjects.Select(o => o as object).ToList());
 
     // Select/unselect objects
     Layer.CanvasObjects.ForEach(o => o.IsSelected = selectedObjects.Contains(o));
 
-    Refresh(Layer);
+    Canvas.Refresh();
 
     base.OnMouseDown(e, modifierKeys);
   }
@@ -71,7 +71,7 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   public override void OnKeyDown(KeyEventArgs e)
   {
     var feedback = objectUnderMouse?.GetFeedback(previousMouseLocation, e.Modifiers) ?? new Feedback(Cursors.Default, string.Empty);
-    Canvas?.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
+    Canvas.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
     base.OnKeyDown(e);
   }
 
@@ -82,7 +82,7 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   public override void OnKeyUp(KeyEventArgs e)
   {
     var feedback = objectUnderMouse?.GetFeedback(previousMouseLocation, e.Modifiers) ?? new Feedback(Cursors.Default, string.Empty);
-    Canvas?.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
+    Canvas.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
     base.OnKeyUp(e);
   }
 
@@ -91,7 +91,7 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   /// </summary>
   public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
   {
-    var location = Canvas?.SnapToInterval == true && (modifierKeys & Keys.Control) != Keys.Control ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
+    var location = Canvas.SnapToInterval == true && (modifierKeys & Keys.Control) != Keys.Control ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
 
     TNTLogger.Info($"location: {location}");
     var dx = location.X - previousMouseLocation.X;
@@ -104,12 +104,12 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
 
     if (e.HasButtonDown())
     {
-      Refresh(this.Layer);
+      Canvas.Invalidate();
     }
     else
     {
       var feedback = objectUnderMouse?.GetFeedback(e.Location, modifierKeys) ?? new Feedback(Cursors.Default, string.Empty);
-      Canvas?.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
+      Canvas.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
     }
 
     base.OnMouseMove(e, modifierKeys);
