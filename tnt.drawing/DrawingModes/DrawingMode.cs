@@ -85,12 +85,6 @@ public class DrawingMode(Canvas canvas, CanvasLayer layer)
   protected virtual void Refresh(CanvasLayer? layer = null) => CommonsExtensions.RunNotNull(Canvas, layer, (canvas, layer) => canvas.Refresh(layer));
 
   /// <summary>
-  /// Calls <see cref="Canvas.Invalidate(CanvasLayer)"/>
-  /// </summary>
-  /// <param name="layer"></param>
-  protected virtual void Invalidate(CanvasLayer? layer = null) => CommonsExtensions.RunNotNull(Canvas, layer, (canvas, layer) => canvas?.Invalidate(layer));
-
-  /// <summary>
   /// Called to log to <see cref="Debug"/>
   /// </summary>
   protected virtual void Log(string msg = "", [CallerMemberName] string callingMethod = "") => TNTLogger.Info(msg, callingMethod);

@@ -12,10 +12,22 @@ namespace TNT.Drawing.Layers;
 [Serializable]
 public class CanvasLayer
 {
+  /// <summary>  
+  /// The `_Redraw` field is a protected boolean flag used to indicate whether the  
+  /// `CanvasLayer` needs to be redrawn.  
+  ///  
+  /// - It is initialized to `true` by default.  
+  /// - The `_Redraw` flag is set to `true` whenever a property change is detected  
+  ///   via the `_BackingFields.OnFieldChanged` event.  
+  /// - This mechanism ensures that the layer is marked for redraw when its state  
+  ///   changes, such as updates to dimensions, visibility, or background color.  
+  /// </summary>  
+  protected bool _Redraw = true;
+
   /// <summary>
   /// Backing fields for properties
   /// </summary>
-  protected BackingFields BackingFields = new BackingFields();
+  protected BackingFields _BackingFields = new BackingFields();
 
   /// <summary>
   /// Reference the <see cref="Canvas"/>
@@ -30,17 +42,17 @@ public class CanvasLayer
   /// <summary>
   /// Background color 
   /// </summary>
-  public Color BackgroundColor { get => BackingFields.Get<Color>(Color.Transparent); set => BackingFields.Set(value); }
+  public Color BackgroundColor { get => _BackingFields.Get<Color>(Color.Transparent); set => _BackingFields.Set(value); }
 
   /// <summary>
   /// The width of the <see cref="CanvasLayer"/>
   /// </summary>
-  public int Width { get => BackingFields.Get(1024); set => BackingFields.Set(value); }
+  public int Width { get => _BackingFields.Get(1024); set => _BackingFields.Set(value); }
 
   /// <summary>
   /// The height of the <see cref="CanvasLayer"/>
   /// </summary>
-  public int Height { get => BackingFields.Get(768); set => BackingFields.Set(value); }
+  public int Height { get => _BackingFields.Get(768); set => _BackingFields.Set(value); }
 
   /// <summary>
   /// <see cref="CanvasObject"/> managed by this layer
@@ -63,6 +75,7 @@ public class CanvasLayer
   public CanvasLayer(Canvas canvas)
   {
     Canvas = canvas;
+    _BackingFields.OnFieldChanged += (field, value) => { _Redraw = true; };
   }
 
   /// <summary>

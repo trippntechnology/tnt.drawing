@@ -305,15 +305,6 @@ namespace TNT.Drawing
     }
 
     /// <summary>
-    /// Invalidates the control to redraw itself
-    /// </summary>
-    /// <param name="layer"></param>
-    public void Invalidate(CanvasLayer layer)
-    {
-      base.Invalidate();
-    }
-
-    /// <summary>
     /// Sets <see cref="KeyEventArgs"/>
     /// </summary>
     protected override void OnKeyDown(KeyEventArgs e)
