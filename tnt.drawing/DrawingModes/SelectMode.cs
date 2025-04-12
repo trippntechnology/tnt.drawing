@@ -12,17 +12,12 @@ namespace TNT.Drawing.DrawingModes;
 /// <summary>
 /// Select <see cref="DrawingMode"/>
 /// </summary>
-public class SelectMode : DrawingMode
+public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, layer)
 {
   private bool allowMove = false;
   private Point previousMouseLocation = Point.Empty;
   private List<CanvasObject> selectedObjects = new List<CanvasObject>();
   private CanvasObject? objectUnderMouse = null;
-
-  /// <summary>
-  /// Initializes with a <paramref name="layer"/>
-  /// </summary>
-  public SelectMode(CanvasLayer layer) : base(layer) { }
 
   /// <summary>
   /// Resets the <see cref="DrawingMode"/> and <see cref="DrawingMode.Layer"/>

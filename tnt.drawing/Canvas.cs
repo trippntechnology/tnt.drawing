@@ -31,7 +31,6 @@ namespace TNT.Drawing
     private const int MINIMUM_PADDING = 1000;
     private const int PADDING = 50;
 
-    private DrawingMode? _DrawingMode;
     private Rectangle _LayerRect = Rectangle.Empty;
     private bool FitOnPaint = false;
     private bool AdjustPostion = false;
@@ -61,18 +60,7 @@ namespace TNT.Drawing
     /// <see cref="DrawingMode"/> interacting with the <see cref="Canvas"/>
     /// </summary>
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public DrawingMode? DrawingMode
-    {
-      get { return _DrawingMode; }
-      set
-      {
-        _DrawingMode = value;
-        if (_DrawingMode != null)
-        {
-          _DrawingMode.Canvas = this;
-        }
-      }
-    }
+    public DrawingMode DrawingMode { get; set; }
 
     /// <summary>
     /// <see cref="List{CanvasLayer}"/> managed by the <see cref="Canvas"/>
@@ -158,6 +146,9 @@ namespace TNT.Drawing
       parent.SizeChanged += OnParentResize;
       ScrollableParent = (Parent as ScrollableControl);
       ScrollableParent?.Also(it => it.AutoScroll = true);
+
+      // DrawingMode can't be null so set an initial DrawingMode
+      DrawingMode = new DrawingMode(this, new CanvasLayer(this));
     }
 
     /// <summary>
@@ -222,7 +213,7 @@ namespace TNT.Drawing
         Fit();
       }
 
-      DrawingMode?.OnDraw(graphics);
+      DrawingMode.OnDraw(graphics);
 
       base.OnPaint(e);
     }
@@ -288,7 +279,7 @@ namespace TNT.Drawing
       var graphics = CreateTransformedGraphics();
       var mea = Transform(e, graphics);
 
-      if (keyEventArgs?.KeyCode != Keys.Space) DrawingMode?.OnMouseMove(mea, ModifierKeys);
+      if (keyEventArgs?.KeyCode != Keys.Space) DrawingMode.OnMouseMove(mea, ModifierKeys);
 
       var currentCursorPosition = Cursor.Position;
       var mousePosition = new Point(e.X, e.Y);
@@ -334,7 +325,7 @@ namespace TNT.Drawing
           Cursor = Cursors.Hand;
           break;
         default:
-          DrawingMode?.OnKeyDown(e);
+          DrawingMode.OnKeyDown(e);
           break;
       }
     }
@@ -346,7 +337,7 @@ namespace TNT.Drawing
     {
       keyEventArgs = null;
       Cursor = Cursors.Default;
-      DrawingMode?.OnKeyUp(e);
+      DrawingMode.OnKeyUp(e);
     }
 
     /// <summary>
@@ -356,7 +347,7 @@ namespace TNT.Drawing
     {
       var graphics = CreateTransformedGraphics();
       var mea = Transform(e, graphics);
-      DrawingMode?.OnMouseClick(mea, ModifierKeys);
+      DrawingMode.OnMouseClick(mea, ModifierKeys);
     }
 
     /// <summary>
@@ -365,7 +356,7 @@ namespace TNT.Drawing
     protected override void OnMouseDoubleClick(MouseEventArgs e)
     {
       base.OnMouseDoubleClick(e);
-      DrawingMode?.OnMouseDoubleClick(e);
+      DrawingMode.OnMouseDoubleClick(e);
     }
 
     /// <summary>
@@ -374,7 +365,7 @@ namespace TNT.Drawing
     protected override void OnMouseDown(MouseEventArgs e)
     {
       MouseEventArgs mea = Transform(e);
-      DrawingMode?.OnMouseDown(mea, ModifierKeys);
+      DrawingMode.OnMouseDown(mea, ModifierKeys);
       base.OnMouseDown(e);
     }
 
@@ -395,7 +386,7 @@ namespace TNT.Drawing
     protected override void OnMouseUp(MouseEventArgs e)
     {
       base.OnMouseUp(e);
-      DrawingMode?.OnMouseUp(e, ModifierKeys);
+      DrawingMode.OnMouseUp(e, ModifierKeys);
     }
 
     /// <summary>

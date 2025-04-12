@@ -11,7 +11,7 @@ namespace TNT.Drawing.DrawingModes;
 /// <summary>
 /// <see cref="DrawingMode"/> to draw a line
 /// </summary>
-public class LineMode : DrawingMode
+public class LineMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, layer)
 {
   private Line? ActiveLine = null;
   private Vertex? ActiveVertex = null;
@@ -21,11 +21,6 @@ public class LineMode : DrawingMode
   /// The <see cref="Line"/> that gets created by default
   /// </summary>
   public override CanvasObject DefaultObject { get; } = new Line();
-
-  /// <summary>
-  /// Initialization constructor
-  /// </summary>
-  public LineMode(CanvasLayer layer) : base(layer) { }
 
   /// <summary>
   /// Clears the state maintained by <see cref="LineMode"/>

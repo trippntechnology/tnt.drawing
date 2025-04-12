@@ -11,14 +11,14 @@ namespace TNT.Drawing.Sample;
 public partial class Form1 : Form
 {
   private ApplicationRegistry? applicationRegistery = null;
-  private Canvas _Canvas;
+  private readonly Canvas canvas;
 
   public Form1()
   {
     InitializeComponent();
     applicationRegistery = new ApplicationRegistry(this, Registry.CurrentUser, "Tripp'n Technology", "CenteredDrawing");
-    _Canvas = new Canvas(splitContainer1.Panel1);
-    _Canvas.Properties = new CanvasProperties(); ;
+    canvas = new Canvas(splitContainer1.Panel1);
+    canvas.Properties = new CanvasProperties(); ;
 
     var line1 = new Line();
     line1.AddVertex(new Vertex(300, 100));
@@ -30,16 +30,16 @@ public partial class Form1 : Form
     line2.AddVertex(new Vertex(600, 300));
     line2.AddVertex(new Vertex(700, 100));
 
-    var layer1 = new CanvasLayer(_Canvas)
+    var layer1 = new CanvasLayer(canvas)
     {
       Name = "Background",
       CanvasObjects = new List<CanvasObject>() { new Square(150, 150, 200, Color.Green) },
       BackgroundColor = Color.White,
     };
 
-    var layer2 = new GridLayer(_Canvas) { Name = "Grid", LineColor = Color.Aqua };
+    var layer2 = new GridLayer(canvas) { Name = "Grid", LineColor = Color.Aqua };
 
-    var layer3 = new CanvasLayer(_Canvas)
+    var layer3 = new CanvasLayer(canvas)
     {
       Name = "Object",
       CanvasObjects = new List<CanvasObject>()
@@ -51,9 +51,9 @@ public partial class Form1 : Form
       }
     };
 
-    _Canvas.Layers = new List<CanvasLayer>() { layer1, layer2, layer3 };
+    canvas.Layers = new List<CanvasLayer>() { layer1, layer2, layer3 };
 
-    _Canvas.Layers.ForEach(layer =>
+    canvas.Layers.ForEach(layer =>
     {
       layerToolStripMenuItem.DropDownItems.Add(new ToolStripMenuItem(layer.ToString()).Also(it =>
       {
@@ -62,13 +62,13 @@ public partial class Form1 : Form
       }));
     });
 
-    propertyGrid1.SelectedObject = _Canvas.Properties;
+    propertyGrid1.SelectedObject = canvas.Properties;
 
-    selectToolStripMenuItem.Tag = new DrawingModes.SelectMode(layer3);
-    lineToolStripMenuItem.Tag = new LineMode(layer3);
+    selectToolStripMenuItem.Tag = new DrawingModes.SelectMode(canvas, layer3);
+    lineToolStripMenuItem.Tag = new LineMode(canvas, layer3);
 
-    _Canvas.DrawingMode = selectToolStripMenuItem.Tag as DrawingMode;
-    _Canvas.OnSelected = (objs) =>
+    canvas.DrawingMode = selectToolStripMenuItem.Tag as DrawingMode;
+    canvas.OnSelected = (objs) =>
     {
       try
       {
@@ -79,14 +79,14 @@ public partial class Form1 : Form
       }
     };
 
-    _Canvas.OnFeedbackChanged = (cursor, hint) =>
+    canvas.OnFeedbackChanged = (cursor, hint) =>
     {
       Cursor = cursor;
       toolStripStatusLabel1.Text = hint;
     };
   }
 
-  private void FitToolStripMenuItem_Click(object sender, System.EventArgs e) => _Canvas?.Fit();
+  private void FitToolStripMenuItem_Click(object sender, System.EventArgs e) => canvas?.Fit();
 
   private void SaveToolStripMenuItem_Click(object sender, System.EventArgs e)
   {
@@ -133,12 +133,12 @@ public partial class Form1 : Form
       if (menuItem.Tag is DrawingMode mode)
       {
         propertyGrid1.SelectedObject = mode.DefaultObject;
-        _Canvas.DrawingMode?.Reset();
-        _Canvas.DrawingMode = mode;
+        canvas.DrawingMode.Reset();
+        canvas.DrawingMode = mode;
       }
     }
   }
 
-  private void PropertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e) => _Canvas.DrawingMode?.Layer?.Also(layer => _Canvas.Refresh(layer));
-  private void AlignToolStripMenuItem_Click(object sender, System.EventArgs e) => _Canvas.AlignToInterval();
+  private void PropertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e) => canvas.DrawingMode.Layer.Also(layer => canvas.Refresh(layer));
+  private void AlignToolStripMenuItem_Click(object sender, System.EventArgs e) => canvas.AlignToInterval();
 }

@@ -12,7 +12,7 @@ namespace TNT.Drawing.DrawingModes;
 /// <summary>
 /// Base class for all drawing modes
 /// </summary>
-public class DrawingMode
+public class DrawingMode(Canvas canvas, CanvasLayer layer)
 {
   /// <summary>
   /// Indicates when the mouse button is pressed
@@ -22,22 +22,17 @@ public class DrawingMode
   /// <summary>
   /// Reference to the <see cref="Canvas"/>
   /// </summary>
-  public Canvas? Canvas { get; set; }
+  protected Canvas Canvas { get; private set; } = canvas;
 
   /// <summary>
   /// The <see cref="CanvasLayer"/> manipulated by this <see cref="DrawingMode"/>
   /// </summary>
-  public CanvasLayer Layer { get; protected set; }
+  public CanvasLayer Layer { get; protected set; } = layer;
 
   /// <summary>
   /// The <see cref="CanvasObject"/> that gets created by the <see cref="DrawingMode"/>
   /// </summary>
   public virtual CanvasObject? DefaultObject { get; } = null;
-
-  /// <summary>
-  /// Initialization constructor
-  /// </summary>
-  public DrawingMode(CanvasLayer layer) { this.Layer = layer; }
 
   /// <summary>
   /// Refreshes the <see cref="Canvas"/> with the current <see cref="CanvasLayer"/>
