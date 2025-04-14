@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 using TNT.Drawing.Extensions;
 
 namespace TNT.Drawing.Objects;
@@ -23,12 +22,12 @@ public class CanvasPoint : CanvasObject
   /// <summary>
   /// X coordinate
   /// </summary>
-  public int X { get; set; }
+  public int X { get => Get(0); set => Set(value); }
 
   /// <summary>
   /// Y coordinate
   /// </summary>
-  public int Y { get; set; }
+  public int Y { get => Get(0); set => Set(value); }
 
   /// <summary>
   /// Converts a <see cref="CanvasPoint"/> to a <see cref="Point"/>
@@ -38,7 +37,6 @@ public class CanvasPoint : CanvasObject
   /// <summary>
   /// Indicates whether the <see cref="CanvasPoint"/> is visible or not
   /// </summary>
-  [XmlIgnore]
   public virtual bool Visible { get => true; }
 
   /// <summary>

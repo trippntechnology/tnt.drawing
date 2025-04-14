@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Drawing;
 using TNT.Reactive;
 
@@ -8,12 +7,8 @@ namespace TNT.Drawing;
 /// <summary>
 /// Properties that can be changed in a <see cref="CanvasPanel"/>
 /// </summary>
-public class CanvasProperties
+public class CanvasProperties : Observable
 {
-  private BackingFields _BackingFields = new BackingFields();
-
-  public Action<string, object?> OnPropertyChanged { get => _BackingFields.OnFieldChanged; set => _BackingFields.OnFieldChanged = value; }
-
   /// <summary>
   /// Initializes default values
   /// </summary>
@@ -23,7 +18,7 @@ public class CanvasProperties
   /// Background color of the <see cref="Canvas"/>
   /// </summary>
   [DisplayName("Back Color")]
-  public Color BackColor { get { return _BackingFields.Get(Color.Blue); } set { _BackingFields.Set(value); } }
+  public Color BackColor { get { return Get(Color.Blue); } set { Set(value); } }
 
   /// <summary>
   /// Serializable for <see cref="BackColor"/>
@@ -34,29 +29,29 @@ public class CanvasProperties
   /// <summary>
   /// </summary>
   [DisplayName("Layer Height")]
-  public int LayerHeight { get { return _BackingFields.Get(768); } set { _BackingFields.Set(value); } }
+  public int LayerHeight { get { return Get(768); } set { Set(value); } }
 
   /// <summary>
   /// </summary>
   [DisplayName("Layer Width")]
-  public int LayerWidth { get { return _BackingFields.Get(1024); } set { _BackingFields.Set(value); } }
+  public int LayerWidth { get { return Get(1024); } set { Set(value); } }
 
   /// <summary>
   /// ScalePercentage of the <see cref="Canvas"/>
   /// </summary>
   [DisplayName("Scale Percentage")]
-  public int ScalePercentage { get { return _BackingFields.Get(100); } set { _BackingFields.Set(value); } }
+  public int ScalePercentage { get { return Get(100); } set { Set(value); } }
 
   /// <summary>
   /// Indicates the snap interval
   /// </summary>
   [DisplayName("Snap Interval")]
   [ReadOnly(true)]
-  public int SnapInterval { get { return _BackingFields.Get(10); } set { _BackingFields.Set(value); } }
+  public int SnapInterval { get { return Get(10); } set { Set(value); } }
 
   /// <summary>
   /// Indicates objects should be snapped to <see cref="SnapInterval"/>
   /// </summary>
   [DisplayName("Snap To Interval")]
-  public bool SnapToInterval { get { return _BackingFields.Get(true); } set { _BackingFields.Set(value); } }
+  public bool SnapToInterval { get { return Get(true); } set { Set(value); } }
 }

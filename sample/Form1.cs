@@ -67,7 +67,7 @@ public partial class Form1 : Form
     selectToolStripMenuItem.Tag = new DrawingModes.SelectMode(canvas, layer3);
     lineToolStripMenuItem.Tag = new LineMode(canvas, layer3);
 
-    canvas.DrawingMode = selectToolStripMenuItem.Tag as DrawingMode;
+    canvas.DrawingMode = (selectToolStripMenuItem.Tag as DrawingMode)!;
     canvas.OnSelected = (objs) =>
     {
       try

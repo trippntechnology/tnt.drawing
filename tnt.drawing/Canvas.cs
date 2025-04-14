@@ -51,7 +51,7 @@ namespace TNT.Drawing
       set
       {
         _Properties = value;
-        _Properties.OnPropertyChanged = (name, val) => { this.SetProperty(name, val); };
+        _Properties.OnPropertyChanged += (name, val) => { this.SetProperty(name, val); };
         _Properties.SetProperties(this);
       }
     }

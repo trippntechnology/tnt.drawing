@@ -24,7 +24,7 @@ public class Line : CanvasObject
   /// <summary>
   /// Indicates the width of the <see cref="Line"/>
   /// </summary>
-  public float Width { get; set; } = 1;
+  public int Width { get => Get(1); set => Set(value); }
 
   /// <summary>
   /// Represents the <see cref="Color"/> as an ARGB value so that it can be persisted
@@ -34,13 +34,12 @@ public class Line : CanvasObject
   /// <summary>
   /// Indicates the <see cref="Color"/> of the <see cref="Line"/>
   /// </summary>
-  [XmlIgnore]
-  public Color Color { get; set; } = Color.Blue;
+  public Color Color { get => Get(Color.Blue); set => Set(value); }
 
   /// <summary>
   /// Indicates the <see cref="DashStyle"/> of the <see cref="Line"/>
   /// </summary>
-  public DashStyle Style { get; set; } = DashStyle.Solid;
+  public DashStyle Style { get => Get(DashStyle.Solid); set => Set(value); }
 
   /// <summary>
   /// The <see cref="List{CanvasPoint}"/> represented by this <see cref="Line"/>
