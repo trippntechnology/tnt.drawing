@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="TNT.Drawing.DrawingModes.DrawingMode">
+    <Position X="25" Y="12.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAACEBAAIAAJAAAAAABoAAAAEIgAAAAACAAA=</HashCode>
+      <FileName>DrawingModes\DrawingMode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TNT.Drawing.DrawingModes.LineMode">
+    <Position X="22.5" Y="17.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAACBAAIAABAAQAAABAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>DrawingModes\LineMode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TNT.Drawing.DrawingModes.PolyLineMode">
+    <Position X="25" Y="17.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAACABAAMgABAAAAAABoAAIAAIgAAAAACAAA=</HashCode>
+      <FileName>DrawingModes\PolyLineMode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TNT.Drawing.DrawingModes.SelectMode">
+    <Position X="27.5" Y="17.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AABAAQAAAACABAAAAABQAAAAABIAEAAQIAAAAAAAAAA=</HashCode>
+      <FileName>DrawingModes\SelectMode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TNT.Drawing.Layers.CanvasLayer">
+    <Position X="13.25" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAIAAABAAAEgAMAAIAQEQACCAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Layers\CanvasLayer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TNT.Drawing.Layers.GridLayer">
+    <Position X="13.25" Y="20.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAgAAAAABAAAAAAAAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>Layers\GridLayer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TNT.Drawing.Objects.CanvasObject">
+    <Position X="17.5" Y="3.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAACgAAAAAAAEgAAAAAAAAIAAgAAAAAEIAAAAAACIAA=</HashCode>
+      <FileName>Objects\CanvasObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TNT.Drawing.Objects.CanvasPoint">
+    <Position X="15" Y="7.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAgAEgAAAAgAAAgCIAIAMAAAAAAACYAA=</HashCode>
+      <FileName>Objects\CanvasPoint.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TNT.Drawing.Objects.ControlPoint">
+    <Position X="16.25" Y="13" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAEgAAAAAAAAAAAgAAAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>Objects\ControlPoint.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TNT.Drawing.Objects.Line">
+    <Position X="19.25" Y="7.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAigIQAAgAIlIBQgAAAGAEpACAgACAIAw=</HashCode>
+      <FileName>Objects\Line.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TNT.Drawing.Objects.Square">
+    <Position X="21.75" Y="7.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAABAAAAgAAAQAAAEAAAgAAAAAEAAAAgAAAYAA=</HashCode>
+      <FileName>Objects\Square.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TNT.Drawing.Objects.Vertex">
+    <Position X="13.5" Y="13" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Objects\Vertex.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TNT.Drawing.Resource.Feedback" Collapsed="true">
+    <Position X="32.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Resource\Feedback.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TNT.Drawing.Canvas" Collapsed="true">
+    <Position X="30.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>KZCAAgAIQADABBGAlACQgAZgEDIAAAAEIiABIAADAAE=</HashCode>
+      <FileName>Canvas.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TNT.Drawing.CanvasPanel" Collapsed="true">
+    <Position X="32.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAA=</HashCode>
+      <FileName>CanvasPanel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TNT.Drawing.CanvasProperties" Collapsed="true">
+    <Position X="30.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAABAAABAAAAAAgAAAAAAAAACAAAAABAAA=</HashCode>
+      <FileName>CanvasProperties.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

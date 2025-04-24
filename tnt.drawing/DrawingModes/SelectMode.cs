@@ -41,11 +41,11 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
     {
       selectedObjects.Clear();
     }
-    else if (modifierKeys == Keys.Shift && selectedObjects.Contains(objectUnderMouse))
+    else if (modifierKeys == Keys.Control && selectedObjects.Contains(objectUnderMouse))
     {
       selectedObjects.Remove(objectUnderMouse);
     }
-    else if (modifierKeys == Keys.Shift && !selectedObjects.Contains(objectUnderMouse))
+    else if (modifierKeys == Keys.Control && !selectedObjects.Contains(objectUnderMouse))
     {
       selectedObjects.Add(objectUnderMouse);
     }
@@ -98,16 +98,17 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
     var dy = location.Y - previousMouseLocation.Y;
     previousMouseLocation = location;
 
-    objectUnderMouse = FindObjectAt(Layer.CanvasObjects, e.Location, modifierKeys);
-
-    if (IsMouseDown && allowMove) selectedObjects.ForEach(o => o.MoveBy(dx, dy, modifierKeys));
-
-    if (e.HasButtonDown())
+    if (IsMouseDown)
     {
+      if (allowMove)
+    {
+        selectedObjects.ForEach(o => o.MoveBy(dx, dy, modifierKeys));
       Canvas.Invalidate();
+    }
     }
     else
     {
+      objectUnderMouse = FindObjectAt(Layer.CanvasObjects, e.Location, modifierKeys);
       var feedback = objectUnderMouse?.GetFeedback(e.Location, modifierKeys) ?? new Feedback(Cursors.Default, string.Empty);
       Canvas.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
     }

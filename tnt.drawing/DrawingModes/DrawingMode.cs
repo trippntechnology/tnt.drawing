@@ -5,8 +5,6 @@ using System.Windows.Forms;
 using TNT.Drawing.Layers;
 using TNT.Drawing.Objects;
 
-using CommonsExtensions = TNT.Commons.Extensions;
-
 namespace TNT.Drawing.DrawingModes;
 
 /// <summary>

@@ -21,7 +21,7 @@ public abstract class CanvasObject : Observable
   /// <summary>
   /// Indicates whether the object is selected or not
   /// </summary>
-  public bool IsSelected { get => Get(false); set => Set(value); }
+  public virtual bool IsSelected { get => Get(false); set => Set(value); }
 
   /// <summary>
   /// Default constructor

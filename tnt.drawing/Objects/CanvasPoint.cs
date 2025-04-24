@@ -68,7 +68,11 @@ public class CanvasPoint : CanvasObject
     if (!Visible) return;
     var center = new Point(POINT_DIAMETER / 2, POINT_DIAMETER / 2);
     var topLeftPoint = ToPoint.Subtract(center);
-    graphics.DrawEllipse(new Pen(Color.Black, 1), topLeftPoint.X, topLeftPoint.Y, POINT_DIAMETER, POINT_DIAMETER);
+
+    if (IsSelected)
+      graphics.FillEllipse(new SolidBrush(Color.FromArgb(128, Color.Black)), topLeftPoint.X, topLeftPoint.Y, POINT_DIAMETER, POINT_DIAMETER);
+    else
+      graphics.DrawEllipse(new Pen(Color.Black, 1), topLeftPoint.X, topLeftPoint.Y, POINT_DIAMETER, POINT_DIAMETER);
   }
 
   /// <summary>
