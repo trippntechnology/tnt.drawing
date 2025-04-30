@@ -4,9 +4,9 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 using TNT.Commons;
 using TNT.Drawing.Extensions;
+using TNT.Drawing.Model;
 using TNT.Drawing.Resource;
 
 using CommonsExtensions = TNT.Commons.Extensions;
@@ -18,7 +18,7 @@ namespace TNT.Drawing.Objects;
 /// </summary>
 public class Line : CanvasObject
 {
-  private CanvasObject? activeObject = null;
+  private List<CanvasPoint> moveablePoints = new();
   private Pen pen = new Pen(Color.Black, 1);
 
   /// <summary>
@@ -185,44 +185,88 @@ public class Line : CanvasObject
   }
 
   /// <summary>
-  /// TODO
+  /// Handles the mouse down event for the <see cref="Line"/> object.
+  /// This method determines the interaction with the line or its points based on the mouse location
+  /// and modifier keys pressed. It supports adding, deleting, selecting, and moving vertices or control points.
   /// </summary>
-  /// <returns></returns>
-  public override CanvasObject OnMouseDown(Point location, Keys modifierKeys, out bool allowMove)
+  /// <param name="location">The location of the mouse pointer.</param>
+  /// <param name="modifierKeys">The modifier keys pressed during the event.</param>
+  /// <returns>A <see cref="MouseDownResponse"/> object indicating the result of the mouse down event.</returns>
+  public override MouseDownResponse OnMouseDown(Point location, Keys modifierKeys)
   {
-    activeObject = this;
-    allowMove = true;
+    var response = new MouseDownResponse(this, null, true);
 
     if (IsSelected)
     {
-      var vertex = Points.FirstOrDefault(p => p is Vertex && p.MouseOver(location, modifierKeys) != null);
-      var ctrlPoint = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys) != null);
+      // Check if the mouse is over any of the points
+      var hitVertex = Points.FirstOrDefault(p => p is Vertex && p.MouseOver(location, modifierKeys) != null) as Vertex;
+      ControlPoint? hitCtrlPoint = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys) != null) as ControlPoint;
 
-      CanvasPoint? point = vertex ?? ctrlPoint;
+      CanvasPoint? hitPoint = hitVertex ?? hitCtrlPoint as CanvasPoint;
 
-      // Check points
-      if (point != null && modifierKeys == (Keys.Shift | Keys.Control))
+      if (hitPoint == null && modifierKeys == (Keys.Control | Keys.Shift))
       {
-        // Delete point
-        DeletePoint(point);
-        allowMove = false;
-      }
-      else if (ctrlPoint != null && modifierKeys == Keys.Shift)
-      {
-        // Check ControlPoints points
-        point = ctrlPoint;
-      }
-
-      if (point == null && modifierKeys == (Keys.Control | Keys.Shift))
-      {
+        // Add vertex
         TryAddVertex(location);
-        allowMove = false;
+        moveablePoints.Clear();
+        moveablePoints.AddRange(Points.FindAll(p => p is Vertex));
+        response = response with { AllowMove = false };
       }
+      else if (hitPoint != null && modifierKeys == (Keys.Control | Keys.Shift))
+      {
+        // Delete vertex
+        DeletePoint(hitPoint);
+        moveablePoints.Clear();
+        moveablePoints.AddRange(Points.FindAll(p => p is Vertex));
+        response = response with { AllowMove = false };
+      }
+      else if (hitVertex != null && modifierKeys == Keys.Control)
+      {
+        // Select/unselect vertex
+        if (!hitVertex.IsSelected && moveablePoints.Contains(hitVertex)) moveablePoints.Clear();
 
-      activeObject = point ?? activeObject;
+        hitVertex.IsSelected = !hitVertex.IsSelected;
+        if (hitVertex.IsSelected) moveablePoints.Add(hitVertex); else moveablePoints.Remove(hitVertex);
+        response = response with { ChildHitObject = hitVertex, AllowMove = false };
+      }
+      else if (hitCtrlPoint != null && modifierKeys == Keys.Shift)
+      {
+        moveablePoints.ForEach(v => v.IsSelected = false);
+        moveablePoints.Clear();
+        moveablePoints.Add(hitCtrlPoint);
+      }
+      else if (hitVertex != null && !hitVertex.IsSelected)
+      {
+        moveablePoints.ForEach(v => v.IsSelected = false);
+        moveablePoints.Clear();
+        hitVertex.IsSelected = true;
+        moveablePoints.Add(hitVertex);
+      }
+      else if (hitPoint != null && !moveablePoints.Contains(hitPoint))
+      {
+        // Select single vertex
+        moveablePoints.ForEach(v => v.IsSelected = false);
+        hitPoint.IsSelected = true;
+        moveablePoints.Clear();
+        moveablePoints.Add(hitPoint);
+        response = response with { ChildHitObject = hitPoint };
+      }
+      else if (hitPoint == null || !moveablePoints.Contains(hitPoint))
+      {
+        // Select all vertices
+        moveablePoints.ForEach(v => v.IsSelected = false);
+        moveablePoints.Clear();
+        moveablePoints.AddRange(Points.FindAll(p => p is Vertex));
+      }
+    }
+    else
+    {
+      moveablePoints.ForEach(v => v.IsSelected = false);
+      moveablePoints.Clear();
+      moveablePoints.AddRange(Points.FindAll(p => p is Vertex));
     }
 
-    return activeObject;
+    return response;
   }
 
   /// <summary>
@@ -377,19 +421,14 @@ public class Line : CanvasObject
   }
 
   /// <summary>
-  /// Moves <see cref="Line"/> by <paramref name="dx"/> and <paramref name="dy"/>
+  /// Moves the <see cref="Line"/> by the specified <paramref name="dx"/> and <paramref name="dy"/> values.  
+  /// This method adjusts the position of all moveable points in the line.  
   /// </summary>
-  public override void MoveBy(int dx, int dy, Keys modifierKeys, bool supressCallback = false)
-  {
-    if (activeObject == this)
-    {
-      Points.FindAll(p => p is Vertex)?.ForEach(p => p.MoveBy(dx, dy, modifierKeys));
-    }
-    else
-    {
-      activeObject?.MoveBy(dx, dy, modifierKeys);
-    }
-  }
+  /// <param name="dx">The horizontal displacement.</param>  
+  /// <param name="dy">The vertical displacement.</param>  
+  /// <param name="modifierKeys">Modifier keys pressed during the move operation.</param>  
+  /// <param name="supressCallback">Indicates whether to suppress the callback during the move operation.</param>  
+  public override void MoveBy(int dx, int dy, Keys modifierKeys, bool supressCallback = false) => moveablePoints.ForEach(v => v.MoveBy(dx, dy, modifierKeys));
 
   /// <summary>
   /// Aligns <see cref="Line"/> to the <paramref name="alignInterval"/>

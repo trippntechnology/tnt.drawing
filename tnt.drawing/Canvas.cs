@@ -186,6 +186,7 @@ namespace TNT.Drawing
     {
       var selectedObjects = Layers.SelectMany(l => l.GetSelected()).ToList();
       selectedObjects.ForEach(o => o.Align(SnapInterval));
+      Invalidate();
     }
 
     /// <summary>

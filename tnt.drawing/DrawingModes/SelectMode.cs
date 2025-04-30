@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using TNT.Drawing.Extensions;
 using TNT.Drawing.Layers;
+using TNT.Drawing.Model;
 using TNT.Drawing.Objects;
 using TNT.Drawing.Resource;
 
@@ -33,26 +34,37 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   /// </summary>
   public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
   {
-    var activeObject = objectUnderMouse?.OnMouseDown(e.Location, modifierKeys, out allowMove);
+    var (hitObject, childObject, allowMove) = objectUnderMouse?.OnMouseDown(e.Location, modifierKeys) ?? new MouseDownResponse();
 
-    if (activeObject != null && objectUnderMouse != activeObject) selectedObjects.Clear();
+    this.allowMove = allowMove;
 
-    if (objectUnderMouse == null)
+    if (childObject == null)
     {
+      if (hitObject != null && objectUnderMouse != hitObject) selectedObjects.Clear();
+
+      if (objectUnderMouse == null)
+      {
+        selectedObjects.Clear();
+      }
+      else if (modifierKeys == Keys.Control && selectedObjects.Contains(objectUnderMouse))
+      {
+        selectedObjects.Remove(objectUnderMouse);
+      }
+      else if (modifierKeys == Keys.Control && !selectedObjects.Contains(objectUnderMouse))
+      {
+        selectedObjects.Add(objectUnderMouse);
+      }
+      else if (!selectedObjects.Contains(objectUnderMouse))
+      {
+        selectedObjects.Clear();
+        selectedObjects.Add(objectUnderMouse);
+      }
+    }
+    else if (hitObject != null)
+    {
+      // Only hitObject should be selected at this point
       selectedObjects.Clear();
-    }
-    else if (modifierKeys == Keys.Control && selectedObjects.Contains(objectUnderMouse))
-    {
-      selectedObjects.Remove(objectUnderMouse);
-    }
-    else if (modifierKeys == Keys.Control && !selectedObjects.Contains(objectUnderMouse))
-    {
-      selectedObjects.Add(objectUnderMouse);
-    }
-    else if (!selectedObjects.Contains(objectUnderMouse))
-    {
-      selectedObjects.Clear();
-      selectedObjects.Add(objectUnderMouse);
+      selectedObjects.Add(hitObject);
     }
 
     Canvas.OnObjectsSelected(selectedObjects.Select(o => o as object).ToList());
@@ -93,7 +105,6 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   {
     var location = Canvas.SnapToInterval == true && (modifierKeys & Keys.Control) != Keys.Control ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
 
-    TNTLogger.Info($"location: {location}");
     var dx = location.X - previousMouseLocation.X;
     var dy = location.Y - previousMouseLocation.Y;
     previousMouseLocation = location;
@@ -101,10 +112,10 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
     if (IsMouseDown)
     {
       if (allowMove)
-    {
+      {
         selectedObjects.ForEach(o => o.MoveBy(dx, dy, modifierKeys));
-      Canvas.Invalidate();
-    }
+        Canvas.Invalidate();
+      }
     }
     else
     {

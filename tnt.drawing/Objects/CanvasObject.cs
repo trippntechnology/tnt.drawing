@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using TNT.Drawing.Model;
 using TNT.Drawing.Resource;
 using TNT.Reactive;
 
@@ -58,15 +59,14 @@ public abstract class CanvasObject : Observable
   /// </summary>
   public abstract void MoveBy(int dx, int dy, Keys modifierKeys, bool supressCallback = false);
 
-  /// <summary>
-  /// Called when a button press event occurs over an object
-  /// </summary>
-  /// <returns><see cref="CanvasObject"/> under mouse at the time of the button press</returns>
-  public virtual CanvasObject? OnMouseDown(Point location, Keys modifierKeys, out bool allowMove)
-  {
-    allowMove = true;
-    return null;
-  }
+  /// <summary>  
+  /// Called when a button press event occurs over an object.  
+  /// This method can be overridden to provide custom behavior when the mouse button is pressed.  
+  /// </summary>  
+  /// <param name="location">The location of the mouse pointer.</param>  
+  /// <param name="modifierKeys">The modifier keys pressed during the event.</param>  
+  /// <returns>A <see cref="MouseDownResponse"/> object indicating the result of the mouse down event.</returns>  
+  public virtual MouseDownResponse OnMouseDown(Point location, Keys modifierKeys) => new MouseDownResponse();
 
   /// <summary>
   /// Called when a button press event occurs over an object
