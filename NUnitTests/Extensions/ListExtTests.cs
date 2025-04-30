@@ -13,4 +13,32 @@ public class ListExtTests
     var result = sut.AdjacentTo(5);
     Assert.That(result, Is.EqualTo(new List<int>() { 4, 6 }).AsCollection);
   }
+
+  [Test]
+  public void AddNotNull_AddsValue_WhenValueIsNotNull()
+  {
+    // Arrange
+    var list = new List<string>();
+    var value = "Test";
+
+    // Act
+    list.AddNotNull(value);
+
+    // Assert
+    Assert.That(list, Does.Contain(value));
+  }
+
+  [Test]
+  public void AddNotNull_DoesNotAddValue_WhenValueIsNull()
+  {
+    // Arrange
+    var list = new List<string>();
+    string? value = null;
+
+    // Act
+    list.AddNotNull(value);
+
+    // Assert
+    Assert.That(list, Is.Empty);
+  }
 }

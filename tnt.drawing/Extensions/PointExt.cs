@@ -58,12 +58,4 @@ public static class PointExt
   /// </summary>
   /// <returns>Deconstructed components of a <see cref="Point"/></returns>
   public static (int, int) Deconstruct(this Point point) => (point.X, point.Y);
-
-  /// <summary>
-  /// Adds <paramref name="value"/> to <paramref name="list"/> if <paramref name="value"/> is not null
-  /// </summary>
-  public static void AddNotNull<T>(this List<T> list, T? value)
-  {
-    if (value != null) list.Add(value);
-  }
 }

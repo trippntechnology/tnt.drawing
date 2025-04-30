@@ -17,4 +17,13 @@ public static class ListExt
     var elementIndex = list.IndexOf(element);
     return list.Where((_, index) => index == elementIndex - 1 || index == elementIndex + 1).ToList();
   }
+
+  /// <summary>
+  /// Adds <paramref name="value"/> to <paramref name="list"/> if <paramref name="value"/> is not null.
+  /// This method ensures null values are not added to the list, maintaining its integrity.
+  /// </summary>
+  public static void AddNotNull<T>(this List<T> list, T? value)
+  {
+    if (value != null) list.Add(value);
+  }
 }
