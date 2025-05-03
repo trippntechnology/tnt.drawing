@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using TNT.Drawing.Model;
-using TNT.Drawing.Resource;
 using TNT.Reactive;
 
 namespace TNT.Drawing.Objects;
@@ -79,5 +78,5 @@ public abstract class CanvasObject : Observable
   /// to display
   /// </summary>
   /// <returns><see cref="Feedback"/> indicating the <see cref="Cursor"/> and hint to display</returns>
-  public virtual Feedback GetFeedback(Point location, Keys keys) => new Feedback(Cursors.Default, string.Empty);
+  public virtual Feedback GetFeedback(Point location, Keys keys) => Feedback.Default;
 }

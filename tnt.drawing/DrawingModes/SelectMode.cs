@@ -6,7 +6,6 @@ using TNT.Drawing.Extensions;
 using TNT.Drawing.Layers;
 using TNT.Drawing.Model;
 using TNT.Drawing.Objects;
-using TNT.Drawing.Resource;
 
 namespace TNT.Drawing.DrawingModes;
 
@@ -82,8 +81,8 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   /// </summary>
   public override void OnKeyDown(KeyEventArgs e)
   {
-    var feedback = objectUnderMouse?.GetFeedback(previousMouseLocation, e.Modifiers) ?? new Feedback(Cursors.Default, string.Empty);
-    Canvas.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
+    var feedback = objectUnderMouse?.GetFeedback(previousMouseLocation, e.Modifiers) ?? Feedback.Default;
+    Canvas.OnFeedbackChanged(feedback);
     base.OnKeyDown(e);
   }
 
@@ -93,8 +92,8 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   /// <param name="e"></param>
   public override void OnKeyUp(KeyEventArgs e)
   {
-    var feedback = objectUnderMouse?.GetFeedback(previousMouseLocation, e.Modifiers) ?? new Feedback(Cursors.Default, string.Empty);
-    Canvas.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
+    var feedback = objectUnderMouse?.GetFeedback(previousMouseLocation, e.Modifiers) ?? Feedback.Default;
+    Canvas.OnFeedbackChanged(feedback);
     base.OnKeyUp(e);
   }
 
@@ -120,8 +119,8 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
     else
     {
       objectUnderMouse = FindObjectAt(Layer.CanvasObjects, e.Location, modifierKeys);
-      var feedback = objectUnderMouse?.GetFeedback(e.Location, modifierKeys) ?? new Feedback(Cursors.Default, string.Empty);
-      Canvas.OnFeedbackChanged(feedback.Cursor, feedback.Hint);
+      var feedback = objectUnderMouse?.GetFeedback(e.Location, modifierKeys) ?? Feedback.Default;
+      Canvas.OnFeedbackChanged(feedback);
     }
 
     base.OnMouseMove(e, modifierKeys);

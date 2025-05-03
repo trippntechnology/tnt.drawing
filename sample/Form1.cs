@@ -79,10 +79,10 @@ public partial class Form1 : Form
       }
     };
 
-    canvas.OnFeedbackChanged = (cursor, hint) =>
+    canvas.OnFeedbackChanged = (feedback) =>
     {
-      Cursor = cursor;
-      toolStripStatusLabel1.Text = hint;
+      Cursor = feedback.Cursor;
+      toolStripStatusLabel1.Text = feedback.Hint;
     };
   }
 

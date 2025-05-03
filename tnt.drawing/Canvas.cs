@@ -9,6 +9,7 @@ using TNT.Commons;
 using TNT.Drawing.DrawingModes;
 using TNT.Drawing.Extensions;
 using TNT.Drawing.Layers;
+using TNT.Drawing.Model;
 
 namespace TNT.Drawing
 {
@@ -24,9 +25,9 @@ namespace TNT.Drawing
     public Action<List<object>> OnSelected = (obj) => { };
 
     /// <summary>
-    /// Delegated that is called when the <see cref="Cursor"/> and/or hint changes
+    /// Delegate that is called to signal when feedback has changed within the <see cref="Canvas"/>
     /// </summary>
-    public Action<Cursor, String> OnFeedbackChanged = (cursor, hint) => { };
+    public Action<Feedback> OnFeedbackChanged = (feedback) => { };
 
     private const int MINIMUM_PADDING = 1000;
     private const int PADDING = 50;
