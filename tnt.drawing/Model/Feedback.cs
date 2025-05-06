@@ -12,5 +12,5 @@ public record Feedback(Cursor Cursor, string Hint)
   /// <summary>
   /// The default feedback instance with a default cursor and an empty hint.
   /// </summary>
-  public static Feedback Default = new Feedback(Cursors.Default, "");
+  public static readonly Feedback Default = new Feedback(Cursors.Default, string.Empty);
 }
