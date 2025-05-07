@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using TNT.Drawing.Extensions;
+using TNT.Drawing.Model;
 
 namespace TNT.Drawing.Objects;
 
@@ -99,12 +100,12 @@ public class CanvasPoint : CanvasObject
   /// Call to check if the mouse is over this <see cref="CanvasPoint"/>
   /// </summary>
   /// <returns><see cref="CanvasPoint"/> when mouse is over the this</returns>
-  public override CanvasObject? MouseOver(Point mousePosition, Keys modifierKeys)
+  public override MouseOverResponse MouseOver(Point mousePosition, Keys modifierKeys)
   {
     var topLeftPoint = ToPoint.Subtract(new Point(POINT_DIAMETER / 2, POINT_DIAMETER / 2));
     var path = new GraphicsPath();
     path.AddEllipse(topLeftPoint.X, topLeftPoint.Y, POINT_DIAMETER, POINT_DIAMETER);
-    return path.IsVisible(mousePosition) ? this : null;
+    return path.IsVisible(mousePosition) ? new MouseOverResponse(this) : MouseOverResponse.Default;
   }
 
   /// <summary>

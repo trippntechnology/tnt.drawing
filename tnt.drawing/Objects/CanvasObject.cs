@@ -51,7 +51,7 @@ public abstract class CanvasObject : Observable
   /// <summary>
   /// Implement by subclass to indicate mouse is over object. Should return the object that is under mouse.
   /// </summary>
-  public abstract CanvasObject? MouseOver(Point mousePosition, Keys modifierKeys);
+  public abstract MouseOverResponse MouseOver(Point mousePosition, Keys modifierKeys);
 
   /// <summary>
   /// Implement by subclass to move the object by <paramref name="dx"/> and <paramref name="dy"/>

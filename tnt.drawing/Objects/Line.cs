@@ -44,7 +44,6 @@ public class Line : CanvasObject
   /// <summary>
   /// The <see cref="List{CanvasPoint}"/> represented by this <see cref="Line"/>
   /// </summary>
-  [XmlIgnore]
   protected List<CanvasPoint> Points { get; set; } = new List<CanvasPoint>();
 
   /// <summary>
@@ -199,8 +198,8 @@ public class Line : CanvasObject
     if (IsSelected)
     {
       // Check if the mouse is over any of the points
-      var hitVertex = Points.FirstOrDefault(p => p is Vertex && p.MouseOver(location, modifierKeys) != null) as Vertex;
-      ControlPoint? hitCtrlPoint = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys) != null) as ControlPoint;
+      var hitVertex = Points.FirstOrDefault(p => p is Vertex && p.MouseOver(location, modifierKeys).HitObject != null) as Vertex;
+      ControlPoint? hitCtrlPoint = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys).HitObject != null) as ControlPoint;
 
       CanvasPoint? hitPoint = hitVertex ?? hitCtrlPoint as CanvasPoint;
 
@@ -332,23 +331,23 @@ public class Line : CanvasObject
   /// <see cref="CanvasObject"/> within the line that it is over
   /// </summary>
   /// <returns><see cref="CanvasObject"/> within the line that it is over</returns>
-  public override CanvasObject? MouseOver(Point mousePosition, Keys modifierKeys)
+  public override MouseOverResponse MouseOver(Point mousePosition, Keys modifierKeys)
   {
-    CanvasObject? objUnderMouse = null;
+    CanvasObject? hitObject = null;
 
     if (Points.Count > 3)
     {
       // Check if over this line
-      objUnderMouse = Path.IsOutlineVisible(mousePosition, new Pen(Color.Black, 10F)) ? this : null;
+      hitObject = Path.IsOutlineVisible(mousePosition, new Pen(Color.Black, 10F)) ? this : null;
 
-      if (objUnderMouse == null)
+      if (hitObject == null)
       {
         // Check if over any points that might be outside of the line
-        objUnderMouse = Points.FirstOrDefault(p => p.MouseOver(mousePosition, modifierKeys) != null) != null ? this : null;
+        hitObject = Points.FirstOrDefault(p => p.MouseOver(mousePosition, modifierKeys).HitObject != null) != null ? this : null;
       }
     }
 
-    return objUnderMouse;
+    return hitObject?.Let(it => new MouseOverResponse(it)) ?? MouseOverResponse.Default;
   }
 
   /// <summary>
@@ -366,8 +365,8 @@ public class Line : CanvasObject
     {
       cursor = Cursors.Hand;
       hint = "CTRL and SHIFT to add point.";
-      var vertex = Points.FirstOrDefault(p => p is Vertex && p.MouseOver(location, keys) != null);
-      var ctrlPoint = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, keys) != null);
+      var vertex = Points.FirstOrDefault(p => p is Vertex && p.MouseOver(location, keys).HitObject != null);
+      var ctrlPoint = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, keys).HitObject != null);
       CanvasPoint? point = vertex ?? ctrlPoint;
 
       if (point != null)

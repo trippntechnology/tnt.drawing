@@ -33,7 +33,7 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   /// </summary>
   public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
   {
-    var (hitObject, childObject, allowMove) = objectUnderMouse?.OnMouseDown(e.Location, modifierKeys) ?? new MouseDownResponse();
+    var (hitObject, childObject, allowMove) = objectUnderMouse?.OnMouseDown(e.Location, modifierKeys) ?? MouseDownResponse.Default;
 
     this.allowMove = allowMove;
 
@@ -147,7 +147,7 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   {
     // See if where over a selected object first just in case the selected object is in the list
     // after another object in the same place
-    return selectedObjects.FirstOrDefault(o => o.MouseOver(mouseLocation, modifierKeys) != null) ??
-      objs.FirstOrDefault(o => o.MouseOver(mouseLocation, modifierKeys) != null);
+    return selectedObjects.FirstOrDefault(o => o.MouseOver(mouseLocation, modifierKeys).HitObject != null) ??
+      objs.FirstOrDefault(o => o.MouseOver(mouseLocation, modifierKeys).HitObject != null);
   }
 }
