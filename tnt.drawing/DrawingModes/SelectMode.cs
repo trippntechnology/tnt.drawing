@@ -73,6 +73,11 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
 
     Canvas.Refresh();
 
+    // Set the feedback (cursor) for the object under mouse
+    var feedback = objectUnderMouse?.GetFeedback(e.Location, modifierKeys) ?? Feedback.Default;
+    Canvas.OnFeedbackChanged(feedback);
+
+
     base.OnMouseDown(e, modifierKeys);
   }
 
@@ -98,8 +103,12 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   }
 
   /// <summary>
-  /// TODO
+  /// Handles mouse movement during selection mode. When the mouse is down and movement is allowed,
+  /// it moves selected objects by the distance the mouse has moved. When the mouse is up,
+  /// it identifies objects under the cursor and updates the feedback (cursor and hint).
   /// </summary>
+  /// <param name="e">Contains mouse position and button information</param>
+  /// <param name="modifierKeys">Current keyboard modifier keys being pressed</param>
   public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
   {
     var location = Canvas.SnapToInterval == true && (modifierKeys & Keys.Control) != Keys.Control ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
@@ -124,8 +133,7 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
     }
 
     base.OnMouseMove(e, modifierKeys);
-  }
-
+  }
   /// <summary>
   /// Draws the selected objects
   /// </summary>
