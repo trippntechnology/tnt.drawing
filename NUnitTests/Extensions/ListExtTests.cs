@@ -41,4 +41,82 @@ public class ListExtTests
     // Assert
     Assert.That(list, Is.Empty);
   }
+
+  [Test]
+  public void IsFirstOrLast_ReturnsTrue_WhenItemIsFirst()
+  {
+    // Arrange
+    var list = new List<int>() { 1, 2, 3, 4, 5 };
+
+    // Act
+    var result = list.IsFirstOrLast(1);
+
+    // Assert
+    Assert.That(result, Is.True);
+  }
+
+  [Test]
+  public void IsFirstOrLast_ReturnsTrue_WhenItemIsLast()
+  {
+    // Arrange
+    var list = new List<int>() { 1, 2, 3, 4, 5 };
+
+    // Act
+    var result = list.IsFirstOrLast(5);
+
+    // Assert
+    Assert.That(result, Is.True);
+  }
+
+  [Test]
+  public void IsFirstOrLast_ReturnsFalse_WhenItemIsMiddle()
+  {
+    // Arrange
+    var list = new List<int>() { 1, 2, 3, 4, 5 };
+
+    // Act
+    var result = list.IsFirstOrLast(3);
+
+    // Assert
+    Assert.That(result, Is.False);
+  }
+
+  [Test]
+  public void IsFirstOrLast_ReturnsFalse_WhenListIsEmpty()
+  {
+    // Arrange
+    var list = new List<int>();
+
+    // Act
+    var result = list.IsFirstOrLast(1);
+
+    // Assert
+    Assert.That(result, Is.False);
+  }
+
+  [Test]
+  public void IsFirstOrLast_ReturnsFalse_WhenItemNotInList()
+  {
+    // Arrange
+    var list = new List<int>() { 1, 2, 3, 4, 5 };
+
+    // Act
+    var result = list.IsFirstOrLast(10);
+
+    // Assert
+    Assert.That(result, Is.False);
+  }
+
+  [Test]
+  public void IsFirstOrLast_ReturnsTrue_WhenListHasOnlyOneItem()
+  {
+    // Arrange
+    var list = new List<string>() { "Only Item" };
+
+    // Act
+    var result = list.IsFirstOrLast("Only Item");
+
+    // Assert
+    Assert.That(result, Is.True);
+  }
 }

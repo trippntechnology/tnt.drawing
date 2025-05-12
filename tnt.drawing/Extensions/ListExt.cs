@@ -26,4 +26,23 @@ public static class ListExt
   {
     if (value != null) list.Add(value);
   }
+
+  /// <summary>
+  /// Determines if <paramref name="element"/> is either the first or last item in <paramref name="list"/>.
+  /// </summary>
+  /// <typeparam name="T">Type of the elements in the list</typeparam>
+  /// <param name="list">The list to check</param>
+  /// <param name="element">The element to check</param>
+  /// <returns>True if the element is the first or last item in the list; otherwise, false</returns>
+  public static bool IsFirstOrLast<T>(this List<T> list, T element)
+  {
+    if (list.Count == 0)
+      return false;
+    
+    var elementIndex = list.IndexOf(element);
+    if (elementIndex == -1)
+      return false;
+      
+    return elementIndex == 0 || elementIndex == list.Count - 1;
+  }
 }
