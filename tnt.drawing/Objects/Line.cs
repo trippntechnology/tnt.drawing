@@ -103,14 +103,14 @@ public class Line : CanvasObject
   /// </summary>
   public void AddVertex(Vertex vertex)
   {
-    vertex.OnPointMoved = OnPointMoved;
+    vertex.OnMoved = OnMoved;
 
     if (Points.Count > 0)
     {
       (Points.Last(p => p is Vertex) as Vertex)?.Also(p1 =>
       {
-        var c1 = new ControlPoint(p1.ToPoint) { OnPointMoved = OnPointMoved, IsVisible = IsControlPointVisible };
-        var c2 = new ControlPoint(vertex.ToPoint) { OnPointMoved = OnPointMoved, IsVisible = IsControlPointVisible };
+        var c1 = new ControlPoint(p1.ToPoint) { OnMoved = OnMoved, IsVisible = IsControlPointVisible };
+        var c2 = new ControlPoint(vertex.ToPoint) { OnMoved = OnMoved, IsVisible = IsControlPointVisible };
 
         Points.Add(c1);
         Points.Add(c2);
@@ -289,9 +289,9 @@ public class Line : CanvasObject
 
     if (insertIndex != null)
     {
-      var vertex = new Vertex(location.X, location.Y) { OnPointMoved = OnPointMoved };
-      var c1 = new ControlPoint(vertex.ToPoint) { OnPointMoved = OnPointMoved, IsVisible = IsControlPointVisible };
-      var c2 = new ControlPoint(vertex.ToPoint) { OnPointMoved = OnPointMoved, IsVisible = IsControlPointVisible };
+      var vertex = new Vertex(location.X, location.Y) { OnMoved = OnMoved };
+      var c1 = new ControlPoint(vertex.ToPoint) { OnMoved = OnMoved, IsVisible = IsControlPointVisible };
+      var c2 = new ControlPoint(vertex.ToPoint) { OnMoved = OnMoved, IsVisible = IsControlPointVisible };
       Points.InsertRange((int)insertIndex, new List<CanvasPoint>() { c1, vertex, c2 });
     }
   }

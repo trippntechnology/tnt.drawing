@@ -18,7 +18,7 @@ public class CanvasPoint : CanvasObject
   /// <see cref="Action{CanvasPoint, Int, Int, Keys}"/> delegate that is called when the <see cref="CanvasPoint"/>
   /// moves
   /// </summary>
-  public Action<CanvasPoint, int, int, Keys> OnPointMoved = (canvasPoint, dx, dy, modifierKeys) => { };
+  public Action<CanvasPoint, int, int, Keys> OnMoved = (canvasPoint, dx, dy, modifierKeys) => { };
 
   /// <summary>
   /// X coordinate
@@ -92,7 +92,7 @@ public class CanvasPoint : CanvasObject
 
     if (!supressCallback)
     {
-      OnPointMoved(this, delta.X, delta.Y, modifierKeys);
+      OnMoved(this, delta.X, delta.Y, modifierKeys);
     }
   }
 
