@@ -25,7 +25,7 @@ public class DrawingMode(Canvas canvas, CanvasLayer layer)
   /// <summary>
   /// The <see cref="CanvasLayer"/> manipulated by this <see cref="DrawingMode"/>
   /// </summary>
-  public CanvasLayer Layer { get; protected set; } = layer;
+  public CanvasLayer Layer { get; private set; } = layer;
 
   /// <summary>
   /// The <see cref="CanvasObject"/> that gets created by the <see cref="DrawingMode"/>
@@ -43,14 +43,14 @@ public class DrawingMode(Canvas canvas, CanvasLayer layer)
   public virtual void OnMouseMove(MouseEventArgs e, Keys modifierKeys) => Log();
 
   /// <summary>
-  /// Called when the mouse button is released
-  /// </summary>
-  public virtual void OnMouseUp(MouseEventArgs e, Keys modifierKeys) { IsMouseDown = false; Log(); }
-
-  /// <summary>
   /// Called when the mouse button is pressed
   /// </summary>
   public virtual void OnMouseDown(MouseEventArgs e, Keys modifierKeys) { IsMouseDown = true; Log(); }
+
+  /// <summary>
+  /// Called when the mouse button is released
+  /// </summary>
+  public virtual void OnMouseUp(MouseEventArgs e, Keys modifierKeys) { IsMouseDown = false; Log(); }
 
   /// <summary>
   /// Called when the mouse button is double clicked

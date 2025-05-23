@@ -19,6 +19,7 @@ namespace TNT.Drawing.Objects;
 public class Line : CanvasObject
 {
   private List<CanvasPoint> moveablePoints = new();
+
   private Pen pen = new Pen(Color.Black, 1);
 
   /// <summary>
@@ -133,7 +134,7 @@ public class Line : CanvasObject
   /// <summary>
   /// Called when the <paramref name="canvasPoint"/> is moved
   /// </summary>
-  private void OnPointMoved(CanvasPoint canvasPoint, int dx, int dy, Keys modifierKeys)
+  private void OnMoved(CanvasPoint canvasPoint, int dx, int dy, Keys modifierKeys)
   {
     if (canvasPoint is ControlPoint)
     {

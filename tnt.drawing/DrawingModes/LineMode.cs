@@ -34,12 +34,23 @@ public class LineMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, la
   }
 
   /// <summary>
-  /// Creates a new line segment
+  /// Handles mouse button release events to update the current line drawing state.
+  /// <para>
+  /// - On left mouse button release: 
+  ///   - If no active line exists, creates a new <see cref="Line"/> and adds the initial vertices at the mouse location.
+  ///   - If a line is active, adds a new vertex at the released location.
+  /// - On right mouse button release: 
+  ///   - If a line and vertex are active, removes the last vertex from the line.
+  ///   - If the line has fewer than two points after removal, clears the active line and vertex.
+  /// </para>
+  /// Refreshes the <see cref="Canvas"/> after each operation.
   /// </summary>
-  public override void OnMouseClick(MouseEventArgs e, Keys modifierKeys)
+  /// <param name="e">Mouse event arguments containing the release location and button information.</param>
+  /// <param name="modifierKeys">Modifier keys pressed during the event.</param>
+  public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
   {
-    base.OnMouseClick(e, modifierKeys);
-    if (Canvas == null) return;
+    // Call the base implementation first
+    base.OnMouseUp(e, modifierKeys);
 
     var location = Canvas.SnapToInterval ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
 
@@ -47,29 +58,35 @@ public class LineMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, la
     {
       if (ActiveLine == null)
       {
-        var line1 = new Line();
         ActiveLine = DefaultObject.Copy() as Line;
         ActiveLine?.Also(line =>
-          {
-            line.IsSelected = true;
-            line.AddVertex(new Vertex(location));
-            ActiveVertex = new Vertex(location);
-            line.AddVertex(ActiveVertex);
-            Canvas.Refresh();
-          }
+            {
+              // Mark the new line as selected and add initial vertices
+              line.IsSelected = true;
+              line.AddVertex(new Vertex(location));
+              ActiveVertex = new Vertex(location);
+              line.AddVertex(ActiveVertex);
+              Canvas.Refresh();
+            }
         );
       }
+      // Subsequent clicks only if we have an active vertex
       else if (ActiveVertex != null)
       {
+        // Create a new vertex at the clicked location and add it to the line
         ActiveVertex = new Vertex(location);
         ActiveLine.AddVertex(ActiveVertex);
         Canvas.Refresh();
       }
     }
+    // Right-click: remove vertices (only when a line and vertex are active)
     else if (e.Button == MouseButtons.Right && ActiveVertex != null && ActiveLine != null)
     {
+      // Remove the current active vertex and update to the last point
       ActiveLine.RemoveVertex(ActiveVertex);
       ActiveVertex = ActiveLine.PointsArray.Last() as Vertex;
+
+      // Clean up if the line becomes invalid (fewer than 2 points)
       if (ActiveLine.PointsArray.Length < 2)
       {
         ActiveLine = null;
@@ -122,9 +139,9 @@ public class LineMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, la
   }
 
   /// <summary>
-  ///  Draws the <see cref="Marker"/> or <see cref="ActiveLine"/>
+  /// Draws the <see cref="Marker"/> or <see cref="ActiveLine"/> on the canvas.
   /// </summary>
-  /// <param name="graphics"></param>
+  /// <param name="graphics">Graphics object used for drawing.</param>
   public override void OnDraw(Graphics graphics)
   {
     base.OnDraw(graphics);

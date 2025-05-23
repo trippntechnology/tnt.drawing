@@ -334,16 +334,6 @@ namespace TNT.Drawing
     }
 
     /// <summary>
-    /// Relays the OnMouseClick to the <see cref="DrawingMode"/>
-    /// </summary>
-    protected override void OnMouseClick(MouseEventArgs e)
-    {
-      var graphics = CreateTransformedGraphics();
-      var mea = Transform(e, graphics);
-      DrawingMode.OnMouseClick(mea, ModifierKeys);
-    }
-
-    /// <summary>
     /// Relays the OnMouseDoubleClick to the <see cref="DrawingMode"/>
     /// </summary>
     protected override void OnMouseDoubleClick(MouseEventArgs e)
@@ -363,6 +353,17 @@ namespace TNT.Drawing
     }
 
     /// <summary>
+    /// Relays the OnMouseUp to the <see cref="DrawingMode"/>
+    /// </summary>
+    protected override void OnMouseUp(MouseEventArgs e)
+    {
+      base.OnMouseUp(e);
+      var graphics = CreateTransformedGraphics();
+      var mea = Transform(e, graphics);
+      DrawingMode.OnMouseUp(mea, ModifierKeys);
+    }
+
+    /// <summary>
     /// Transforms the location within the <see cref="MouseEventArgs"/> using the <paramref name="graphics"/>
     /// </summary>
     /// <returns><see cref="MouseEventArgs"/> with the transformed location</returns>
@@ -371,15 +372,6 @@ namespace TNT.Drawing
       graphics = graphics ?? CreateTransformedGraphics();
       var layerPoint = e.Location.ToGridCoordinates(graphics); //.Snap(10);
       return new MouseEventArgs(e.Button, e.Clicks, layerPoint.X, layerPoint.Y, e.Delta);
-    }
-
-    /// <summary>
-    /// Relays the OnMouseUp to the <see cref="DrawingMode"/>
-    /// </summary>
-    protected override void OnMouseUp(MouseEventArgs e)
-    {
-      base.OnMouseUp(e);
-      DrawingMode.OnMouseUp(e, ModifierKeys);
     }
 
     /// <summary>
