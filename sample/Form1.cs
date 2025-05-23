@@ -1,12 +1,13 @@
 ﻿using Microsoft.Win32;
 using TNT.Commons;
+using TNT.Drawing;
 using TNT.Drawing.DrawingModes;
 using TNT.Drawing.Layers;
 using TNT.Drawing.Objects;
 using TNT.Utilities;
 
 
-namespace TNT.Drawing.Sample;
+namespace Sample;
 
 public partial class Form1 : Form
 {
@@ -64,7 +65,7 @@ public partial class Form1 : Form
 
     propertyGrid1.SelectedObject = canvas.Properties;
 
-    selectToolStripMenuItem.Tag = new DrawingModes.SelectMode(canvas, layer3);
+    selectToolStripMenuItem.Tag = new TNT.Drawing.DrawingModes.SelectMode(canvas, layer3);
     lineToolStripMenuItem.Tag = new LineMode(canvas, layer3);
 
     canvas.DrawingMode = (selectToolStripMenuItem.Tag as DrawingMode)!;

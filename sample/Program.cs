@@ -1,4 +1,4 @@
-namespace TNT.Drawing.Sample;
+namespace Sample;
 
 internal static class Program
 {
