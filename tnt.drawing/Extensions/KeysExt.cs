@@ -2,41 +2,52 @@
 
 namespace TNT.Drawing.Extensions;
 
-public static class KeysExt
-{
-  /// <summary>
-  /// Checks if the specified Keys value contains one or more Keys values.
-  /// </summary>
-  /// <param name="keys">The Keys value to check.</param>
-  /// <param name="keysToCheck">One or more Keys values to check for.</param>
-  /// <returns>True if the Keys value contains ALL of the specified Keys values; otherwise, false.</returns>
-  public static bool ContainsAll(this Keys keys, params Keys[] keysToCheck)
+  public static class KeysExt
   {
-    foreach (var key in keysToCheck)
-    {
-      if ((keys & key) != key)
+      /// <summary>
+      /// Checks if the specified Keys value does NOT contain the specified Keys value.
+      /// </summary>
+      /// <param name="keys">The Keys value to check.</param>
+      /// <param name="keyToCheck">The Keys value to check for absence.</param>
+      /// <returns>True if the Keys value does NOT contain the specified Keys value; otherwise, false.</returns>
+      public static bool DoesNotContain(this Keys keys, Keys keyToCheck)
       {
-        return false;
+          return (keys & keyToCheck) != keyToCheck;
       }
-    }
-    return true;
-  }
 
-  /// <summary>
-  /// Checks if the specified Keys value contains any of the specified Keys values.
-  /// </summary>
-  /// <param name="keys">The Keys value to check.</param>
-  /// <param name="keysToCheck">One or more Keys values to check for.</param>
-  /// <returns>True if the Keys value contains ANY of the specified Keys values; otherwise, false.</returns>
-  public static bool ContainsAny(this Keys keys, params Keys[] keysToCheck)
-  {
-    foreach (var key in keysToCheck)
-    {
-      if ((keys & key) == key)
+      /// <summary>
+      /// Checks if the specified Keys value contains one or more Keys values.
+      /// </summary>
+      /// <param name="keys">The Keys value to check.</param>
+      /// <param name="keysToCheck">One or more Keys values to check for.</param>
+      /// <returns>True if the Keys value contains ALL of the specified Keys values; otherwise, false.</returns>
+      public static bool ContainsAll(this Keys keys, params Keys[] keysToCheck)
       {
-        return true;
+          foreach (var key in keysToCheck)
+          {
+              if ((keys & key) != key)
+              {
+                  return false;
+              }
+          }
+          return true;
       }
-    }
-    return false;
+
+      /// <summary>
+      /// Checks if the specified Keys value contains any of the specified Keys values.
+      /// </summary>
+      /// <param name="keys">The Keys value to check.</param>
+      /// <param name="keysToCheck">One or more Keys values to check for.</param>
+      /// <returns>True if the Keys value contains ANY of the specified Keys values; otherwise, false.</returns>
+      public static bool ContainsAny(this Keys keys, params Keys[] keysToCheck)
+      {
+          foreach (var key in keysToCheck)
+          {
+              if ((keys & key) == key)
+              {
+                  return true;
+              }
+          }
+          return false;
+      }
   }
-}
