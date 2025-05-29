@@ -45,11 +45,11 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
       {
         selectedObjects.Clear();
       }
-      else if (modifierKeys == Keys.Control && selectedObjects.Contains(objectUnderMouse))
+      else if (modifierKeys.ContainsAll(Keys.Control) && selectedObjects.Contains(objectUnderMouse))
       {
         selectedObjects.Remove(objectUnderMouse);
       }
-      else if (modifierKeys == Keys.Control && !selectedObjects.Contains(objectUnderMouse))
+      else if (modifierKeys.ContainsAll(Keys.Control) && !selectedObjects.Contains(objectUnderMouse))
       {
         selectedObjects.Add(objectUnderMouse);
       }
@@ -111,7 +111,7 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   /// <param name="modifierKeys">Current keyboard modifier keys being pressed</param>
   public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
   {
-    var location = Canvas.SnapToInterval == true && (modifierKeys & Keys.Control) != Keys.Control ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
+    var location = Canvas.SnapToInterval == modifierKeys.DoesNotContain(Keys.Control) ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
 
     var dx = location.X - previousMouseLocation.X;
     var dy = location.Y - previousMouseLocation.Y;
@@ -133,7 +133,8 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
     }
 
     base.OnMouseMove(e, modifierKeys);
-  }
+  }
+
   /// <summary>
   /// Draws the selected objects
   /// </summary>

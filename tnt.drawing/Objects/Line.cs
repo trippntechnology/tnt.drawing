@@ -138,7 +138,7 @@ public class Line : CanvasObject
   {
     if (canvasPoint is ControlPoint)
     {
-      if (modifierKeys == Keys.Shift)
+      if (modifierKeys.ContainsAll(Keys.Shift))
       {
         // Find the Vertex adjacent to canvasPoint
         var canvasPointIndex = Points.IndexOf(canvasPoint);
@@ -204,7 +204,7 @@ public class Line : CanvasObject
 
       CanvasPoint? hitPoint = hitVertex ?? hitCtrlPoint as CanvasPoint;
 
-      if (hitPoint == null && modifierKeys == (Keys.Control | Keys.Shift))
+      if (hitPoint == null && modifierKeys.ContainsAll(Keys.Control, Keys.Shift))
       {
         // Add vertex
         TryAddVertex(location);
@@ -212,7 +212,7 @@ public class Line : CanvasObject
         moveablePoints.AddRange(Points.FindAll(p => p is Vertex));
         response = response with { AllowMove = false };
       }
-      else if (hitPoint != null && modifierKeys == (Keys.Control | Keys.Shift))
+      else if (hitPoint != null && modifierKeys.ContainsAll(Keys.Control, Keys.Shift))
       {
         // Delete vertex
         DeletePoint(hitPoint);
@@ -220,7 +220,7 @@ public class Line : CanvasObject
         moveablePoints.AddRange(Points.FindAll(p => p is Vertex));
         response = response with { AllowMove = false };
       }
-      else if (hitVertex != null && modifierKeys == Keys.Control)
+      else if (hitVertex != null && modifierKeys.ContainsAll(Keys.Control))
       {
         // Select/unselect vertex
         if (!hitVertex.IsSelected && moveablePoints.Contains(hitVertex)) moveablePoints.Clear();
@@ -229,7 +229,7 @@ public class Line : CanvasObject
         if (hitVertex.IsSelected) moveablePoints.Add(hitVertex); else moveablePoints.Remove(hitVertex);
         response = response with { ChildHitObject = hitVertex, AllowMove = false };
       }
-      else if (hitCtrlPoint != null && modifierKeys == Keys.Shift)
+      else if (hitCtrlPoint != null && modifierKeys.ContainsAll(Keys.Shift))
       {
         moveablePoints.ForEach(v => v.IsSelected = false);
         moveablePoints.Clear();
@@ -356,7 +356,7 @@ public class Line : CanvasObject
   /// by <paramref name="location"/>
   /// </summary>
   /// <returns><see cref="Cursor"/> represented by <paramref name="location"/></returns>
-  public override Feedback GetFeedback(Point location, Keys keys)
+  public override Feedback GetFeedback(Point location, Keys modifierKeys)
   {
     var cursor = Cursors.Hand;
     var hint = "Click to select. SHIFT for multiple objects.";
@@ -366,17 +366,17 @@ public class Line : CanvasObject
     {
       cursor = Cursors.Hand;
       hint = "CTRL and SHIFT to add point.";
-      var vertex = Points.FirstOrDefault(p => p is Vertex && p.MouseOver(location, keys).HitObject != null);
-      var ctrlPoint = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, keys).HitObject != null);
+      var vertex = Points.FirstOrDefault(p => p is Vertex && p.MouseOver(location, modifierKeys).HitObject != null);
+      var ctrlPoint = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys).HitObject != null);
       CanvasPoint? point = vertex ?? ctrlPoint;
 
       if (point != null)
       {
-        if (keys == (Keys.Control | Keys.Shift))
+        if (modifierKeys.ContainsAll(Keys.Control, Keys.Shift))
         {
           cursor = Resources.Cursors.RemovePoint;
         }
-        else if (ctrlPoint != null && keys == Keys.Shift)
+        else if (ctrlPoint != null && modifierKeys.ContainsAll(Keys.Shift))
         {
           cursor = Resources.Cursors.AddCurve;
         }
@@ -388,7 +388,7 @@ public class Line : CanvasObject
       }
       else
       {
-        if (keys == (Keys.Control | Keys.Shift))
+        if (modifierKeys.ContainsAll(Keys.Control, Keys.Shift))
         {
           cursor = Resources.Cursors.AddPoint;
           hint = "Click to add point";

@@ -78,5 +78,5 @@ public abstract class CanvasObject : Observable
   /// to display
   /// </summary>
   /// <returns><see cref="Feedback"/> indicating the <see cref="Cursor"/> and hint to display</returns>
-  public virtual Feedback GetFeedback(Point location, Keys keys) => Feedback.Default;
+  public virtual Feedback GetFeedback(Point location, Keys modifierKeys) => Feedback.Default;
 }
