@@ -58,11 +58,6 @@ public class DrawingMode(Canvas canvas, CanvasLayer layer)
   public virtual void OnMouseDoubleClick(MouseEventArgs e) => Log();
 
   /// <summary>
-  /// Called when the mouse button is clicked
-  /// </summary>
-  public virtual void OnMouseClick(MouseEventArgs e, Keys modifierKeys) => Log();
-
-  /// <summary>
   /// Called when a key is pressed
   /// </summary>
   public virtual void OnKeyDown(KeyEventArgs e) => Log($"{e.KeyCode}");
