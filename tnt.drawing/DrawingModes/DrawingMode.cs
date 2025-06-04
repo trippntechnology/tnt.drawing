@@ -10,7 +10,7 @@ namespace TNT.Drawing.DrawingModes;
 /// <summary>
 /// Base class for all drawing modes
 /// </summary>
-public class DrawingMode(Canvas canvas, CanvasLayer layer)
+public class DrawingMode(Canvas canvas, CanvasLayer layer, CanvasObject? defaultObject = null)
 {
   /// <summary>
   /// Indicates when the mouse button is pressed
@@ -30,7 +30,7 @@ public class DrawingMode(Canvas canvas, CanvasLayer layer)
   /// <summary>
   /// The <see cref="CanvasObject"/> that gets created by the <see cref="DrawingMode"/>
   /// </summary>
-  public virtual CanvasObject? DefaultObject { get; } = null;
+  public CanvasObject? DefaultObject { get; } = defaultObject;
 
   /// <summary>
   /// Refreshes the <see cref="Canvas"/> with the current <see cref="CanvasLayer"/>

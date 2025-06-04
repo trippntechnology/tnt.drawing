@@ -31,16 +31,24 @@ public partial class Form1 : Form
     line2.AddVertex(new Vertex(600, 300));
     line2.AddVertex(new Vertex(700, 100));
 
-    var layer1 = new CanvasLayer(canvas)
+    var backgroundLayer = new CanvasLayer(canvas)
     {
       Name = "Background",
       CanvasObjects = new List<CanvasObject>() { new Square(150, 150, 200, Color.Green) },
       BackgroundColor = Color.White,
     };
 
-    var layer2 = new GridLayer(canvas) { Name = "Grid", LineColor = Color.Aqua };
+    var gridLayer = new GridLayer(canvas) { Name = "Grid", LineColor = Color.Aqua };
 
-    var layer3 = new CanvasLayer(canvas)
+    // Demonstrate ClosedBezierPath
+    var closedBezier = new ClosedBezierPath();
+    closedBezier.AddVertex(new Vertex(200, 400));
+    closedBezier.AddVertex(new Vertex(300, 600));
+    closedBezier.AddVertex(new Vertex(500, 600));
+    closedBezier.AddVertex(new Vertex(600, 400));
+    closedBezier.FillColor = Color.FromArgb(128, Color.Orange);
+
+    var objectsLayer = new CanvasLayer(canvas)
     {
       Name = "Object",
       CanvasObjects = new List<CanvasObject>()
@@ -49,10 +57,11 @@ public partial class Form1 : Form
         new Square(500,500,200,Color.Red),
         line1,
         line2,
+        closedBezier, // Add ClosedBezierPath to the sample
       }
     };
 
-    canvas.Layers = new List<CanvasLayer>() { layer1, layer2, layer3 };
+    canvas.Layers = new List<CanvasLayer>() { backgroundLayer, gridLayer, objectsLayer };
 
     canvas.Layers.ForEach(layer =>
     {
@@ -65,10 +74,25 @@ public partial class Form1 : Form
 
     propertyGrid1.SelectedObject = canvas.Properties;
 
-    selectToolStripMenuItem.Tag = new TNT.Drawing.DrawingModes.SelectMode(canvas, layer3);
-    lineToolStripMenuItem.Tag = new BezierPathMode(canvas, layer3);
+    var modes = new List<DrawingMode> {
+      new SelectMode(canvas,      objectsLayer),
+      new LineMode(canvas, objectsLayer, new BezierPath()),
+      new BezierPathMode(canvas, objectsLayer, new BezierPath())
+    };
 
-    canvas.DrawingMode = (selectToolStripMenuItem.Tag as DrawingMode)!;
+    modes.ForEach(mode =>
+    {
+      var menuItem = new ToolStripMenuItem(mode.ToString());
+      menuItem.Tag = mode;
+      menuItem.Click += LineToolStripMenuItem_Click;
+      modeToolStripMenuItem.DropDownItems.Add(menuItem);
+    });
+
+    //selectToolStripMenuItem.Tag = new TNT.Drawing.DrawingModes.SelectMode(canvas, objectsLayer);
+    //lineToolStripMenuItem.Tag = new TNT.Drawing.DrawingModes.LineMode(canvas, objectsLayer);
+    //bezeirModeToolStripMenuItem.Tag = new TNT.Drawing.DrawingModes.BezierPathMode(canvas, objectsLayer);
+
+    canvas.DrawingMode = modes.First();
     canvas.OnSelected = (objs) =>
     {
       try
@@ -127,7 +151,7 @@ public partial class Form1 : Form
     }
   }
 
-  private void LineToolStripMenuItem_Click(object sender, System.EventArgs e)
+  private void LineToolStripMenuItem_Click(object? sender, System.EventArgs e)
   {
     if (sender is ToolStripMenuItem menuItem)
     {

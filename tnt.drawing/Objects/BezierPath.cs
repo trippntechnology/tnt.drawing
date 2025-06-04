@@ -16,11 +16,9 @@ namespace TNT.Drawing.Objects;
 /// <summary>
 /// Repesents a line on the <see cref="Canvas"/>
 /// </summary>
-public class BezierPath : CanvasObject
+public class BezierPath() : CanvasObject
 {
   private List<CanvasPoint> moveablePoints = new();
-
-  private Pen pen = new Pen(Color.Black, 1);
 
   /// <summary>
   /// Indicates the width of the <see cref="BezierPath"/>
@@ -45,17 +43,17 @@ public class BezierPath : CanvasObject
   /// <summary>
   /// The <see cref="List{CanvasPoint}"/> represented by this <see cref="BezierPath"/>
   /// </summary>
-  protected List<CanvasPoint> Points { get; set; } = new List<CanvasPoint>();
+  protected List<CanvasPoint> CanvasPoints { get; set; } = new List<CanvasPoint>();
 
   /// <summary>
-  /// Creates the <see cref="GraphicsPath"/> represented by <see cref="Points"/>
+  /// Creates the <see cref="GraphicsPath"/> represented by <see cref="CanvasPoints"/>
   /// </summary>
-  protected GraphicsPath Path
+  protected virtual GraphicsPath Path
   {
     get
     {
       var path = new GraphicsPath();
-      var points = Points.Select(v => v.ToPoint).ToArray();
+      var points = CanvasPoints.Select(v => v.ToPoint).ToArray();
       path.AddBeziers(points);
       return path;
     }
@@ -66,33 +64,31 @@ public class BezierPath : CanvasObject
   /// </summary>
   public CanvasPoint[] PointsArray
   {
-    get => Points.ToArray();
+    get => CanvasPoints.ToArray();
     set
     {
-      Points = value.ToList();
-      var ctrlPoints = Points.ToList().FindAll(p => p is ControlPoint);
-      var vertices = Points.ToList().FindAll(p => p is Vertex);
+      CanvasPoints = value.ToList();
+      var ctrlPoints = CanvasPoints.ToList().FindAll(p => p is ControlPoint);
+      var vertices = CanvasPoints.ToList().FindAll(p => p is Vertex);
     }
   }
 
+  private readonly Pen _ControlPointConnectorPen = new Pen(Color.FromArgb(100, Color.Black), 1);
+  private Pen _PathPen = new Pen(Color.Black, 1);
+
   /// <summary>
-  /// Represents the <see cref="Pen"/> used when generating this <see cref="BezierPath"/>
+  /// Represents the <see cref="PenPath"/> used when generating this <see cref="BezierPath"/>
   /// </summary>
-  private Pen Pen
+  private Pen PenPath
   {
     get
     {
-      pen.Color = Color;
-      pen.Width = Width;
-      pen.DashStyle = Style;
-      return pen;
+      _PathPen.Color = Color;
+      _PathPen.Width = Width;
+      _PathPen.DashStyle = Style;
+      return _PathPen;
     }
   }
-
-  /// <summary>
-  /// Default constructor
-  /// </summary>
-  public BezierPath() : base() { }
 
   /// <summary>
   /// Copy constructor
@@ -102,22 +98,22 @@ public class BezierPath : CanvasObject
   /// <summary>
   /// Adds a <see cref="Vertex"/> to this line
   /// </summary>
-  public void AddVertex(Vertex vertex)
+  virtual public void AddVertex(Vertex vertex)
   {
     vertex.OnMoved = OnMoved;
 
-    if (Points.Count > 0)
+    if (CanvasPoints.Count > 0)
     {
-      (Points.Last(p => p is Vertex) as Vertex)?.Also(p1 =>
+      (CanvasPoints.Last(p => p is Vertex) as Vertex)?.Also(p1 =>
       {
         var c1 = new ControlPoint(p1.ToPoint) { OnMoved = OnMoved, IsVisible = IsControlPointVisible };
         var c2 = new ControlPoint(vertex.ToPoint) { OnMoved = OnMoved, IsVisible = IsControlPointVisible };
 
-        Points.Add(c1);
-        Points.Add(c2);
+        CanvasPoints.Add(c1);
+        CanvasPoints.Add(c2);
       });
     }
-    Points.Add(vertex);
+    CanvasPoints.Add(vertex);
   }
 
   /// <summary>
@@ -127,7 +123,7 @@ public class BezierPath : CanvasObject
   private bool IsControlPointVisible(ControlPoint ctrlPoint)
   {
     // Find the vertex next to control point
-    var adjacent = Points.AdjacentTo(ctrlPoint);
+    var adjacent = CanvasPoints.AdjacentTo(ctrlPoint);
     return adjacent.Find(p => p is Vertex)?.Let(vertex => !(vertex.X == ctrlPoint.X && vertex.Y == ctrlPoint.Y)) ?? false;
   }
 
@@ -141,15 +137,15 @@ public class BezierPath : CanvasObject
       if (modifierKeys.ContainsAll(Keys.Shift))
       {
         // Find the Vertex adjacent to canvasPoint
-        var canvasPointIndex = Points.IndexOf(canvasPoint);
-        var adjacentIndex = Points[canvasPointIndex - 1] is Vertex ? canvasPointIndex - 1 : canvasPointIndex + 1;
+        var canvasPointIndex = CanvasPoints.IndexOf(canvasPoint);
+        var adjacentIndex = CanvasPoints[canvasPointIndex - 1] is Vertex ? canvasPointIndex - 1 : canvasPointIndex + 1;
         //var adjacentVertex = Points.ElementAtOrDefault(adjacentIndex);
 
         // Get the opposite control point
         var oppositeIndex = adjacentIndex < canvasPointIndex ? adjacentIndex - 1 : adjacentIndex + 1;
         //var oppositeVertex = Points.ElementAtOrDefault(oppositeIndex);
 
-        CommonsExtensions.RunNotNull(Points.ElementAtOrDefault(adjacentIndex), Points.ElementAtOrDefault(oppositeIndex), (adjacentVertex, oppositeVertex) =>
+        CommonsExtensions.RunNotNull(CanvasPoints.ElementAtOrDefault(adjacentIndex), CanvasPoints.ElementAtOrDefault(oppositeIndex), (adjacentVertex, oppositeVertex) =>
         {
           var offset = adjacentVertex.ToPoint.Subtract(canvasPoint.ToPoint);
           var newPoint = adjacentVertex.ToPoint.Add(offset);
@@ -160,10 +156,10 @@ public class BezierPath : CanvasObject
     else if (canvasPoint is Vertex)
     {
       // Find ControlPoints adjacent to this Vertex
-      var vertexIndex = Points.IndexOf(canvasPoint);
+      var vertexIndex = CanvasPoints.IndexOf(canvasPoint);
       var ctrlPoints = new List<CanvasPoint>();
-      ctrlPoints.AddNotNull(Points.ElementAtOrDefault(vertexIndex - 1));
-      ctrlPoints.AddNotNull(Points.ElementAtOrDefault(vertexIndex + 1));
+      ctrlPoints.AddNotNull(CanvasPoints.ElementAtOrDefault(vertexIndex - 1));
+      ctrlPoints.AddNotNull(CanvasPoints.ElementAtOrDefault(vertexIndex + 1));
       ctrlPoints.ForEach(cp => cp.MoveBy(dx, dy, Keys.None, true));
     }
   }
@@ -173,15 +169,15 @@ public class BezierPath : CanvasObject
   /// </summary>
   public void RemoveVertex(Vertex vertex)
   {
-    var vertexIndex = Points.IndexOf(vertex);
-    var count = vertexIndex == 0 || vertexIndex == Points.Count - 1 ? 2 : 3;
+    var vertexIndex = CanvasPoints.IndexOf(vertex);
+    var count = vertexIndex == 0 || vertexIndex == CanvasPoints.Count - 1 ? 2 : 3;
 
     // Remove vertex and associated ControlPoints
-    Points.RemoveRange(Math.Max(0, vertexIndex - 1), count);
+    CanvasPoints.RemoveRange(Math.Max(0, vertexIndex - 1), count);
 
     // Remove ControlPoints that might be at the start or end that are no longer needed
-    var orphanedCtrlPoint = Points.FirstOrDefault() as ControlPoint ?? Points.LastOrDefault() as ControlPoint;
-    orphanedCtrlPoint?.Also(p => Points.Remove(p));
+    var orphanedCtrlPoint = CanvasPoints.FirstOrDefault() as ControlPoint ?? CanvasPoints.LastOrDefault() as ControlPoint;
+    orphanedCtrlPoint?.Also(p => CanvasPoints.Remove(p));
   }
 
   /// <summary>
@@ -199,8 +195,8 @@ public class BezierPath : CanvasObject
     if (IsSelected)
     {
       // Check if the mouse is over any of the points
-      var hitVertex = Points.FirstOrDefault(p => p is Vertex && p.MouseOver(location, modifierKeys).HitObject != null) as Vertex;
-      ControlPoint? hitCtrlPoint = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys).HitObject != null) as ControlPoint;
+      var hitVertex = CanvasPoints.FirstOrDefault(p => p is Vertex && p.MouseOver(location, modifierKeys).HitObject != null) as Vertex;
+      ControlPoint? hitCtrlPoint = CanvasPoints.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys).HitObject != null) as ControlPoint;
 
       CanvasPoint? hitPoint = hitVertex ?? hitCtrlPoint as CanvasPoint;
 
@@ -209,7 +205,7 @@ public class BezierPath : CanvasObject
         // Add vertex
         TryAddVertex(location);
         moveablePoints.Clear();
-        moveablePoints.AddRange(Points.FindAll(p => p is Vertex));
+        moveablePoints.AddRange(CanvasPoints.FindAll(p => p is Vertex));
         response = response with { AllowMove = false };
       }
       else if (hitPoint != null && modifierKeys.ContainsAll(Keys.Control, Keys.Shift))
@@ -217,7 +213,7 @@ public class BezierPath : CanvasObject
         // Delete vertex
         DeletePoint(hitPoint);
         moveablePoints.Clear();
-        moveablePoints.AddRange(Points.FindAll(p => p is Vertex));
+        moveablePoints.AddRange(CanvasPoints.FindAll(p => p is Vertex));
         response = response with { AllowMove = false };
       }
       else if (hitVertex != null && modifierKeys.ContainsAll(Keys.Control))
@@ -256,14 +252,14 @@ public class BezierPath : CanvasObject
         // Select all vertices
         moveablePoints.ForEach(v => v.IsSelected = false);
         moveablePoints.Clear();
-        moveablePoints.AddRange(Points.FindAll(p => p is Vertex));
+        moveablePoints.AddRange(CanvasPoints.FindAll(p => p is Vertex));
       }
     }
     else
     {
       moveablePoints.ForEach(v => v.IsSelected = false);
       moveablePoints.Clear();
-      moveablePoints.AddRange(Points.FindAll(p => p is Vertex));
+      moveablePoints.AddRange(CanvasPoints.FindAll(p => p is Vertex));
     }
 
     return response;
@@ -279,9 +275,9 @@ public class BezierPath : CanvasObject
     int? insertIndex = null;
 
     // Find the line that the mouse is over
-    for (var index = 3; insertIndex == null && index < Points.Count(); index += 3)
+    for (var index = 3; insertIndex == null && index < CanvasPoints.Count(); index += 3)
     {
-      var points = Points.GetRange(index - 3, 4).Select(p => p.ToPoint);
+      var points = CanvasPoints.GetRange(index - 3, 4).Select(p => p.ToPoint);
       path.ClearMarkers();
       path.AddBeziers(points.ToArray());
 
@@ -293,7 +289,7 @@ public class BezierPath : CanvasObject
       var vertex = new Vertex(location.X, location.Y) { OnMoved = OnMoved };
       var c1 = new ControlPoint(vertex.ToPoint) { OnMoved = OnMoved, IsVisible = IsControlPointVisible };
       var c2 = new ControlPoint(vertex.ToPoint) { OnMoved = OnMoved, IsVisible = IsControlPointVisible };
-      Points.InsertRange((int)insertIndex, new List<CanvasPoint>() { c1, vertex, c2 });
+      CanvasPoints.InsertRange((int)insertIndex, new List<CanvasPoint>() { c1, vertex, c2 });
     }
   }
 
@@ -306,7 +302,7 @@ public class BezierPath : CanvasObject
     if (point is Vertex vertex)
     {
       // Only remove if there are two verteces remaining
-      if (Points.Sum(p => p is Vertex ? 1 : 0) > 2)
+      if (CanvasPoints.Sum(p => p is Vertex ? 1 : 0) > 2)
       {
         // Remove the vertex
         RemoveVertex(vertex);
@@ -315,9 +311,9 @@ public class BezierPath : CanvasObject
     else if (point is ControlPoint ctrlPoint)
     {
       // Reset position of ControlPoint
-      var ctrlPointIndex = Points.IndexOf(point);
-      var canvasPoint = Points.ElementAtOrDefault(ctrlPointIndex - 1) as Vertex ?? Points.ElementAtOrDefault(ctrlPointIndex + 1) as Vertex;
-      (Points.ElementAtOrDefault(ctrlPointIndex - 1) as Vertex ?? Points.ElementAtOrDefault(ctrlPointIndex + 1) as Vertex)?.Also(vertex => ctrlPoint.MoveTo(vertex.ToPoint, Keys.None));
+      var ctrlPointIndex = CanvasPoints.IndexOf(point);
+      var canvasPoint = CanvasPoints.ElementAtOrDefault(ctrlPointIndex - 1) as Vertex ?? CanvasPoints.ElementAtOrDefault(ctrlPointIndex + 1) as Vertex;
+      (CanvasPoints.ElementAtOrDefault(ctrlPointIndex - 1) as Vertex ?? CanvasPoints.ElementAtOrDefault(ctrlPointIndex + 1) as Vertex)?.Also(vertex => ctrlPoint.MoveTo(vertex.ToPoint, Keys.None));
     }
   }
 
@@ -336,7 +332,7 @@ public class BezierPath : CanvasObject
   {
     CanvasObject? hitObject = null;
 
-    if (Points.Count > 3)
+    if (CanvasPoints.Count > 3)
     {
       // Check if over this line
       hitObject = Path.IsOutlineVisible(mousePosition, new Pen(Color.Black, 10F)) ? this : null;
@@ -344,7 +340,7 @@ public class BezierPath : CanvasObject
       if (hitObject == null)
       {
         // Check if over any points that might be outside of the line
-        hitObject = Points.FirstOrDefault(p => p.MouseOver(mousePosition, modifierKeys).HitObject != null) != null ? this : null;
+        hitObject = CanvasPoints.FirstOrDefault(p => p.MouseOver(mousePosition, modifierKeys).HitObject != null) != null ? this : null;
       }
     }
 
@@ -366,8 +362,8 @@ public class BezierPath : CanvasObject
     {
       cursor = Cursors.Hand;
       hint = "CTRL and SHIFT to add point.";
-      var vertex = Points.FirstOrDefault(p => p is Vertex && p.MouseOver(location, modifierKeys).HitObject != null);
-      var ctrlPoint = Points.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys).HitObject != null);
+      var vertex = CanvasPoints.FirstOrDefault(p => p is Vertex && p.MouseOver(location, modifierKeys).HitObject != null);
+      var ctrlPoint = CanvasPoints.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys).HitObject != null);
       CanvasPoint? point = vertex ?? ctrlPoint;
 
       if (point != null)
@@ -404,17 +400,16 @@ public class BezierPath : CanvasObject
   /// </summary>
   public override void Draw(Graphics graphics)
   {
-    graphics.DrawPath(Pen, Path);
+    graphics.DrawPath(PenPath, Path);
     if (IsSelected)
     {
-      Pen pen = new Pen(Color.FromArgb(100, Color.Black));
-      Points.ForEach(v => v.Draw(graphics));
-      var vertices = Points.FindAll(p => p is Vertex);
+      CanvasPoints.ForEach(v => v.Draw(graphics));
+      var vertices = CanvasPoints.FindAll(p => p is Vertex);
       vertices.ForEach(v =>
       {
-        Points.AdjacentTo(v).ForEach(a =>
+        CanvasPoints.AdjacentTo(v).ForEach(a =>
         {
-          graphics.DrawLine(pen, v.ToPoint, a.ToPoint);
+          graphics.DrawLine(_ControlPointConnectorPen, v.ToPoint, a.ToPoint);
         });
       });
     }
@@ -433,5 +428,5 @@ public class BezierPath : CanvasObject
   /// <summary>
   /// Aligns <see cref="BezierPath"/> to the <paramref name="alignInterval"/>
   /// </summary>
-  public override void Align(int alignInterval) => Points.ForEach(p => p.Align(alignInterval));
+  public override void Align(int alignInterval) => CanvasPoints.ForEach(p => p.Align(alignInterval));
 }

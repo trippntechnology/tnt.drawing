@@ -10,7 +10,7 @@ namespace TNT.Drawing.Objects;
 /// <summary>
 /// Represents a <see cref="Point"/> on the <see cref="Canvas"/>
 /// </summary>
-public class CanvasPoint : CanvasObject
+public class CanvasPoint() : CanvasObject
 {
   protected const int POINT_DIAMETER = 8;
 
@@ -41,14 +41,9 @@ public class CanvasPoint : CanvasObject
   public virtual bool Visible { get => true; }
 
   /// <summary>
-  /// Default constructor
-  /// </summary>
-  public CanvasPoint() { }
-
-  /// <summary>
   /// Initializes the <see cref="X"/> and <see cref="Y"/> coordinates
   /// </summary>
-  public CanvasPoint(int x, int y) { X = x; Y = y; }
+  public CanvasPoint(int x, int y) : this() { X = x; Y = y; }
 
   /// <summary>
   /// Copy constructor

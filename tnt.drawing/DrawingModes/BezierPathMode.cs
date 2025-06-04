@@ -11,16 +11,11 @@ namespace TNT.Drawing.DrawingModes;
 /// <summary>
 /// <see cref="DrawingMode"/> to draw a line
 /// </summary>
-public class BezierPathMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, layer)
+public class BezierPathMode(Canvas canvas, CanvasLayer layer, BezierPath bezierPath) : DrawingMode(canvas, layer, bezierPath)
 {
   private BezierPath? ActiveLine = null;
   private Vertex? ActiveVertex = null;
   private CanvasPoint? Marker = null;
-
-  /// <summary>
-  /// The <see cref="BezierPath"/> that gets created by default
-  /// </summary>
-  public override CanvasObject DefaultObject { get; } = new BezierPath();
 
   /// <summary>
   /// Clears the state maintained by <see cref="BezierPathMode"/>
@@ -145,7 +140,7 @@ public class BezierPathMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canv
   public override void OnDraw(Graphics graphics)
   {
     base.OnDraw(graphics);
-    Marker?.Draw(graphics);
     ActiveLine?.Draw(graphics);
+    Marker?.Draw(graphics);
   }
 }
