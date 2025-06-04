@@ -21,12 +21,12 @@ public partial class Form1 : Form
     canvas = new Canvas(splitContainer1.Panel1);
     canvas.Properties = new CanvasProperties(); ;
 
-    var line1 = new Line();
+    var line1 = new BezierPath();
     line1.AddVertex(new Vertex(300, 100));
     line1.AddVertex(new Vertex(400, 300));
     line1.AddVertex(new Vertex(500, 100));
 
-    var line2 = new Line();
+    var line2 = new BezierPath();
     line2.AddVertex(new Vertex(500, 100));
     line2.AddVertex(new Vertex(600, 300));
     line2.AddVertex(new Vertex(700, 100));
@@ -66,7 +66,7 @@ public partial class Form1 : Form
     propertyGrid1.SelectedObject = canvas.Properties;
 
     selectToolStripMenuItem.Tag = new TNT.Drawing.DrawingModes.SelectMode(canvas, layer3);
-    lineToolStripMenuItem.Tag = new LineMode(canvas, layer3);
+    lineToolStripMenuItem.Tag = new BezierPathMode(canvas, layer3);
 
     canvas.DrawingMode = (selectToolStripMenuItem.Tag as DrawingMode)!;
     canvas.OnSelected = (objs) =>

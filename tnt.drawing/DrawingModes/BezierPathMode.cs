@@ -11,19 +11,19 @@ namespace TNT.Drawing.DrawingModes;
 /// <summary>
 /// <see cref="DrawingMode"/> to draw a line
 /// </summary>
-public class LineMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, layer)
+public class BezierPathMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, layer)
 {
-  private Line? ActiveLine = null;
+  private BezierPath? ActiveLine = null;
   private Vertex? ActiveVertex = null;
   private CanvasPoint? Marker = null;
 
   /// <summary>
-  /// The <see cref="Line"/> that gets created by default
+  /// The <see cref="BezierPath"/> that gets created by default
   /// </summary>
-  public override CanvasObject DefaultObject { get; } = new Line();
+  public override CanvasObject DefaultObject { get; } = new BezierPath();
 
   /// <summary>
-  /// Clears the state maintained by <see cref="LineMode"/>
+  /// Clears the state maintained by <see cref="BezierPathMode"/>
   /// </summary>
   public override void Reset()
   {
@@ -37,7 +37,7 @@ public class LineMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, la
   /// Handles mouse button release events to update the current line drawing state.
   /// <para>
   /// - On left mouse button release: 
-  ///   - If no active line exists, creates a new <see cref="Line"/> and adds the initial vertices at the mouse location.
+  ///   - If no active line exists, creates a new <see cref="BezierPath"/> and adds the initial vertices at the mouse location.
   ///   - If a line is active, adds a new vertex at the released location.
   /// - On right mouse button release: 
   ///   - If a line and vertex are active, removes the last vertex from the line.
@@ -58,7 +58,7 @@ public class LineMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, la
     {
       if (ActiveLine == null)
       {
-        ActiveLine = DefaultObject.Copy() as Line;
+        ActiveLine = DefaultObject.Copy() as BezierPath;
         ActiveLine?.Also(line =>
             {
               // Mark the new line as selected and add initial vertices
@@ -97,7 +97,7 @@ public class LineMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, la
   }
 
   /// <summary>
-  /// Completes the <see cref="Line"/> and adds it to the <see cref="Canvas"/>
+  /// Completes the <see cref="BezierPath"/> and adds it to the <see cref="Canvas"/>
   /// </summary>
   public override void OnMouseDoubleClick(MouseEventArgs e)
   {

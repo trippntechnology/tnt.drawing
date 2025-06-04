@@ -16,14 +16,14 @@ namespace TNT.Drawing.Objects;
 /// <summary>
 /// Repesents a line on the <see cref="Canvas"/>
 /// </summary>
-public class Line : CanvasObject
+public class BezierPath : CanvasObject
 {
   private List<CanvasPoint> moveablePoints = new();
 
   private Pen pen = new Pen(Color.Black, 1);
 
   /// <summary>
-  /// Indicates the width of the <see cref="Line"/>
+  /// Indicates the width of the <see cref="BezierPath"/>
   /// </summary>
   public int Width { get => Get(1); set => Set(value); }
 
@@ -33,17 +33,17 @@ public class Line : CanvasObject
   public int ColorARGB { get => this.Color.ToArgb(); set => this.Color = Color.FromArgb(value); }
 
   /// <summary>
-  /// Indicates the <see cref="Color"/> of the <see cref="Line"/>
+  /// Indicates the <see cref="Color"/> of the <see cref="BezierPath"/>
   /// </summary>
   public Color Color { get => Get(Color.Blue); set => Set(value); }
 
   /// <summary>
-  /// Indicates the <see cref="DashStyle"/> of the <see cref="Line"/>
+  /// Indicates the <see cref="DashStyle"/> of the <see cref="BezierPath"/>
   /// </summary>
   public DashStyle Style { get => Get(DashStyle.Solid); set => Set(value); }
 
   /// <summary>
-  /// The <see cref="List{CanvasPoint}"/> represented by this <see cref="Line"/>
+  /// The <see cref="List{CanvasPoint}"/> represented by this <see cref="BezierPath"/>
   /// </summary>
   protected List<CanvasPoint> Points { get; set; } = new List<CanvasPoint>();
 
@@ -76,7 +76,7 @@ public class Line : CanvasObject
   }
 
   /// <summary>
-  /// Represents the <see cref="Pen"/> used when generating this <see cref="Line"/>
+  /// Represents the <see cref="Pen"/> used when generating this <see cref="BezierPath"/>
   /// </summary>
   private Pen Pen
   {
@@ -92,12 +92,12 @@ public class Line : CanvasObject
   /// <summary>
   /// Default constructor
   /// </summary>
-  public Line() : base() { }
+  public BezierPath() : base() { }
 
   /// <summary>
   /// Copy constructor
   /// </summary>
-  public Line(Line line) : this() { Width = line.Width; Color = line.Color; }
+  public BezierPath(BezierPath line) : this() { Width = line.Width; Color = line.Color; }
 
   /// <summary>
   /// Adds a <see cref="Vertex"/> to this line
@@ -169,7 +169,7 @@ public class Line : CanvasObject
   }
 
   /// <summary>
-  /// Removes a <see cref="Vertex"/> from this <see cref=" Line"/>
+  /// Removes a <see cref="Vertex"/> from this <see cref=" BezierPath"/>
   /// </summary>
   public void RemoveVertex(Vertex vertex)
   {
@@ -185,7 +185,7 @@ public class Line : CanvasObject
   }
 
   /// <summary>
-  /// Handles the mouse down event for the <see cref="Line"/> object.
+  /// Handles the mouse down event for the <see cref="BezierPath"/> object.
   /// This method determines the interaction with the line or its points based on the mouse location
   /// and modifier keys pressed. It supports adding, deleting, selecting, and moving vertices or control points.
   /// </summary>
@@ -270,7 +270,7 @@ public class Line : CanvasObject
   }
 
   /// <summary>
-  /// Tries to add a <see cref="Vertex"/> at <paramref name="location"/> from <see cref="Line"/>
+  /// Tries to add a <see cref="Vertex"/> at <paramref name="location"/> from <see cref="BezierPath"/>
   /// </summary>
   private void TryAddVertex(Point location)
   {
@@ -298,7 +298,7 @@ public class Line : CanvasObject
   }
 
   /// <summary>
-  /// Deletes the <paramref name="point"/> from <see cref="Line"/>
+  /// Deletes the <paramref name="point"/> from <see cref="BezierPath"/>
   /// </summary>
   /// <param name="point"></param>
   private void DeletePoint(CanvasPoint point)
@@ -322,13 +322,13 @@ public class Line : CanvasObject
   }
 
   /// <summary>
-  /// Copies this <see cref="Line"/>
+  /// Copies this <see cref="BezierPath"/>
   /// </summary>
   /// <returns></returns>
-  public override CanvasObject Copy() => new Line(this);
+  public override CanvasObject Copy() => new BezierPath(this);
 
   /// <summary>
-  /// Checks if <paramref name="mousePosition"/> is over any part of this <see cref="Line"/> and return the 
+  /// Checks if <paramref name="mousePosition"/> is over any part of this <see cref="BezierPath"/> and return the 
   /// <see cref="CanvasObject"/> within the line that it is over
   /// </summary>
   /// <returns><see cref="CanvasObject"/> within the line that it is over</returns>
@@ -352,7 +352,7 @@ public class Line : CanvasObject
   }
 
   /// <summary>
-  /// Gets a <see cref="Cursor"/> representing the state of the <see cref="Line"/> that is represented
+  /// Gets a <see cref="Cursor"/> representing the state of the <see cref="BezierPath"/> that is represented
   /// by <paramref name="location"/>
   /// </summary>
   /// <returns><see cref="Cursor"/> represented by <paramref name="location"/></returns>
@@ -400,7 +400,7 @@ public class Line : CanvasObject
   }
 
   /// <summary>
-  /// Draws <see cref="Line"/>
+  /// Draws <see cref="BezierPath"/>
   /// </summary>
   public override void Draw(Graphics graphics)
   {
@@ -421,7 +421,7 @@ public class Line : CanvasObject
   }
 
   /// <summary>
-  /// Moves the <see cref="Line"/> by the specified <paramref name="dx"/> and <paramref name="dy"/> values.  
+  /// Moves the <see cref="BezierPath"/> by the specified <paramref name="dx"/> and <paramref name="dy"/> values.  
   /// This method adjusts the position of all moveable points in the line.  
   /// </summary>
   /// <param name="dx">The horizontal displacement.</param>  
@@ -431,7 +431,7 @@ public class Line : CanvasObject
   public override void MoveBy(int dx, int dy, Keys modifierKeys, bool supressCallback = false) => moveablePoints.ForEach(v => v.MoveBy(dx, dy, modifierKeys));
 
   /// <summary>
-  /// Aligns <see cref="Line"/> to the <paramref name="alignInterval"/>
+  /// Aligns <see cref="BezierPath"/> to the <paramref name="alignInterval"/>
   /// </summary>
   public override void Align(int alignInterval) => Points.ForEach(p => p.Align(alignInterval));
 }
