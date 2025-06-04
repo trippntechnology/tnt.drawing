@@ -74,41 +74,10 @@ public class LineMode(Canvas canvas, CanvasLayer layer, BezierPath defaultObject
     currentVertices.ForEach(v => v.Draw(graphics));
     activeVertex.Draw(graphics);
   }
-
   public override void Reset()
   {
     currentVertices.Clear();
     base.Reset();
-  }
-
-  public override bool Equals(object? obj)
-  {
-    return base.Equals(obj);
-  }
-
-  public override int GetHashCode()
-  {
-    return base.GetHashCode();
-  }
-
-  public override void OnKeyDown(KeyEventArgs e)
-  {
-    base.OnKeyDown(e);
-  }
-
-  public override void OnKeyUp(KeyEventArgs e)
-  {
-    base.OnKeyUp(e);
-  }
-
-  public override void OnMouseDoubleClick(MouseEventArgs e)
-  {
-    base.OnMouseDoubleClick(e);
-  }
-
-  public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
-  {
-    base.OnMouseDown(e, modifierKeys);
   }
 
   public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
@@ -116,13 +85,7 @@ public class LineMode(Canvas canvas, CanvasLayer layer, BezierPath defaultObject
     base.OnMouseMove(e, modifierKeys);
 
     var location = Canvas.SnapToInterval ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
-    activeVertex.MoveTo(location, modifierKeys);
-    Canvas.Invalidate();
-  }
-
-  public override string? ToString()
-  {
-    return base.ToString();
+    activeVertex.MoveTo(location, modifierKeys);    Canvas.Invalidate();
   }
 
   protected override void Log(string msg = "", [CallerMemberName] string callingMethod = "")

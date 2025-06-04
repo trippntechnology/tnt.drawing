@@ -45,11 +45,11 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
       {
         selectedObjects.Clear();
       }
-      else if (modifierKeys.ContainsAll(Keys.Control) && selectedObjects.Contains(objectUnderMouse))
+      else if (modifierKeys == Keys.Control && selectedObjects.Contains(objectUnderMouse))
       {
         selectedObjects.Remove(objectUnderMouse);
       }
-      else if (modifierKeys.ContainsAll(Keys.Control) && !selectedObjects.Contains(objectUnderMouse))
+      else if (modifierKeys == Keys.Control && !selectedObjects.Contains(objectUnderMouse))
       {
         selectedObjects.Add(objectUnderMouse);
       }

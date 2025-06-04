@@ -368,11 +368,12 @@ public class BezierPath() : CanvasObject
 
       if (point != null)
       {
-        if (modifierKeys.ContainsAll(Keys.Control, Keys.Shift))
+        if (modifierKeys == (Keys.Control | Keys.Shift))
         {
           cursor = Resources.Cursors.RemovePoint;
+          hint = "Click to remove point";
         }
-        else if (ctrlPoint != null && modifierKeys.ContainsAll(Keys.Shift))
+        else if (ctrlPoint != null && modifierKeys == Keys.Shift)
         {
           cursor = Resources.Cursors.AddCurve;
         }
@@ -384,7 +385,7 @@ public class BezierPath() : CanvasObject
       }
       else
       {
-        if (modifierKeys.ContainsAll(Keys.Control, Keys.Shift))
+        if (modifierKeys == (Keys.Control | Keys.Shift))
         {
           cursor = Resources.Cursors.AddPoint;
           hint = "Click to add point";
