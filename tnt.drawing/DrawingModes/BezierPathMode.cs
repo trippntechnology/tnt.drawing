@@ -53,7 +53,7 @@ public class BezierPathMode(Canvas canvas, CanvasLayer layer, BezierPath bezierP
     {
       if (ActiveLine == null)
       {
-        ActiveLine = DefaultObject.Copy() as BezierPath;
+        ActiveLine = DefaultObject?.Clone() as BezierPath;
         ActiveLine?.Also(line =>
             {
               // Mark the new line as selected and add initial vertices

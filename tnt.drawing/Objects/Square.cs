@@ -34,7 +34,7 @@ namespace TNT.Drawing.Objects
       graphics.FillRectangle(_SolidBrush, X, Y, Width, Height);
     }
 
-    public override CanvasObject Copy()
+    public override CanvasObject Clone()
     {
       throw new NotImplementedException();
     }

@@ -321,7 +321,7 @@ public class BezierPath() : CanvasObject
   /// Copies this <see cref="BezierPath"/>
   /// </summary>
   /// <returns></returns>
-  public override CanvasObject Copy() => new BezierPath(this);
+  public override CanvasObject Clone() => new BezierPath(this);
 
   /// <summary>
   /// Checks if <paramref name="mousePosition"/> is over any part of this <see cref="BezierPath"/> and return the 

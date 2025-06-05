@@ -40,7 +40,7 @@ public class LineMode(Canvas canvas, CanvasLayer layer, BezierPath defaultObject
       if (currentVertices.Count > 1)
       {
         // Create a new BezierPath and add each vertex
-        var path = new BezierPath();
+        var path = (DefaultBezierPath.Clone() as BezierPath)!;
         foreach (var v in currentVertices)
         {
           path.AddVertex(new Vertex(v));

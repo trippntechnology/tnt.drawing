@@ -51,10 +51,10 @@ public class CanvasPoint() : CanvasObject
   public CanvasPoint(CanvasPoint canvasPoint) : this(canvasPoint.X, canvasPoint.Y) { }
 
   /// <summary>
-  /// Copies this <see cref="CanvasPoint"/>
+  /// Creates a deep copy of this <see cref="CanvasPoint"/> instance.
   /// </summary>
-  /// <returns>A copy of this <see cref="CanvasPoint"/></returns>
-  public override CanvasObject Copy() => new CanvasPoint(this);
+  /// <returns>A new <see cref="CanvasPoint"/> with identical state to this instance.</returns>
+  public override CanvasObject Clone() => new CanvasPoint(this);
 
   /// <summary>
   /// Draws the <see cref="CanvasPoint"/>

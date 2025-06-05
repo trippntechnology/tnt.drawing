@@ -39,9 +39,10 @@ public abstract class CanvasObject : Observable
   public abstract void Draw(Graphics graphics);
 
   /// <summary>
-  /// Implement by subclass to copy object
+  /// Creates a deep copy of the current <see cref="CanvasObject"/> instance.
+  /// Subclasses must implement this method to return a new instance with identical state.
   /// </summary>
-  public abstract CanvasObject Copy();
+  public abstract CanvasObject Clone();
 
   /// <summary>
   /// Implement to align the object at the given <paramref name="alignInterval"/>

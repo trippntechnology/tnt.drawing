@@ -49,9 +49,9 @@ namespace TNT.Drawing.Objects
     }
 
     /// <summary>
-    /// Copies this <see cref="ControlPoint"/>
+    /// Creates a deep copy of this <see cref="ControlPoint"/>, including its current state and properties.
     /// </summary>
     /// <returns>Copy of this <see cref="ControlPoint"/></returns>
-    public override CanvasObject Copy() => new ControlPoint(this);
+    public override CanvasObject Clone() => new ControlPoint(this);
   }
 }

@@ -28,10 +28,10 @@ public class Vertex : CanvasPoint
   public Vertex(Vertex vertex) : base(vertex) { }
 
   /// <summary>
-  /// Copies this <see cref="Vertex"/>
+  /// Creates a deep copy of this <see cref="Vertex"/> instance.
   /// </summary>
-  /// <returns>Copy of this <see cref="Vertex"/></returns>
-  public override CanvasObject Copy() => new Vertex(this);
+  /// <returns>A new <see cref="Vertex"/> with identical state to this instance.</returns>
+  public override CanvasObject Clone() => new Vertex(this);
 
 
 }
