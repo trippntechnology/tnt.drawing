@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using TNT.Drawing.Extensions;
 using TNT.Drawing.Layers;
@@ -33,47 +32,44 @@ public class LineMode(Canvas canvas, CanvasLayer layer, BezierPath defaultObject
     var location = Canvas.SnapToInterval ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
 
     // Add a new vertex at the mouse location
-    var vertex = new Vertex(location);
-    currentVertices.Add(vertex);
+    currentVertices.Add(new Vertex(location));
 
     // If CTRL is held, finish the line
-    if ((modifierKeys & Keys.Control) == Keys.Control && currentVertices.Count > 1)
+    if (modifierKeys == Keys.Control && currentVertices.Count > 1)
     {
-      CommitLine();
+      if (currentVertices.Count > 1)
+      {
+        // Create a new BezierPath and add each vertex
+        var path = new BezierPath();
+        foreach (var v in currentVertices)
+        {
+          path.AddVertex(new Vertex(v));
+        }
+        Layer.CanvasObjects.Add(path);
+      }
+      currentVertices.Clear();
     }
 
     base.OnMouseUp(e, modifierKeys);
   }
 
-  /// <summary>
-  /// Commits the current line to the layer and resets the state
-  /// </summary>
-  private void CommitLine()
-  {
-    if (currentVertices.Count > 1)
-    {
-      // Create a new BezierPath and add each vertex
-      var path = new BezierPath();
-      foreach (var v in currentVertices)
-      {
-        path.AddVertex(new Vertex(v));
-      }
-      Layer.CanvasObjects.Add(path);
-    }
-    currentVertices.Clear();
-  }
-
   public override void OnDraw(Graphics graphics)
   {
     base.OnDraw(graphics);
+    // Draw the lines connecting the vertices
     var points = currentVertices.ConvertAll(v => v.ToPoint);
-    points.Add(activeVertex.ToPoint); // Add the active vertex point
-    if (points?.Count > 1){
+    // Add the active vertex to the end of the points list for drawing
+    points.Add(activeVertex.ToPoint);
+    if (points.Count > 1)
+    {
       graphics.DrawLines(LinesPen, points.ToArray());
     }
+    // Draw the vertices
     currentVertices.ForEach(v => v.Draw(graphics));
+    // Draw the active vertex
     activeVertex.Draw(graphics);
   }
+
   public override void Reset()
   {
     currentVertices.Clear();
@@ -85,11 +81,7 @@ public class LineMode(Canvas canvas, CanvasLayer layer, BezierPath defaultObject
     base.OnMouseMove(e, modifierKeys);
 
     var location = Canvas.SnapToInterval ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
-    activeVertex.MoveTo(location, modifierKeys);    Canvas.Invalidate();
-  }
-
-  protected override void Log(string msg = "", [CallerMemberName] string callingMethod = "")
-  {
-    base.Log(msg, callingMethod);
+    activeVertex.MoveTo(location, modifierKeys);
+    Canvas.Invalidate();
   }
 }
