@@ -41,11 +41,12 @@ public partial class Form1 : Form
     var gridLayer = new GridLayer(canvas) { Name = "Grid", LineColor = Color.Aqua };
 
     // Demonstrate ClosedBezierPath
-    var closedBezier = new ClosedBezierPath();
+    var closedBezier = new BezierPath();
     closedBezier.AddVertex(new Vertex(200, 400));
     closedBezier.AddVertex(new Vertex(300, 600));
     closedBezier.AddVertex(new Vertex(500, 600));
     closedBezier.AddVertex(new Vertex(600, 400));
+    closedBezier.AddVertex(new Vertex(200, 400));
     closedBezier.FillColor = Color.FromArgb(128, Color.Orange);
 
     var objectsLayer = new CanvasLayer(canvas)

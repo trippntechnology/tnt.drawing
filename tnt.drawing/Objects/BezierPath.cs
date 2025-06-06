@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -24,19 +25,31 @@ public class BezierPath() : CanvasObject
   public int Width { get => Get(1); set => Set(value); }
 
   /// <summary>
-  /// Represents the <see cref="Color"/> as an ARGB value so that it can be persisted
+  /// Represents the <see cref="LineColor"/> as an ARGB value so that it can be persisted
   /// </summary>
-  public int ColorARGB { get => this.Color.ToArgb(); set => this.Color = Color.FromArgb(value); }
+  public int LineARGB { get => this.LineColor.ToArgb(); set => this.LineColor = Color.FromArgb(value); }
 
   /// <summary>
-  /// Indicates the <see cref="Color"/> of the <see cref="BezierPath"/>
+  /// Indicates the <see cref="LineColor"/> of the <see cref="BezierPath"/>
   /// </summary>
-  public Color Color { get => Get(Color.Blue); set => Set(value); }
+  [DisplayName("Line Color")]
+  public Color LineColor { get => Get(Color.Blue); set => Set(value); }
+
+  public int FillARGB { get => FillColor.ToArgb(); set => FillColor = Color.FromArgb(value); }
+
+  /// <summary>
+  /// Indicates the fill color of the <see cref="BezierPath"/>. This color is used to fill the interior of the path if applicable.
+  /// </summary>
+  [DisplayName("Fill Color")]
+  public Color FillColor { get => Get(Color.Transparent); set => Set(value); }
 
   /// <summary>
   /// Indicates the <see cref="DashStyle"/> of the <see cref="BezierPath"/>
   /// </summary>
-  public DashStyle Style { get => Get(DashStyle.Solid); set => Set(value); }
+  [DisplayName("Line Style")]
+  public DashStyle LineStyle { get => Get(DashStyle.Solid); set => Set(value); }
+
+  private bool IsClosedPath => CanvasPoints.FirstOrDefault()?.Let(firstPoint => CanvasPoints.FindCoincident(firstPoint) != null) ?? false;
 
   /// <summary>
   /// The <see cref="List{CanvasPoint}"/> represented by this <see cref="BezierPath"/>
@@ -53,6 +66,9 @@ public class BezierPath() : CanvasObject
       var path = new GraphicsPath();
       var points = CanvasPoints.Select(v => v.ToPoint).ToArray();
       path.AddBeziers(points);
+
+      if (IsClosedPath) path.CloseFigure();
+
       return path;
     }
   }
@@ -72,26 +88,26 @@ public class BezierPath() : CanvasObject
   }
 
   private readonly Pen _ControlPointConnectorPen = new Pen(Color.FromArgb(100, Color.Black), 1);
-  private Pen _PathPen = new Pen(Color.Black, 1);
+  private Pen _OutlinePen = new Pen(Color.Black, 1);
 
   /// <summary>
-  /// Represents the <see cref="PenPath"/> used when generating this <see cref="BezierPath"/>
+  /// Represents the <see cref="OutlinePen"/> used when generating this <see cref="BezierPath"/>
   /// </summary>
-  private Pen PenPath
+  private Pen OutlinePen
   {
     get
     {
-      _PathPen.Color = Color;
-      _PathPen.Width = Width;
-      _PathPen.DashStyle = Style;
-      return _PathPen;
+      _OutlinePen.Color = LineColor;
+      _OutlinePen.Width = Width;
+      _OutlinePen.DashStyle = LineStyle;
+      return _OutlinePen;
     }
   }
 
   /// <summary>
   /// Copy constructor
   /// </summary>
-  public BezierPath(BezierPath line) : this() { Width = line.Width; Color = line.Color; }
+  public BezierPath(BezierPath line) : this() { Width = line.Width; LineColor = line.LineColor; }
 
   /// <summary>
   /// Adds a <see cref="Vertex"/> to this line
@@ -333,7 +349,7 @@ public class BezierPath() : CanvasObject
     if (CanvasPoints.Count > 3)
     {
       // Check if over this line
-      hitObject = Path.IsOutlineVisible(mousePosition, new Pen(Color.Black, 10F)) ? this : null;
+      hitObject = Path.IsOutlineVisible(mousePosition, new Pen(Color.Black, 10F)) || (IsClosedPath && Path.IsVisible(mousePosition)) ? this : null;
 
       if (hitObject == null)
       {
@@ -399,7 +415,9 @@ public class BezierPath() : CanvasObject
   /// </summary>
   public override void Draw(Graphics graphics)
   {
-    graphics.DrawPath(PenPath, Path);
+    if (IsClosedPath) graphics.FillPath(new SolidBrush(FillColor), Path);
+    graphics.DrawPath(OutlinePen, Path);
+
     if (IsSelected)
     {
       CanvasPoints.ForEach(v => v.Draw(graphics));

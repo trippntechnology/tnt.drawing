@@ -20,9 +20,9 @@ public class LineMode(Canvas canvas, CanvasLayer layer, BezierPath defaultObject
   {
     get
     {
-      _linesPen.Color = DefaultBezierPath.Color;
+      _linesPen.Color = DefaultBezierPath.LineColor;
       _linesPen.Width = DefaultBezierPath.Width;
-      _linesPen.DashStyle = DefaultBezierPath.Style;
+      _linesPen.DashStyle = DefaultBezierPath.LineStyle;
       return _linesPen;
     }
   }
