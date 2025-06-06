@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using TNT.Drawing.Objects;
 
-namespace NUnitTests;
+namespace NUnitTests.Objects;
 
 [ExcludeFromCodeCoverage]
 public class BezierPathTests

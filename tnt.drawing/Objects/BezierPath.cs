@@ -9,8 +9,6 @@ using TNT.Drawing.Extensions;
 using TNT.Drawing.Model;
 using TNT.Drawing.Resource;
 
-using CommonsExtensions = TNT.Commons.Extensions;
-
 namespace TNT.Drawing.Objects;
 
 /// <summary>
@@ -132,35 +130,30 @@ public class BezierPath() : CanvasObject
   /// </summary>
   private void OnMoved(CanvasPoint canvasPoint, int dx, int dy, Keys modifierKeys)
   {
-    if (canvasPoint is ControlPoint)
+    if (canvasPoint is ControlPoint ctrlPoint)
     {
       if (modifierKeys.ContainsAll(Keys.Shift))
       {
         // Find the Vertex adjacent to canvasPoint
-        var canvasPointIndex = CanvasPoints.IndexOf(canvasPoint);
-        var adjacentIndex = CanvasPoints[canvasPointIndex - 1] is Vertex ? canvasPointIndex - 1 : canvasPointIndex + 1;
-        //var adjacentVertex = Points.ElementAtOrDefault(adjacentIndex);
+        var ctrlPointVertex = CanvasPoints.AdjacentTo(ctrlPoint).FirstOrDefault(p => p is Vertex) as Vertex;
+        if (ctrlPointVertex == null) return;
 
         // Get the opposite control point
-        var oppositeIndex = adjacentIndex < canvasPointIndex ? adjacentIndex - 1 : adjacentIndex + 1;
-        //var oppositeVertex = Points.ElementAtOrDefault(oppositeIndex);
+        var oppositeVertex = CanvasPoints.FindCoincident(ctrlPointVertex);
+        var oppositeCtrlPoint = CanvasPoints.AdjacentTo(ctrlPointVertex).FirstOrDefault(p => p is ControlPoint && p != ctrlPoint) as ControlPoint
+          ?? oppositeVertex?.Let(vertex => CanvasPoints.AdjacentTo(vertex).FirstOrDefault());
+        ;
+        if (oppositeCtrlPoint == null) return;
 
-        CommonsExtensions.RunNotNull(CanvasPoints.ElementAtOrDefault(adjacentIndex), CanvasPoints.ElementAtOrDefault(oppositeIndex), (adjacentVertex, oppositeVertex) =>
-        {
-          var offset = adjacentVertex.ToPoint.Subtract(canvasPoint.ToPoint);
-          var newPoint = adjacentVertex.ToPoint.Add(offset);
-          oppositeVertex?.MoveTo(newPoint, modifierKeys, true);
-        });
+        var offset = ctrlPointVertex.ToPoint.Subtract(ctrlPoint.ToPoint);
+        var newPoint = ctrlPointVertex.ToPoint.Add(offset);
+        oppositeCtrlPoint?.MoveTo(newPoint, modifierKeys, true);
+
       }
     }
-    else if (canvasPoint is Vertex)
+    else if (canvasPoint is Vertex vertex)
     {
-      // Find ControlPoints adjacent to this Vertex
-      var vertexIndex = CanvasPoints.IndexOf(canvasPoint);
-      var ctrlPoints = new List<CanvasPoint>();
-      ctrlPoints.AddNotNull(CanvasPoints.ElementAtOrDefault(vertexIndex - 1));
-      ctrlPoints.AddNotNull(CanvasPoints.ElementAtOrDefault(vertexIndex + 1));
-      ctrlPoints.ForEach(cp => cp.MoveBy(dx, dy, Keys.None, true));
+      CanvasPoints.AdjacentTo(vertex).ForEach(ctrlPoint => ctrlPoint.MoveBy(dx, dy, Keys.None, true));
     }
   }
 
@@ -237,6 +230,11 @@ public class BezierPath() : CanvasObject
         moveablePoints.Clear();
         hitVertex.IsSelected = true;
         moveablePoints.Add(hitVertex);
+        CanvasPoints.FindCoincident(hitVertex)?.Also(coincidentPoint =>
+        {
+          coincidentPoint.IsSelected = true;
+          moveablePoints.Add(coincidentPoint);
+        });
       }
       else if (hitPoint != null && !moveablePoints.Contains(hitPoint))
       {

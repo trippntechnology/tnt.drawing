@@ -32,6 +32,4 @@ public class Vertex : CanvasPoint
   /// </summary>
   /// <returns>A new <see cref="Vertex"/> with identical state to this instance.</returns>
   public override CanvasObject Clone() => new Vertex(this);
-
-
 }

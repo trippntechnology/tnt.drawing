@@ -130,4 +130,18 @@ public class CanvasPoint() : CanvasObject
   }
 
   override public string ToString() => $"{base.ToString()} [{X}, {Y}]";
+
+  /// <summary>
+  /// Determines whether this <see cref="CanvasPoint"/> is within a specified distance of another <see cref="CanvasPoint"/>.
+  /// </summary>
+  /// <param name="other">The other <see cref="CanvasPoint"/> to compare against.</param>
+  /// <param name="threshold">The maximum distance (in pixels) to consider the points as "near"; defaults to <see cref="POINT_DIAMETER"/>.</param>
+  /// <returns><c>true</c> if the distance between the points is less than or equal to <paramref name="threshold"/>; otherwise, <c>false</c>.</returns>
+  public bool IsNear(CanvasPoint other, int threshold = POINT_DIAMETER)
+  {
+    int dx = X - other.X;
+    int dy = Y - other.Y;
+    int distanceSquared = dx * dx + dy * dy;
+    return distanceSquared <= threshold * threshold;
+  }
 }
