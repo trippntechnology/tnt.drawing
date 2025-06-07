@@ -107,7 +107,13 @@ public class BezierPath() : CanvasObject
   /// <summary>
   /// Copy constructor
   /// </summary>
-  public BezierPath(BezierPath line) : this() { Width = line.Width; LineColor = line.LineColor; }
+  public BezierPath(BezierPath path) : this()
+  {
+    Width = path.Width;
+    LineColor = path.LineColor;
+    FillColor = path.FillColor;
+    LineStyle = path.LineStyle;
+  }
 
   /// <summary>
   /// Adds a <see cref="Vertex"/> to this line
@@ -225,13 +231,24 @@ public class BezierPath() : CanvasObject
         moveablePoints.AddRange(CanvasPoints.FindAll(p => p is Vertex));
         response = response with { AllowMove = false };
       }
-      else if (hitVertex != null && modifierKeys.ContainsAll(Keys.Control))
+      else if (hitVertex != null && modifierKeys == Keys.Control)
       {
-        // Select/unselect vertex
-        if (!hitVertex.IsSelected && moveablePoints.Contains(hitVertex)) moveablePoints.Clear();
+        var vertices = new List<Vertex>() { hitVertex };
+        CanvasPoints.FindCoincident(hitVertex).Also(coincidentPoint =>
+        {
+          if (coincidentPoint is Vertex coincidentVertex)
+          {
+            vertices.Add(coincidentVertex);
+          }
+        });
 
-        hitVertex.IsSelected = !hitVertex.IsSelected;
-        if (hitVertex.IsSelected) moveablePoints.Add(hitVertex); else moveablePoints.Remove(hitVertex);
+        // Select/unselect vertex
+        vertices.ForEach(v =>
+        {
+          v.IsSelected = !v.IsSelected;
+          if (v.IsSelected) moveablePoints.Add(v); else moveablePoints.Remove(v);
+        });
+
         response = response with { ChildHitObject = hitVertex, AllowMove = false };
       }
       else if (hitCtrlPoint != null && modifierKeys.ContainsAll(Keys.Shift))
