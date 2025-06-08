@@ -34,7 +34,7 @@ public partial class Form1 : Form
     var backgroundLayer = new CanvasLayer(canvas)
     {
       Name = "Background",
-      CanvasObjects = new List<CanvasObject>() { new Square(150, 150, 200, Color.Green) },
+      CanvasObjects = new List<CanvasObject>() { CreateSquarePath(150, 150, 50, Color.Green) },
       BackgroundColor = Color.White,
     };
 
@@ -54,8 +54,8 @@ public partial class Form1 : Form
       Name = "Object",
       CanvasObjects = new List<CanvasObject>()
       {
-        new Square(100,100,100,Color.Blue),
-        new Square(500,500,200,Color.Red),
+        CreateSquarePath(100,100,100, Color.Blue),
+        CreateSquarePath(500,500,200, Color.Red),
         line1,
         line2,
         closedBezier, // Add ClosedBezierPath to the sample
@@ -90,10 +90,6 @@ public partial class Form1 : Form
       modeToolStripMenuItem.DropDownItems.Add(menuItem);
     });
 
-    //selectToolStripMenuItem.Tag = new TNT.Drawing.DrawingModes.SelectMode(canvas, objectsLayer);
-    //lineToolStripMenuItem.Tag = new TNT.Drawing.DrawingModes.LineMode(canvas, objectsLayer);
-    //bezeirModeToolStripMenuItem.Tag = new TNT.Drawing.DrawingModes.BezierPathMode(canvas, objectsLayer);
-
     canvas.DrawingMode = modes.First();
     canvas.OnSelected = (objs) =>
     {
@@ -111,6 +107,21 @@ public partial class Form1 : Form
       Cursor = feedback.Cursor;
       toolStripStatusLabel1.Text = feedback.Hint;
     };
+  }
+
+  private BezierPath CreateSquarePath(int x, int y, int size, Color fillColor)
+  {
+    var path = new BezierPath
+    {
+      FillColor = fillColor,
+    };
+    path.AddVertex(new Vertex(x, y));
+    path.AddVertex(new Vertex(x + size, y));
+    path.AddVertex(new Vertex(x + size, y + size));
+    path.AddVertex(new Vertex(x, y + size));
+    path.AddVertex(new Vertex(x, y)); // Close the square
+
+    return path;
   }
 
   private void FitToolStripMenuItem_Click(object sender, System.EventArgs e) => canvas?.Fit();
