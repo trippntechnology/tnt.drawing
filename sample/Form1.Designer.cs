@@ -40,6 +40,7 @@ partial class Form1
     propertyGrid1 = new PropertyGrid();
     statusStrip1 = new StatusStrip();
     toolStripStatusLabel1 = new ToolStripStatusLabel();
+    bringToFrontToolStripMenuItem = new ToolStripMenuItem();
     ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
     splitContainer1.Panel1.SuspendLayout();
     splitContainer1.Panel2.SuspendLayout();
@@ -80,7 +81,7 @@ partial class Form1
     // 
     // menuToolStripMenuItem
     // 
-    menuToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { fitToolStripMenuItem1, saveToolStripMenuItem1, openToolStripMenuItem1, alignToolStripMenuItem });
+    menuToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { fitToolStripMenuItem1, saveToolStripMenuItem1, openToolStripMenuItem1, alignToolStripMenuItem, bringToFrontToolStripMenuItem });
     menuToolStripMenuItem.Name = "menuToolStripMenuItem";
     menuToolStripMenuItem.Size = new Size(50, 20);
     menuToolStripMenuItem.Text = "Menu";
@@ -88,28 +89,28 @@ partial class Form1
     // fitToolStripMenuItem1
     // 
     fitToolStripMenuItem1.Name = "fitToolStripMenuItem1";
-    fitToolStripMenuItem1.Size = new Size(103, 22);
+    fitToolStripMenuItem1.Size = new Size(180, 22);
     fitToolStripMenuItem1.Text = "Fit";
     fitToolStripMenuItem1.Click += FitToolStripMenuItem_Click;
     // 
     // saveToolStripMenuItem1
     // 
     saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
-    saveToolStripMenuItem1.Size = new Size(103, 22);
+    saveToolStripMenuItem1.Size = new Size(180, 22);
     saveToolStripMenuItem1.Text = "Save";
     saveToolStripMenuItem1.Click += SaveToolStripMenuItem_Click;
     // 
     // openToolStripMenuItem1
     // 
     openToolStripMenuItem1.Name = "openToolStripMenuItem1";
-    openToolStripMenuItem1.Size = new Size(103, 22);
+    openToolStripMenuItem1.Size = new Size(180, 22);
     openToolStripMenuItem1.Text = "Open";
     openToolStripMenuItem1.Click += OpenToolStripMenuItem_Click;
     // 
     // alignToolStripMenuItem
     // 
     alignToolStripMenuItem.Name = "alignToolStripMenuItem";
-    alignToolStripMenuItem.Size = new Size(103, 22);
+    alignToolStripMenuItem.Size = new Size(180, 22);
     alignToolStripMenuItem.Text = "Align";
     alignToolStripMenuItem.Click += AlignToolStripMenuItem_Click;
     // 
@@ -152,6 +153,13 @@ partial class Form1
     toolStripStatusLabel1.Size = new Size(118, 17);
     toolStripStatusLabel1.Text = "toolStripStatusLabel1";
     // 
+    // bringToFrontToolStripMenuItem
+    // 
+    bringToFrontToolStripMenuItem.Name = "bringToFrontToolStripMenuItem";
+    bringToFrontToolStripMenuItem.Size = new Size(180, 22);
+    bringToFrontToolStripMenuItem.Text = "Bring to Front";
+    bringToFrontToolStripMenuItem.Click += bringToFrontToolStripMenuItem_Click;
+    // 
     // Form1
     // 
     AutoScaleDimensions = new SizeF(7F, 15F);
@@ -191,5 +199,6 @@ partial class Form1
 	private System.Windows.Forms.ToolStripMenuItem modeToolStripMenuItem;
 	private System.Windows.Forms.ToolStripMenuItem layerToolStripMenuItem;
 	private System.Windows.Forms.ToolStripMenuItem alignToolStripMenuItem;
+  private ToolStripMenuItem bringToFrontToolStripMenuItem;
 }
 

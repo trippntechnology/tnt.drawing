@@ -146,17 +146,11 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   }
 
   /// <summary>
-  /// Finds a <see cref="CanvasObject"/> at <paramref name="mouseLocation"/>
+  /// Finds the first selected object under the mouse, or the topmost object in the given list at the mouse location.
   /// </summary>
-  /// <param name="objs"></param>
-  /// <param name="mouseLocation"></param>
-  /// <param name="modifierKeys"></param>
-  /// <returns><see cref="CanvasObject"/> if found, otherwise false</returns>
   protected CanvasObject? FindObjectAt(List<CanvasObject> objs, Point mouseLocation, Keys modifierKeys)
   {
-    // See if where over a selected object first just in case the selected object is in the list
-    // after another object in the same place
     return selectedObjects.FirstOrDefault(o => o.MouseOver(mouseLocation, modifierKeys).HitObject != null) ??
-      objs.FirstOrDefault(o => o.MouseOver(mouseLocation, modifierKeys).HitObject != null);
+      objs.LastOrDefault(o => o.MouseOver(mouseLocation, modifierKeys).HitObject != null);
   }
 }

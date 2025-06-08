@@ -183,10 +183,25 @@ namespace TNT.Drawing
     /// <summary>
     /// Aligns all selected objects to the <see cref="SnapInterval"/>
     /// </summary>
-    public void AlignToInterval()
+    public void AlignToSnapInterval()
     {
       var selectedObjects = Layers.SelectMany(l => l.GetSelected()).ToList();
       selectedObjects.ForEach(o => o.Align(SnapInterval));
+      Invalidate();
+    }
+
+    public new void BringToFront()
+    {
+      Layers.ForEach(layer =>
+      {
+        var selectedObjects = layer.GetSelected();
+        selectedObjects.ForEach(obj =>
+        {
+          layer.CanvasObjects.Remove(obj);
+          layer.CanvasObjects.Add(obj);
+        });
+      });
+
       Invalidate();
     }
 

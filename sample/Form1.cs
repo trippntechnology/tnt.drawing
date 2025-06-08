@@ -178,5 +178,8 @@ public partial class Form1 : Form
   }
 
   private void PropertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e) => canvas.DrawingMode.Layer.Also(layer => canvas.Refresh(layer));
-  private void AlignToolStripMenuItem_Click(object sender, System.EventArgs e) => canvas.AlignToInterval();
+
+  private void AlignToolStripMenuItem_Click(object sender, System.EventArgs e) => canvas.AlignToSnapInterval();
+
+  private void bringToFrontToolStripMenuItem_Click(object sender, EventArgs e) => canvas.BringToFront();
 }
