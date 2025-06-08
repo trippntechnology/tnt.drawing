@@ -233,6 +233,9 @@ public class BezierPath() : CanvasObject
       }
       else if (hitVertex != null && modifierKeys == Keys.Control)
       {
+        // Unselect all points that aren't selected since Control key indicates that points are being selected
+        moveablePoints.FindAll(v => !v.IsSelected).ForEach(point => moveablePoints.Remove(point));
+
         var vertices = new List<Vertex>() { hitVertex };
         CanvasPoints.FindCoincident(hitVertex).Also(coincidentPoint =>
         {
@@ -283,11 +286,13 @@ public class BezierPath() : CanvasObject
         // Select all vertices
         moveablePoints.ForEach(v => v.IsSelected = false);
         moveablePoints.Clear();
+        //CanvasPoints.ForEach(point=> point.IsSelected = true);
         moveablePoints.AddRange(CanvasPoints.FindAll(p => p is Vertex));
       }
     }
     else
     {
+      // Not selected, so select this BezierPath
       moveablePoints.ForEach(v => v.IsSelected = false);
       moveablePoints.Clear();
       moveablePoints.AddRange(CanvasPoints.FindAll(p => p is Vertex));

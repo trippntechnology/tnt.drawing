@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -19,7 +18,6 @@ namespace TNT.Drawing.DrawingModes;
 /// <param name="defaultObject">The default rectangle object template (optional).</param>
 public class SquareMode(Canvas canvas, CanvasLayer layer, CanvasObject? defaultObject = null) : DrawingMode(canvas, layer, defaultObject)
 {
-  private List<Vertex> vertices = new List<Vertex>();
   private BezierPath DefaultBezierPath => (DefaultObject as BezierPath)!;
 
   private Pen _linesPen = new Pen(Color.Black, 1);
@@ -35,23 +33,41 @@ public class SquareMode(Canvas canvas, CanvasLayer layer, CanvasObject? defaultO
   }
 
   /// <inheritdoc />
-  public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
+  public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
   {
-    base.OnMouseDown(e, modifierKeys);
-
     var location = Canvas.SnapToInterval ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
 
-    vertices.Add(new Vertex(location));
-    vertices.Add(new Vertex(location));
-    vertices.Add(new Vertex(location));
-    vertices.Add(new Vertex(location));
+    if (vertices.Count > 0)
+    {
+      // Create a new BezierPath and add each vertex
+      var path = (DefaultBezierPath.Clone() as BezierPath)!;
+
+      vertices.ForEach(v => path.AddVertex(new Vertex(v)));
+      // Close the path by adding the first vertex again
+      path.AddVertex(new Vertex(vertices.First()));
+
+      Layer.CanvasObjects.Add(path);
+
+      vertices.Clear();
+    }
+    else
+    {
+      vertices.Add(new Vertex(location));
+      vertices.Add(new Vertex(location));
+      vertices.Add(new Vertex(location));
+      vertices.Add(new Vertex(location));
+    }
 
     Canvas.Invalidate();
+
+    base.OnMouseDown(e, modifierKeys);
   }
 
   /// <inheritdoc />
   public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
   {
+    base.OnMouseMove(e, modifierKeys);
+
     var location = Canvas.SnapToInterval ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
 
     if (vertices.Count != 0)
@@ -62,39 +78,28 @@ public class SquareMode(Canvas canvas, CanvasLayer layer, CanvasObject? defaultO
       int width = location.X - vertices.First().X;
       int height = location.Y - vertices.First().Y;
 
-      TNTLogger.Info($"width: {width}, height: {height}");
-
       var p2 = new Point(startVertex.X + width, startVertex.Y);
       var p4 = new Point(startVertex.X, startVertex.Y + height);
       vertices[1].MoveTo(p2, Keys.None);
       vertices[2].MoveTo(location, Keys.None);
       vertices[3].MoveTo(p4, Keys.None);
-
-      Canvas.Invalidate();
     }
-  }
+    else
+    {
+      activeVertex.MoveTo(location, modifierKeys);
+    }
 
-  /// <inheritdoc />
-  public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
-  {
-    base.OnMouseUp(e, modifierKeys);
-    // Create a new BezierPath and add each vertex
-    var path = (DefaultBezierPath.Clone() as BezierPath)!;
-
-    vertices.ForEach(v => path.AddVertex(new Vertex(v)));
-    // Close the path by adding the first vertex again
-    path.AddVertex(new Vertex(vertices.First()));
-
-    Layer.CanvasObjects.Add(path);
-    vertices.Clear();
     Canvas.Invalidate();
   }
 
   /// <inheritdoc />
   public override void OnDraw(Graphics graphics)
   {
+    base.OnDraw(graphics);
+
     if (vertices.Count < 4)
     {
+      activeVertex.Draw(graphics);
       return; // Not enough vertices to draw a rectangle
     }
 

@@ -18,6 +18,16 @@ public class DrawingMode(Canvas canvas, CanvasLayer layer, CanvasObject? default
   protected bool IsMouseDown = false;
 
   /// <summary>
+  /// The active vertex that is being manipulated in the drawing mode.
+  /// </summary>
+  protected Vertex activeVertex = new Vertex();
+
+  /// <summary>
+  /// List of vertices that are being drawn in the current drawing mode.
+  /// </summary>
+  protected List<Vertex> vertices = new List<Vertex>();
+
+  /// <summary>
   /// Reference to the <see cref="Canvas"/>
   /// </summary>
   protected Canvas Canvas { get; private set; } = canvas;
@@ -35,7 +45,11 @@ public class DrawingMode(Canvas canvas, CanvasLayer layer, CanvasObject? default
   /// <summary>
   /// Refreshes the <see cref="Canvas"/> with the current <see cref="CanvasLayer"/>
   /// </summary>
-  public virtual void Reset() => Canvas.Refresh();
+  public virtual void Reset()
+  {
+    vertices.Clear();
+    Canvas.Invalidate();
+  }
 
   /// <summary>
   /// Called when the mouse moves across the <see cref="Canvas"/>
