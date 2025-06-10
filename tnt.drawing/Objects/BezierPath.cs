@@ -13,9 +13,9 @@ using TNT.Drawing.Resource;
 namespace TNT.Drawing.Objects;
 
 /// <summary>
-/// Repesents a line on the <see cref="Canvas"/>
+/// Represents a line on the <see cref="Canvas"/>
 /// </summary>
-public class BezierPath() : CanvasObject
+public class BezierPath() : CanvasObject()
 {
   private List<CanvasPoint> moveablePoints = new();
 
@@ -468,4 +468,44 @@ public class BezierPath() : CanvasObject
   /// Aligns <see cref="BezierPath"/> to the <paramref name="alignInterval"/>
   /// </summary>
   public override void Align(int alignInterval) => CanvasPoints.ForEach(p => p.Align(alignInterval));
+
+  /// <summary>
+  /// Calculates the centroid (center of mass) of the closed Bezier path in canvas coordinates.
+  /// The centroid is computed by flattening the Bezier path into a polygon and applying the standard polygon centroid formula.
+  /// Returns null if the path is not closed or has insufficient points to define an area.
+  /// </summary>
+  public override Point? GetCentroid()
+  {
+    // 1. Flatten the path to a polygon
+    var path = Path;
+    path.Flatten(); // Converts curves to line segments
+
+    var points = path.PathPoints;
+    if (points.Length < 3)
+      return null;
+
+    // 2. Compute the centroid of the polygon
+    float area = 0;
+    float cx = 0;
+    float cy = 0;
+
+    for (int i = 0, j = points.Length - 1; i < points.Length; j = i++)
+    {
+      float xi = points[i].X, yi = points[i].Y;
+      float xj = points[j].X, yj = points[j].Y;
+      float a = xi * yj - xj * yi;
+      area += a;
+      cx += (xi + xj) * a;
+      cy += (yi + yj) * a;
+    }
+
+    area *= 0.5f;
+    if (Math.Abs(area) < 1e-5)
+      return null; // Degenerate
+
+    cx /= (6 * area);
+    cy /= (6 * area);
+
+    return new Point(Convert.ToInt32(cx), Convert.ToInt32(cy));
+  }
 }

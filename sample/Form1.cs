@@ -76,9 +76,10 @@ public partial class Form1 : Form
     propertyGrid1.SelectedObject = canvas.Properties;
 
     var modes = new List<DrawingMode> {
-      new SelectMode(canvas,      objectsLayer),
+      new SelectMode(canvas, objectsLayer),
       new LineMode(canvas, objectsLayer, new BezierPath()),
       new SquareMode(canvas, objectsLayer, new BezierPath()),
+      new RotationMode(canvas, objectsLayer),
     };
 
     modes.ForEach(mode =>

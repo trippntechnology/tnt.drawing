@@ -80,4 +80,11 @@ public abstract class CanvasObject : Observable
   /// </summary>
   /// <returns><see cref="Feedback"/> indicating the <see cref="Cursor"/> and hint to display</returns>
   public virtual Feedback GetFeedback(Point location, Keys modifierKeys) => Feedback.Default;
+
+  /// <summary>
+  /// Returns the centroid (center of mass) of the object in canvas coordinates, if defined.
+  /// Subclasses should override this method to provide the centroid for their specific geometry.
+  /// Returns null if the centroid is not defined for this object.
+  /// </summary>
+  public virtual Point? GetCentroid() => null;
 }
