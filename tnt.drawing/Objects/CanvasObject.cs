@@ -24,6 +24,12 @@ public abstract class CanvasObject : Observable
   public virtual bool IsSelected { get => Get(false); set => Set(value); }
 
   /// <summary>
+  /// The rotation angle (in degrees) of the object.
+  /// </summary>
+  [DisplayName("Rotation Angle")]
+  public double RotationAngle { get => Get(0.0); set => Set(value); }
+
+  /// <summary>
   /// Default constructor
   /// </summary>
   protected CanvasObject() => Id = Guid.NewGuid().ToString();

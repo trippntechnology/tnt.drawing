@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using TNT.Commons;
 using TNT.Drawing.Extensions;
+using TNT.Drawing.Interface;
 using TNT.Drawing.Layers;
 using TNT.Drawing.Model;
 
@@ -21,14 +22,12 @@ public class RotationMode(Canvas canvas, CanvasLayer layer) : InteractionMode(ca
 {
   // Fields for rotation interaction
   private bool _isRotating = false;
-  private Point? _rotationCentroid = null;
 
   /// <summary>
   /// Handles mouse down event: starts rotation if a Vertex is under the mouse.
   /// </summary>
   public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
   {
-    var location = Canvas.SnapToInterval == modifierKeys.DoesNotContain(Keys.Control) ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
     var (hitObject, childObject, allowMove) = _objectUnderMouse?.OnMouseDown(e.Location, modifierKeys) ?? MouseDownResponse.Default;
 
     if (childObject == null)
@@ -46,9 +45,6 @@ public class RotationMode(Canvas canvas, CanvasLayer layer) : InteractionMode(ca
     else
     {
       _isRotating = true;
-
-      // Get the centroid for the object under mouse to use as rotation center
-      _rotationCentroid = _objectUnderMouse?.GetCentroid();
     }
 
     Layer.CanvasObjects.FindAll(o => o.IsSelected)?.Cast<object>().ToList()?.Also(o => Canvas.OnObjectsSelected(o));
@@ -69,10 +65,9 @@ public class RotationMode(Canvas canvas, CanvasLayer layer) : InteractionMode(ca
   public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
   {
     var location = Canvas.SnapToInterval == modifierKeys.DoesNotContain(Keys.Control) ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
-    _rotationCentroid = _objectUnderMouse?.GetCentroid() ?? _rotationCentroid;
-    TNTLogger.Info($"location: {location}, _isRotating: {_isRotating}, _rotationCentroid: {_rotationCentroid}");
+    var _rotationCentroid = _objectUnderMouse?.GetCentroid();
 
-    if (_isRotating && _objectUnderMouse != null && _rotationCentroid != null)
+    if (_isRotating && _objectUnderMouse is IRotatable rotatatble && _rotationCentroid != null)
     {
       // Calculate angle from the rotation center to the current mouse position
       double currentAngle = Math.Atan2(location.Y - _rotationCentroid.Value.Y, location.X - _rotationCentroid.Value.X);
@@ -87,7 +82,8 @@ public class RotationMode(Canvas canvas, CanvasLayer layer) : InteractionMode(ca
       // Apply rotation to the object
       if (Math.Abs(deltaDegrees) > 0.1) // Apply only if there's a significant change to avoid tiny adjustments
       {
-        _objectUnderMouse.RotationAngle = (_objectUnderMouse.RotationAngle + deltaDegrees) % 360;
+
+        rotatatble.RotateBy(deltaDegrees, modifierKeys);
         Canvas.Invalidate();
       }
     }
@@ -104,7 +100,6 @@ public class RotationMode(Canvas canvas, CanvasLayer layer) : InteractionMode(ca
   public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
   {
     _isRotating = false;
-    _rotationCentroid = null;
 
     Canvas.Invalidate();
     base.OnMouseUp(e, modifierKeys);
@@ -132,5 +127,14 @@ public class RotationMode(Canvas canvas, CanvasLayer layer) : InteractionMode(ca
         graphics.FillEllipse(brush, center.Value.X - radius, center.Value.Y - radius, radius * 2, radius * 2);
       }
     }
+  }
+
+  protected override void UpdateFeedback(Point location, Keys modifierKeys)
+  {
+    if (_objectUnderMouse is IRotatable)
+    {
+      base.UpdateFeedback(location, modifierKeys);
+    }
+    else { Canvas.OnFeedbackChanged(Feedback.Default); }
   }
 }

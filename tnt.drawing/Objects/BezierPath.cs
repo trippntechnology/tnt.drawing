@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows.Forms;
 using TNT.Commons;
 using TNT.Drawing.Extensions;
+using TNT.Drawing.Interface;
 using TNT.Drawing.Model;
 using TNT.Drawing.Resource;
 
@@ -15,7 +16,7 @@ namespace TNT.Drawing.Objects;
 /// <summary>
 /// Represents a line on the <see cref="Canvas"/>
 /// </summary>
-public class BezierPath() : CanvasObject()
+public class BezierPath : CanvasObject, IRotatable
 {
   private List<CanvasPoint> selectedPoints = new();
 
@@ -104,6 +105,18 @@ public class BezierPath() : CanvasObject()
     }
   }
 
+  public override bool IsSelected
+  {
+    get => base.IsSelected;
+    set
+    {
+      // Make sure all selected points are deselected when the path is unselected
+      selectedPoints.ForEach(p => p.IsSelected = false);
+      selectedPoints.Clear();
+      base.IsSelected = value;
+    }
+  }
+
   /// <summary>
   /// Copy constructor
   /// </summary>
@@ -113,6 +126,24 @@ public class BezierPath() : CanvasObject()
     LineColor = path.LineColor;
     FillColor = path.FillColor;
     LineStyle = path.LineStyle;
+  }
+
+  /// <summary>
+  /// Default constructor
+  /// </summary>
+  public BezierPath()
+  {
+    // Subscribe to base property changed event
+    base.OnPropertyChanged += (propertyName, value) =>
+    {
+      if (propertyName == nameof(RotationAngle) && value is double angle && Math.Abs(angle) > 0.0001)
+      {
+        RotateBy(angle, Keys.None);
+
+        // Reset the rotation angle to 0 after transformation
+        base.Set(0.0, nameof(RotationAngle));
+      }
+    };
   }
 
   /// <summary>
@@ -286,7 +317,6 @@ public class BezierPath() : CanvasObject()
         // Select all vertices
         selectedPoints.ForEach(v => v.IsSelected = false);
         selectedPoints.Clear();
-        //CanvasPoints.ForEach(point=> point.IsSelected = true);
         selectedPoints.AddRange(CanvasPoints.FindAll(p => p is Vertex));
       }
 

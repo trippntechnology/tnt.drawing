@@ -35,7 +35,7 @@ public abstract class InteractionMode(Canvas canvas, CanvasLayer layer) : Drawin
   /// <summary>
   /// Sets the Canvas cursor based on the object under mouse
   /// </summary>
-  protected void UpdateFeedback(Point location, Keys modifierKeys)
+  protected virtual void UpdateFeedback(Point location, Keys modifierKeys)
   {
     var feedback = _objectUnderMouse?.GetFeedback(location, modifierKeys) ?? Feedback.Default;
     Canvas.OnFeedbackChanged(feedback);
