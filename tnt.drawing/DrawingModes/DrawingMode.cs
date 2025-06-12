@@ -90,5 +90,5 @@ public class DrawingMode(Canvas canvas, CanvasLayer layer, CanvasObject? default
   /// <summary>
   /// Called to log to <see cref="Debug"/>
   /// </summary>
-  protected virtual void Log(string msg = "", [CallerMemberName] string callingMethod = "") => TNTLogger.Info(msg, callingMethod);
+  protected virtual void Log(string msg = "", [CallerMemberName] string callingMethod = "") { }// => TNTLogger.Info(msg, callingMethod);
 }

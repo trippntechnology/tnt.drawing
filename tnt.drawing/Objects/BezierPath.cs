@@ -289,6 +289,8 @@ public class BezierPath() : CanvasObject()
         //CanvasPoints.ForEach(point=> point.IsSelected = true);
         selectedPoints.AddRange(CanvasPoints.FindAll(p => p is Vertex));
       }
+
+      response = response with { InnerHitObject = hitPoint };
     }
 
     return response;
@@ -464,6 +466,44 @@ public class BezierPath() : CanvasObject()
     else
     {
       CanvasPoints.Select(p => p as Vertex).ToList().ForEach(v => v?.MoveBy(dx, dy, modifierKeys));
+    }
+  }
+
+  /// <summary>
+  /// Rotates the <see cref="BezierPath"/> by the specified angle in degrees around its centroid.
+  /// </summary>
+  /// <param name="dx">The rotation angle in degrees to apply.</param>
+  /// <param name="modifierKeys">Modifier keys pressed during the rotation operation.</param>
+  public void RotateBy(double dx, Keys modifierKeys)
+  {
+    // Get the centroid of the path to use as rotation center
+    var centroid = GetCentroid();
+    if (centroid == null || CanvasPoints.Count == 0)
+      return;
+
+    // Convert angle from degrees to radians
+    double radians = dx * Math.PI / 180.0;
+    int cx = centroid.Value.X;
+    int cy = centroid.Value.Y;
+
+    // Calculate rotation matrix values once
+    double cos = Math.Cos(radians);
+    double sin = Math.Sin(radians);
+
+    // Rotate each point around the centroid
+    foreach (var pt in CanvasPoints)
+    {
+      // Translate point to origin (relative to centroid)
+      int dx_point = pt.X - cx;
+      int dy_point = pt.Y - cy;
+
+      // Apply rotation
+      int rx = (int)Math.Round(dx_point * cos - dy_point * sin) + cx;
+      int ry = (int)Math.Round(dx_point * sin + dy_point * cos) + cy;
+
+      // Update point position
+      pt.X = rx;
+      pt.Y = ry;
     }
   }
 
