@@ -17,7 +17,7 @@ namespace TNT.Drawing.Objects;
 /// </summary>
 public class BezierPath() : CanvasObject()
 {
-  private List<CanvasPoint> moveablePoints = new();
+  private List<CanvasPoint> selectedPoints = new();
 
   /// <summary>
   /// Indicates the width of the <see cref="BezierPath"/>
@@ -219,22 +219,22 @@ public class BezierPath() : CanvasObject()
       {
         // Add vertex
         TryAddVertex(location);
-        moveablePoints.Clear();
-        moveablePoints.AddRange(CanvasPoints.FindAll(p => p is Vertex));
+        selectedPoints.Clear();
+        selectedPoints.AddRange(CanvasPoints.FindAll(p => p is Vertex));
         response = response with { AllowMove = false };
       }
       else if (hitPoint != null && modifierKeys.ContainsAll(Keys.Control, Keys.Shift))
       {
         // Delete vertex
         DeletePoint(hitPoint);
-        moveablePoints.Clear();
-        moveablePoints.AddRange(CanvasPoints.FindAll(p => p is Vertex));
+        selectedPoints.Clear();
+        selectedPoints.AddRange(CanvasPoints.FindAll(p => p is Vertex));
         response = response with { AllowMove = false };
       }
       else if (hitVertex != null && modifierKeys == Keys.Control)
       {
         // Unselect all points that aren't selected since Control key indicates that points are being selected
-        moveablePoints.FindAll(v => !v.IsSelected).ForEach(point => moveablePoints.Remove(point));
+        selectedPoints.FindAll(v => !v.IsSelected).ForEach(point => selectedPoints.Remove(point));
 
         var vertices = new List<Vertex>() { hitVertex };
         CanvasPoints.FindCoincident(hitVertex).Also(coincidentPoint =>
@@ -249,53 +249,46 @@ public class BezierPath() : CanvasObject()
         vertices.ForEach(v =>
         {
           v.IsSelected = !v.IsSelected;
-          if (v.IsSelected) moveablePoints.Add(v); else moveablePoints.Remove(v);
+          if (v.IsSelected) selectedPoints.Add(v); else selectedPoints.Remove(v);
         });
 
-        response = response with { ChildHitObject = hitVertex, AllowMove = false };
+        response = response with { InnerHitObject = hitVertex, AllowMove = false };
       }
       else if (hitCtrlPoint != null && modifierKeys.ContainsAll(Keys.Shift))
       {
-        moveablePoints.ForEach(v => v.IsSelected = false);
-        moveablePoints.Clear();
-        moveablePoints.Add(hitCtrlPoint);
+        selectedPoints.ForEach(v => v.IsSelected = false);
+        selectedPoints.Clear();
+        selectedPoints.Add(hitCtrlPoint);
       }
       else if (hitVertex != null && !hitVertex.IsSelected)
       {
-        moveablePoints.ForEach(v => v.IsSelected = false);
-        moveablePoints.Clear();
+        selectedPoints.ForEach(v => v.IsSelected = false);
+        selectedPoints.Clear();
         hitVertex.IsSelected = true;
-        moveablePoints.Add(hitVertex);
+        selectedPoints.Add(hitVertex);
         CanvasPoints.FindCoincident(hitVertex)?.Also(coincidentPoint =>
         {
           coincidentPoint.IsSelected = true;
-          moveablePoints.Add(coincidentPoint);
+          selectedPoints.Add(coincidentPoint);
         });
       }
-      else if (hitPoint != null && !moveablePoints.Contains(hitPoint))
+      else if (hitPoint != null && !selectedPoints.Contains(hitPoint))
       {
         // Select single vertex
-        moveablePoints.ForEach(v => v.IsSelected = false);
+        selectedPoints.ForEach(v => v.IsSelected = false);
         hitPoint.IsSelected = true;
-        moveablePoints.Clear();
-        moveablePoints.Add(hitPoint);
-        response = response with { ChildHitObject = hitPoint };
+        selectedPoints.Clear();
+        selectedPoints.Add(hitPoint);
+        response = response with { InnerHitObject = hitPoint };
       }
-      else if (hitPoint == null || !moveablePoints.Contains(hitPoint))
+      else if (hitPoint == null || !selectedPoints.Contains(hitPoint))
       {
         // Select all vertices
-        moveablePoints.ForEach(v => v.IsSelected = false);
-        moveablePoints.Clear();
+        selectedPoints.ForEach(v => v.IsSelected = false);
+        selectedPoints.Clear();
         //CanvasPoints.ForEach(point=> point.IsSelected = true);
-        moveablePoints.AddRange(CanvasPoints.FindAll(p => p is Vertex));
+        selectedPoints.AddRange(CanvasPoints.FindAll(p => p is Vertex));
       }
-    }
-    else
-    {
-      // Not selected, so select this BezierPath
-      moveablePoints.ForEach(v => v.IsSelected = false);
-      moveablePoints.Clear();
-      moveablePoints.AddRange(CanvasPoints.FindAll(p => p is Vertex));
     }
 
     return response;
@@ -462,7 +455,17 @@ public class BezierPath() : CanvasObject()
   /// <param name="dy">The vertical displacement.</param>  
   /// <param name="modifierKeys">Modifier keys pressed during the move operation.</param>  
   /// <param name="supressCallback">Indicates whether to suppress the callback during the move operation.</param>  
-  public override void MoveBy(int dx, int dy, Keys modifierKeys, bool supressCallback = false) => moveablePoints.ForEach(v => v.MoveBy(dx, dy, modifierKeys));
+  public override void MoveBy(int dx, int dy, Keys modifierKeys, bool supressCallback = false)
+  {
+    if (selectedPoints.Any())
+    {
+      selectedPoints.ForEach(v => v.MoveBy(dx, dy, modifierKeys));
+    }
+    else
+    {
+      CanvasPoints.Select(p => p as Vertex).ToList().ForEach(v => v?.MoveBy(dx, dy, modifierKeys));
+    }
+  }
 
   /// <summary>
   /// Aligns <see cref="BezierPath"/> to the <paramref name="alignInterval"/>

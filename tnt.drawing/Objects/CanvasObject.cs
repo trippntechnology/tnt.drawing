@@ -66,13 +66,16 @@ public abstract class CanvasObject : Observable
   /// <param name="location">The location of the mouse pointer.</param>  
   /// <param name="modifierKeys">The modifier keys pressed during the event.</param>  
   /// <returns>A <see cref="MouseDownResponse"/> object indicating the result of the mouse down event.</returns>  
-  public virtual MouseDownResponse OnMouseDown(Point location, Keys modifierKeys) => new MouseDownResponse();
+  public virtual MouseDownResponse OnMouseDown(Point location, Keys modifierKeys) => MouseDownResponse.Default;
 
   /// <summary>
-  /// Called when a button press event occurs over an object
+  /// Called when a mouse button is released over an object.
+  /// This method can be overridden to provide custom behavior when the mouse button is released.
   /// </summary>
-  /// <returns><see cref="CanvasObject"/> under mouse at the time of the button press</returns>
-  public virtual CanvasObject? OnMouseUp(Point location, Keys modifierKeys) => null;
+  /// <param name="location">The location of the mouse pointer.</param>
+  /// <param name="modifierKeys">The modifier keys pressed during the event.</param>
+  /// <returns>A <see cref="MouseUpResponse"/> object indicating the result of the mouse up event.</returns>
+  public virtual MouseUpResponse OnMouseUp(Point location, Keys modifierKeys) => MouseUpResponse.Default;
 
   /// <summary>
   /// Implement to return a <see cref="Feedback"/> indicating the <see cref="Cursor"/> and hint
