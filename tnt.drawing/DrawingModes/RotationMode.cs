@@ -109,14 +109,13 @@ public class RotationMode(Canvas canvas, CanvasLayer layer) : InteractionMode(ca
   {
     //Layer.CanvasObjects.FindAll(o => o.IsSelected).ForEach(o => o.Draw(graphics));
     base.OnDraw(graphics);
-
-    if (_objectUnderMouse?.IsSelected == true)
+    Layer.CanvasObjects.FirstOrDefault(o => o.IsSelected)?.Also(selectedObject =>
     {
       // Draw the selected object
-      _objectUnderMouse.Draw(graphics);
+      selectedObject.Draw(graphics);
 
       // Calculate the center of mass (centroid) for the object
-      Point? center = _objectUnderMouse.GetCentroid();
+      Point? center = selectedObject.GetCentroid();
 
       if (center == null) return;
 
@@ -126,7 +125,7 @@ public class RotationMode(Canvas canvas, CanvasLayer layer) : InteractionMode(ca
       {
         graphics.FillEllipse(brush, center.Value.X - radius, center.Value.Y - radius, radius * 2, radius * 2);
       }
-    }
+    });
   }
 
   protected override void UpdateFeedback(Point location, Keys modifierKeys)
