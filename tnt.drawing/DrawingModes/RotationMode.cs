@@ -3,7 +3,6 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using TNT.Commons;
-using TNT.Drawing.Extensions;
 using TNT.Drawing.Interface;
 using TNT.Drawing.Layers;
 using TNT.Drawing.Model;
@@ -56,7 +55,6 @@ public class RotationMode(Canvas canvas, CanvasLayer layer) : InteractionMode(ca
 
     base.OnMouseDown(e, modifierKeys);
   }
-
   /// <summary>
   /// Handles mouse movement: updates the object under the mouse and provides feedback.
   /// </summary>
@@ -64,26 +62,27 @@ public class RotationMode(Canvas canvas, CanvasLayer layer) : InteractionMode(ca
   /// <param name="modifierKeys">Current keyboard modifier keys</param>
   public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
   {
-    var location = Canvas.SnapToInterval == modifierKeys.DoesNotContain(Keys.Control) ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
-    var _rotationCentroid = _objectUnderMouse?.GetCentroid();
+    var location = e.Location;
+    var rotationCentroid = _objectUnderMouse?.GetCentroid();
 
-    if (_isRotating && _objectUnderMouse is IRotatable rotatatble && _rotationCentroid != null)
+    if (_isRotating && _objectUnderMouse is IRotatable rotatable && rotationCentroid != null)
     {
       // Calculate angle from the rotation center to the current mouse position
-      double currentAngle = Math.Atan2(location.Y - _rotationCentroid.Value.Y, location.X - _rotationCentroid.Value.X);
+      double currentAngle = Math.Atan2(location.Y - rotationCentroid.Value.Y, location.X - rotationCentroid.Value.X);
 
-      // Calculate the change in angle from the previous position
-      double previousAngle = Math.Atan2(_lastMouseLocation.Y - _rotationCentroid.Value.Y, _lastMouseLocation.X - _rotationCentroid.Value.X);
+      // Calculate the angle from the rotation center to the previous mouse position
+      double previousAngle = Math.Atan2(_lastMouseLocation.Y - rotationCentroid.Value.Y, _lastMouseLocation.X - rotationCentroid.Value.X);
+
+      // Calculate the change in angle (delta)
       double deltaAngle = currentAngle - previousAngle;
 
       // Convert radians to degrees
-      double deltaDegrees = deltaAngle * 180 / Math.PI;
+      double deltaDegrees = deltaAngle * 180.0 / Math.PI;
 
-      // Apply rotation to the object
-      if (Math.Abs(deltaDegrees) > 0.1) // Apply only if there's a significant change to avoid tiny adjustments
+      // Apply rotation to the object if there's a significant change
+      if (Math.Abs(deltaDegrees) > 0.1)
       {
-
-        rotatatble.RotateBy(deltaDegrees, modifierKeys);
+        rotatable.RotateBy(deltaDegrees, modifierKeys);
         Canvas.Invalidate();
       }
     }
@@ -107,8 +106,8 @@ public class RotationMode(Canvas canvas, CanvasLayer layer) : InteractionMode(ca
 
   public override void OnDraw(Graphics graphics)
   {
-    //Layer.CanvasObjects.FindAll(o => o.IsSelected).ForEach(o => o.Draw(graphics));
     base.OnDraw(graphics);
+
     Layer.CanvasObjects.FirstOrDefault(o => o.IsSelected)?.Also(selectedObject =>
     {
       // Draw the selected object
