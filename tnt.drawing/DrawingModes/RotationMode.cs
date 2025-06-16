@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 using TNT.Commons;
 using TNT.Drawing.Interface;
 using TNT.Drawing.Layers;
 using TNT.Drawing.Model;
+using TNT.Drawing.Resource;
 
 namespace TNT.Drawing.DrawingModes;
 
@@ -21,6 +23,9 @@ public class RotationMode(Canvas canvas, CanvasLayer layer) : InteractionMode(ca
 {
   // Fields for rotation interaction
   private bool _isRotating = false;
+  
+  // Track current rotation angle for the icon
+  private double _currentRotationAngle = 0;
 
   /// <summary>
   /// Handles mouse down event: starts rotation if a Vertex is under the mouse.
@@ -83,6 +88,10 @@ public class RotationMode(Canvas canvas, CanvasLayer layer) : InteractionMode(ca
       if (Math.Abs(deltaDegrees) > 0.1)
       {
         rotatable.RotateBy(deltaDegrees, modifierKeys);
+        
+        // Update the current rotation angle for the icon
+        _currentRotationAngle += deltaDegrees;
+        
         Canvas.Invalidate();
       }
     }
@@ -118,11 +127,29 @@ public class RotationMode(Canvas canvas, CanvasLayer layer) : InteractionMode(ca
 
       if (center == null) return;
 
-      // Draw a filled circle at the center
-      const float radius = 6f;
-      using (var brush = new SolidBrush(Color.Red))
+      // Get the rotation icon
+      var rotateImage = Resources.Images.Rotate24;
+      
+      // Create a graphics state to apply the rotation transform
+      GraphicsState state = graphics.Save();
+      
+      try
       {
-        graphics.FillEllipse(brush, center.Value.X - radius, center.Value.Y - radius, radius * 2, radius * 2);
+        // Set up the transform for rotation
+        graphics.TranslateTransform(center.Value.X, center.Value.Y);
+        graphics.RotateTransform((float)_currentRotationAngle);
+        
+        // Draw the rotated image centered at the origin (which is now the centroid)
+        graphics.DrawImage(rotateImage, 
+            -rotateImage.Width / 2, 
+            -rotateImage.Height / 2, 
+            rotateImage.Width, 
+            rotateImage.Height);
+      }
+      finally
+      {
+        // Restore the original graphics state
+        graphics.Restore(state);
       }
     });
   }

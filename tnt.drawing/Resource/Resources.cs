@@ -24,6 +24,21 @@ public static class Resources
     /// <see cref="Vertex"/> <see cref="Image"/>
     /// </summary>
     public static Image Vertex { get; } = ResourceToImage("TNT.Drawing.Resource.Image.Vertex.png");
+
+    /// <summary>
+    /// Extra small Rotate icon <see cref="Image"/> (16x16)
+    /// </summary>
+    public static Image Rotate16 { get; } = ResourceToImage("TNT.Drawing.Resource.Image.Rotate_16.png");
+
+    /// <summary>
+    /// Small Rotate icon <see cref="Image"/> (24x24)
+    /// </summary>
+    public static Image Rotate24 { get; } = ResourceToImage("TNT.Drawing.Resource.Image.Rotate_24.png");
+
+    /// <summary>
+    /// Large Rotate icon <see cref="Image"/> (48x48)
+    /// </summary>
+    public static Image Rotate48 { get; } = ResourceToImage("TNT.Drawing.Resource.Image.Rotate_48.png");
   }
 
   /// <summary>

@@ -15,6 +15,9 @@
     <None Remove="Resource\Cursor\MovePoint.cur" />
     <None Remove="Resource\Cursor\RemovePoint.cur" />
     <None Remove="Resource\Image\ControlPoint.png" />
+    <None Remove="Resource\Image\Rotate_16.png" />
+    <None Remove="Resource\Image\Rotate_24.png" />
+    <None Remove="Resource\Image\Rotate_48.png" />
     <None Remove="Resource\Image\Vertex.png" />
   </ItemGroup>
 
@@ -25,6 +28,9 @@
     <EmbeddedResource Include="Resource\Cursor\MovePoint.cur" />
     <EmbeddedResource Include="Resource\Cursor\RemovePoint.cur" />
     <EmbeddedResource Include="Resource\Image\ControlPoint.png" />
+    <EmbeddedResource Include="Resource\Image\Rotate_16.png" />
+    <EmbeddedResource Include="Resource\Image\Rotate_24.png" />
+    <EmbeddedResource Include="Resource\Image\Rotate_48.png" />
     <EmbeddedResource Include="Resource\Image\Vertex.png" />
   </ItemGroup>
 
