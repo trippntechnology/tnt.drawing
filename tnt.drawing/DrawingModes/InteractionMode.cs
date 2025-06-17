@@ -30,8 +30,6 @@ public abstract class InteractionMode(Canvas canvas, CanvasLayer layer) : Drawin
   /// </summary>
   protected Point _lastMouseLocation = Point.Empty;
 
-  protected List<CanvasObject> _selectedObjects = new List<CanvasObject>();
-
   /// <summary>
   /// Sets the Canvas cursor based on the object under mouse
   /// </summary>
@@ -92,7 +90,8 @@ public abstract class InteractionMode(Canvas canvas, CanvasLayer layer) : Drawin
   /// </summary>
   protected virtual CanvasObject? FindObjectAt(List<CanvasObject> objs, Point mouseLocation, Keys modifierKeys)
   {
-    return _selectedObjects.FirstOrDefault(o => o.MouseOver(mouseLocation, modifierKeys).HitObject != null) ??
+    var selectedObjects = objs.FindAll(o => o.IsSelected);
+    return selectedObjects.FirstOrDefault(o => o.MouseOver(mouseLocation, modifierKeys).HitObject != null) ??
       objs.LastOrDefault(o => o.MouseOver(mouseLocation, modifierKeys).HitObject != null);
   }
 }
