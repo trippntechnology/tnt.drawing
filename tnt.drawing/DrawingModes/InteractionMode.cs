@@ -63,14 +63,14 @@ public abstract class InteractionMode(Canvas canvas, CanvasLayer layer) : Drawin
   public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
   {
     // Update the saved mouse location
-    var location = Canvas.SnapToInterval == modifierKeys.DoesNotContain(Keys.Control) ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
+    var location = Canvas.SnapToInterval && modifierKeys.DoesNotContain(Keys.Control) ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
     _lastMouseLocation = location;
 
     if (!IsMouseDown)
     {
       // Update object under mouse when not dragging
-      _objectUnderMouse = FindObjectAt(Layer.CanvasObjects, location, modifierKeys);
-      UpdateFeedback(location, modifierKeys);
+      _objectUnderMouse = FindObjectAt(Layer.CanvasObjects, e.Location, modifierKeys);
+      UpdateFeedback(e.Location, modifierKeys);
     }
 
     base.OnMouseMove(e, modifierKeys);
