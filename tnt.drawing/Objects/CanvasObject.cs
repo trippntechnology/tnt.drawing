@@ -96,4 +96,18 @@ public abstract class CanvasObject : Observable
   /// Returns null if the centroid is not defined for this object.
   /// </summary>
   public virtual Point? GetCentroid() => null;
+
+  /// <summary>
+  /// Determines whether the specified object is equal to the current <see cref="CanvasObject"/>.
+  /// Two <see cref="CanvasObject"/> instances are considered equal if their <see cref="Id"/> properties are equal.
+  /// </summary>
+  /// <param name="obj">The object to compare with the current object.</param>
+  /// <returns><c>true</c> if the specified object is a <see cref="CanvasObject"/> with the same <see cref="Id"/>; otherwise, <c>false</c>.</returns>
+  public override bool Equals(object? obj) => obj is CanvasObject canvasObject && Id == canvasObject.Id;
+
+  /// <summary>
+  /// Returns a hash code for this <see cref="CanvasObject"/> based on its <see cref="Id"/> property.
+  /// </summary>
+  /// <returns>A hash code for the current object.</returns>
+  public override int GetHashCode() => Id.GetHashCode();
 }

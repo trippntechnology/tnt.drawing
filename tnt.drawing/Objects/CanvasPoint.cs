@@ -113,21 +113,24 @@ public class CanvasPoint() : CanvasObject
   }
 
   /// <summary>
-  /// Equal operator
+  /// Determines whether the specified object is equal to the current <see cref="CanvasPoint"/>.
+  /// Two <see cref="CanvasPoint"/> instances are considered equal if their base <see cref="CanvasObject"/> is equal and their X and Y coordinates are equal.
   /// </summary>
-  /// <returns>True if equal, false if otherwise</returns>
-  public override bool Equals(object? obj) => obj is CanvasPoint point && Id == point.Id;
+  /// <param name="obj">The object to compare with the current object.</param>
+  /// <returns><c>true</c> if the specified object is a <see cref="CanvasPoint"/> with the same Id, X, and Y; otherwise, <c>false</c>.</returns>
+  public override bool Equals(object? obj)
+  {
+    if (ReferenceEquals(this, obj)) return true;
+    if (obj is not CanvasPoint other) return false;
+    if (!base.Equals(obj)) return false;
+    return X == other.X && Y == other.Y;
+  }
 
   /// <summary>
-  /// Hashcode
+  /// Returns a hash code for this <see cref="CanvasPoint"/> based on its <see cref="Id"/>, <see cref="X"/>, and <see cref="Y"/> properties.
   /// </summary>
-  /// <returns>Hashcode for this <see cref="CanvasPoint"/></returns>
-  public override int GetHashCode()
-  {
-    int hashCode = 1861411795;
-    hashCode = hashCode * -1521134295 + Id.GetHashCode();
-    return hashCode;
-  }
+  /// <returns>A hash code for the current object.</returns>
+  public override int GetHashCode() => HashCode.Combine(Id, X, Y);
 
   override public string ToString() => $"{base.ToString()} [{X}, {Y}]";
 
