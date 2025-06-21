@@ -78,8 +78,7 @@ public partial class Form1 : Form
     var modes = new List<DrawingMode> {
       new SelectMode(canvas, objectsLayer),
       new LineMode(canvas, objectsLayer, new BezierPath()),
-      new SquareMode(canvas, objectsLayer, new BezierPath()),
-      new RotationMode(canvas, objectsLayer),
+      new SquareMode(canvas, objectsLayer, new BezierPath())
     };
 
     modes.ForEach(mode =>

@@ -70,6 +70,11 @@ public static class Resources
     /// <see cref="Cursor"/> that represents an Remove Point action
     /// </summary>
     public static Cursor RemovePoint { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.RemovePoint.cur");
+
+    /// <summary>
+    /// <see cref="Cursor"/> that represents a Rotate action
+    /// </summary>
+    public static Cursor Rotate { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Rotate.cur");
   }
 
   /// <summary>

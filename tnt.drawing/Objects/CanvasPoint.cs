@@ -12,7 +12,7 @@ namespace TNT.Drawing.Objects;
 /// </summary>
 public class CanvasPoint() : CanvasObject
 {
-  protected const int POINT_DIAMETER = 8;
+  protected const int POINT_DIAMETER = 10;
 
   /// <summary>
   /// <see cref="Action{CanvasPoint, Int, Int, Keys}"/> delegate that is called when the <see cref="CanvasPoint"/>

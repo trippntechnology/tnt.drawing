@@ -14,6 +14,7 @@
     <None Remove="Resource\Cursor\Curve.cur" />
     <None Remove="Resource\Cursor\MovePoint.cur" />
     <None Remove="Resource\Cursor\RemovePoint.cur" />
+    <None Remove="Resource\Cursor\Rotate.cur" />
     <None Remove="Resource\Image\ControlPoint.png" />
     <None Remove="Resource\Image\Rotate_16.png" />
     <None Remove="Resource\Image\Rotate_24.png" />
@@ -27,6 +28,7 @@
     <EmbeddedResource Include="Resource\Cursor\Curve.cur" />
     <EmbeddedResource Include="Resource\Cursor\MovePoint.cur" />
     <EmbeddedResource Include="Resource\Cursor\RemovePoint.cur" />
+    <EmbeddedResource Include="Resource\Cursor\Rotate.cur" />
     <EmbeddedResource Include="Resource\Image\ControlPoint.png" />
     <EmbeddedResource Include="Resource\Image\Rotate_16.png" />
     <EmbeddedResource Include="Resource\Image\Rotate_24.png" />

@@ -8,7 +8,9 @@ using TNT.Drawing.Extensions;
 using TNT.Drawing.Interface;
 using TNT.Drawing.Layers;
 using TNT.Drawing.Model;
+using TNT.Drawing.Objects;
 using TNT.Drawing.Resource;
+using static TNT.Drawing.Resource.Resources.Cursors;
 
 namespace TNT.Drawing.DrawingModes;
 
@@ -27,12 +29,41 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : InteractionMode(canv
   private Rectangle _rotationHandleRect = Rectangle.Empty;
   private Point? _rotationCenter = null;
 
+  private Centroid _centroid = new Centroid(0, 0);
+
+  // Flag to indicate if rotation selection mode is active
+  private bool _rotationSelectionMode = false;
+
   // Track current rotation angle for the icon
   private double _currentRotationAngle = 0;
 
-  // Constants for rotation handle appearance
-  private const int CentroidDotSize = 4; // Size of dot at centroid point
+  // Track if we need to toggle rotation mode when mouse is released
+  private bool _clickedRotationHandle = false;
+
   private const int RotationHandleHitArea = 20; // Size of the hit area for the rotation handle
+
+  /// <summary>
+  /// Gets or sets whether rotation selection mode is active.
+  /// When active, dragging any vertex will rotate the object around its centroid.
+  /// </summary>
+  public bool RotationSelectionMode
+  {
+    get => _rotationSelectionMode;
+    set
+    {
+      _rotationSelectionMode = value;
+    }
+  }
+
+  /// <summary>
+  /// Toggles the rotation selection mode on/off
+  /// </summary>
+  /// <returns>The new state of the rotation selection mode</returns>
+  public bool ToggleRotationSelectionMode()
+  {
+    RotationSelectionMode = !RotationSelectionMode;
+    return RotationSelectionMode;
+  }
 
   /// <summary>
   /// Determines if a point is over the rotation handle
@@ -45,35 +76,72 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : InteractionMode(canv
   }
 
   /// <summary>
+  /// Determines if a point is near any vertex of the selected object
+  /// </summary>
+  /// <param name="point">The point to check</param>
+  /// <returns>True if the point is near a vertex, false otherwise</returns>
+  private bool IsPointNearVertex(Point point)
+  {
+    if (!_rotationSelectionMode)
+      return false;
+
+    var selectedObject = Layer.CanvasObjects.FirstOrDefault(o => o.IsSelected);
+    if (selectedObject == null)
+      return false;
+
+    // Use MouseOver to detect if we're near a vertex/handle
+    var response = selectedObject.MouseOver(point, Keys.None);
+
+    // Check if it's interacting with a child object (vertex or handle)
+    return response.HitObject != null;
+  }
+
+  /// <summary>
   /// Handles mouse down event for selection
   /// </summary>
   public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
   {
     // Get the current selected objects before anything changes
     var previouslySelectedObjects = Layer.CanvasObjects.FindAll(o => o.IsSelected);
-    
+
     // Handling rotation takes precedence over other operations
     if (IsPointOverRotationHandle(e.Location))
     {
-      _isRotatingObject = true;
-      _allowMove = false;
+      // Set flag to indicate we clicked the rotation handle
+      _clickedRotationHandle = true;
 
-      // Store rotation center point for calculations
+      // Store rotation center for potential rotation operations
       var selectedObjects = Layer.CanvasObjects.FindAll(o => o.IsSelected);
       if (selectedObjects.Count == 1)
       {
         _rotationCenter = selectedObjects[0].GetCentroid();
       }
 
-      // Important: Do not return early, allow the base class to handle mouse down
+      // Only enter rotating mode if we're not trying to toggle the rotation mode
+      // Otherwise, we'll toggle the mode on mouse up instead
+      _isRotatingObject = true;
+      _allowMove = false;
     }
     else
     {
+      // Reset clicked rotation handle flag
+      _clickedRotationHandle = false;
+
       // Normal selection handling
       var (hitObject, childObject, allowMove) = _objectUnderMouse?.OnMouseDown(e.Location, modifierKeys) ?? MouseDownResponse.Default;
 
-      _allowMove = allowMove;
-      _isRotatingObject = false;
+      // In rotation selection mode, if we clicked a vertex, start rotation
+      if (_rotationSelectionMode && childObject != null && _objectUnderMouse?.IsSelected == true)
+      {
+        _isRotatingObject = true;
+        _allowMove = false;
+        _rotationCenter = _objectUnderMouse.GetCentroid();
+      }
+      else
+      {
+        _allowMove = allowMove;
+        _isRotatingObject = false;
+      }
 
       if (childObject == null)
       {
@@ -94,13 +162,13 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : InteractionMode(canv
 
       // Get the newly selected objects
       var nowSelectedObjects = Layer.CanvasObjects.FindAll(o => o.IsSelected);
-      
+
       // Reset rotation angle if the selection has changed - either different objects
       // or different count of objects
-      bool selectionChanged = 
-          previouslySelectedObjects.Count != nowSelectedObjects.Count || 
+      bool selectionChanged =
+          previouslySelectedObjects.Count != nowSelectedObjects.Count ||
           !previouslySelectedObjects.All(o => nowSelectedObjects.Contains(o));
-      
+
       if (selectionChanged)
       {
         _currentRotationAngle = 0;
@@ -130,46 +198,48 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : InteractionMode(canv
   {
     var location = Canvas.SnapToInterval == modifierKeys.DoesNotContain(Keys.Control) ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
 
-    // Handle rotation if we're in rotation mode
-    if (IsMouseDown && _isRotatingObject && _rotationCenter.HasValue)
+    if (IsMouseDown)
     {
-      var selectedObject = Layer.CanvasObjects.FindAll(o => o.IsSelected).FirstOrDefault();
-
-      if (selectedObject is IRotatable rotatable)
+      // Handle rotation if we're in rotation mode
+      if (_isRotatingObject && _rotationCenter.HasValue)
       {
-        Point center = _rotationCenter.Value;
+        var selectedObject = Layer.CanvasObjects.FindAll(o => o.IsSelected).FirstOrDefault();
 
-        // Calculate angle from the rotation center to the current mouse position
-        double currentAngle = Math.Atan2(location.Y - center.Y, location.X - center.X);
-
-        // Calculate the angle from the rotation center to the previous mouse position
-        double previousAngle = Math.Atan2(_lastMouseLocation.Y - center.Y, _lastMouseLocation.X - center.X);
-
-        // Calculate the change in angle (delta)
-        double deltaAngle = currentAngle - previousAngle;
-
-        // Convert radians to degrees
-        double deltaDegrees = deltaAngle * 180.0 / Math.PI;
-
-        // Apply rotation to the object if there's a significant change
-        if (Math.Abs(deltaDegrees) > 0.1)
+        if (selectedObject is IRotatable rotatable)
         {
-          rotatable.RotateBy(deltaDegrees, modifierKeys);
+          Point center = _rotationCenter.Value;
 
-          // Update the current rotation angle for the icon
-          _currentRotationAngle += deltaDegrees;
+          // Calculate angle from the rotation center to the current mouse position
+          double currentAngle = Math.Atan2(location.Y - center.Y, location.X - center.X);
 
-          Canvas.Invalidate();
+          // Calculate the angle from the rotation center to the previous mouse position
+          double previousAngle = Math.Atan2(_lastMouseLocation.Y - center.Y, _lastMouseLocation.X - center.X);
+
+          // Calculate the change in angle (delta)
+          double deltaAngle = currentAngle - previousAngle;
+
+          // Convert radians to degrees
+          double deltaDegrees = deltaAngle * 180.0 / Math.PI;
+
+          // Apply rotation to the object if there's a significant change
+          if (Math.Abs(deltaDegrees) > 0.1)
+          {
+            rotatable.RotateBy(deltaDegrees, modifierKeys);
+
+            // Update the current rotation angle for the icon
+            _currentRotationAngle += deltaDegrees;
+          }
         }
       }
-    }
-    // Regular object movement
-    else if (IsMouseDown && _allowMove)
-    {
-      var dx = location.X - _lastMouseLocation.X;
-      var dy = location.Y - _lastMouseLocation.Y;
+      // Regular object movement
+      else if (_allowMove)
+      {
+        var dx = location.X - _lastMouseLocation.X;
+        var dy = location.Y - _lastMouseLocation.Y;
 
-      Layer.CanvasObjects.FindAll(o => o.IsSelected).ForEach(o => o.MoveBy(dx, dy, modifierKeys));
+        Layer.CanvasObjects.FindAll(o => o.IsSelected).ForEach(o => o.MoveBy(dx, dy, modifierKeys));
+      }
+
       Canvas.Invalidate();
     }
 
@@ -183,6 +253,15 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : InteractionMode(canv
   /// <param name="modifierKeys">Current keyboard modifier keys being pressed</param>
   public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
   {
+    // If mouse up is over the rotation handle and we originally clicked on it,
+    // toggle the rotation mode
+    if (_clickedRotationHandle && IsPointOverRotationHandle(e.Location))
+    {
+      ToggleRotationSelectionMode();
+    }
+
+    // Reset rotation and movement flags
+    _clickedRotationHandle = false;
     _isRotatingObject = false;
     _rotationCenter = null;
 
@@ -230,15 +309,18 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : InteractionMode(canv
         graphics.TranslateTransform(center.Value.X, center.Value.Y);
         graphics.RotateTransform((float)_currentRotationAngle);
 
+        // Change background color when in rotation selection mode
+        Color bgColor = _rotationSelectionMode ? Color.FromArgb(220, Color.LightGreen) : (_isRotatingObject ? Color.FromArgb(220, Color.LightBlue) : Color.FromArgb(220, Color.White));
+
         // Draw background circle for the handle (for better visibility)
-        using (SolidBrush circleBrush = new SolidBrush(_isRotatingObject ? Color.FromArgb(220, Color.LightBlue) : Color.FromArgb(220, Color.White)))
-        {
-          int circleSize = rotateImage.Width + 6; // Larger background circle
-          graphics.FillEllipse(circleBrush, -circleSize / 2, -circleSize / 2, circleSize, circleSize);
-        }
+        //using (SolidBrush circleBrush = new SolidBrush(bgColor))
+        //{
+        //  int circleSize = rotateImage.Width + 6; // Larger background circle
+        //  graphics.FillEllipse(circleBrush, -circleSize / 2, -circleSize / 2, circleSize, circleSize);
+        //}
 
         // Draw the rotated image centered at the origin (which is now the centroid)
-        graphics.DrawImage(rotateImage, -rotateImage.Width / 2, -rotateImage.Height / 2, rotateImage.Width, rotateImage.Height);
+        //graphics.DrawImage(rotateImage, -rotateImage.Width / 2, -rotateImage.Height / 2, rotateImage.Width, rotateImage.Height);
       }
       finally
       {
@@ -252,6 +334,13 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : InteractionMode(canv
       _rotationHandleRect = Rectangle.Empty;
     }
 
+    selectedObjects.FirstOrDefault()?.GetCentroid()?.Also(center =>
+    {
+      _centroid.MoveTo(center, Keys.None);
+      _centroid.IsSelected = _rotationSelectionMode;
+      _centroid.Draw(graphics);
+    });
+
     base.OnDraw(graphics);
   }
 
@@ -263,7 +352,17 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : InteractionMode(canv
     // Change cursor to rotation cursor when over the rotation handle
     if (IsPointOverRotationHandle(location))
     {
-      Canvas.OnFeedbackChanged(new Feedback(Cursors.Hand, "Click and drag to rotate object"));
+      string message = _rotationSelectionMode ?
+          "Click to toggle rotation mode off" :
+          "Click to toggle rotation mode on";
+      Canvas.OnFeedbackChanged(new Feedback(Cursors.Hand, message));
+      return;
+    }
+
+    // Change cursor to rotation cursor when near a vertex in rotation mode
+    if (_rotationSelectionMode && IsPointNearVertex(location))
+    {
+      Canvas.OnFeedbackChanged(new Feedback(TNT.Drawing.Resource.Resources.Cursors.Rotate, "Drag to rotate object around centroid"));
       return;
     }
 
