@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -10,7 +11,6 @@ using TNT.Drawing.Layers;
 using TNT.Drawing.Model;
 using TNT.Drawing.Objects;
 using TNT.Drawing.Resource;
-using static TNT.Drawing.Resource.Resources.Cursors;
 
 namespace TNT.Drawing.DrawingModes;
 
@@ -22,7 +22,7 @@ namespace TNT.Drawing.DrawingModes;
 /// </remarks>
 /// <param name="canvas">The canvas to interact with</param>
 /// <param name="layer">The canvas layer containing objects</param>
-public class SelectMode(Canvas canvas, CanvasLayer layer) : InteractionMode(canvas, layer)
+public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, layer)
 {
   private bool _allowMove = false;
   private bool _isRotatingObject = false;
@@ -30,6 +30,9 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : InteractionMode(canv
   private Point? _rotationCenter = null;
 
   private Centroid _centroid = new Centroid(0, 0);
+
+  protected CanvasObject? _objectUnderMouse = null;
+  protected Point _lastMouseLocation = Point.Empty;
 
   // Flag to indicate if rotation selection mode is active
   private bool _rotationSelectionMode = false;
@@ -243,7 +246,23 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : InteractionMode(canv
       Canvas.Invalidate();
     }
 
+    // Update the saved mouse location
+    _lastMouseLocation = location;
+
+    if (!IsMouseDown)
+    {
+      // Update object under mouse when not dragging
+      _objectUnderMouse = FindObjectAt(Layer.CanvasObjects, e.Location, modifierKeys);
+      UpdateFeedback(e.Location, modifierKeys);
+    }
+
     base.OnMouseMove(e, modifierKeys);
+  }
+  protected virtual CanvasObject? FindObjectAt(List<CanvasObject> objs, Point mouseLocation, Keys modifierKeys)
+  {
+    var selectedObjects = objs.FindAll(o => o.IsSelected);
+    return selectedObjects.FirstOrDefault(o => o.MouseOver(mouseLocation, modifierKeys).HitObject != null) ??
+      objs.LastOrDefault(o => o.MouseOver(mouseLocation, modifierKeys).HitObject != null);
   }
 
   /// <summary>
@@ -347,7 +366,7 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : InteractionMode(canv
   /// <summary>
   /// Updates feedback cursor and tooltip based on what's under the mouse
   /// </summary>
-  protected override void UpdateFeedback(Point location, Keys modifierKeys)
+  protected void UpdateFeedback(Point location, Keys modifierKeys)
   {
     // Change cursor to rotation cursor when over the rotation handle
     if (IsPointOverRotationHandle(location))
@@ -367,6 +386,7 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : InteractionMode(canv
     }
 
     // Default behavior for other areas
-    base.UpdateFeedback(location, modifierKeys);
+    var feedback = _objectUnderMouse?.GetFeedback(location, modifierKeys) ?? Feedback.Default;
+    Canvas.OnFeedbackChanged(feedback);
   }
 }
