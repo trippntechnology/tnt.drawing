@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using TNT.Drawing.Extensions;
 
 namespace TNT.Drawing.Objects
@@ -37,15 +38,28 @@ namespace TNT.Drawing.Objects
     public ControlPoint(ControlPoint controlPoint) : base(controlPoint) { }
 
     /// <summary>
+    /// Gets the <see cref="GraphicsPath"/> representing the shape of this <see cref="ControlPoint"/>.
+    /// Returns a rectangle path.
+    /// </summary>
+    protected override GraphicsPath Path
+    {
+      get
+      {
+        var center = new Point(POINT_DIAMETER / 2, POINT_DIAMETER / 2);
+        var topLeftPoint = ToPoint.Subtract(center);
+        var path = new GraphicsPath();
+        path.AddRectangle(new Rectangle(topLeftPoint.X, topLeftPoint.Y, POINT_DIAMETER, POINT_DIAMETER));
+        return path;
+      }
+    }
+
+    /// <summary>
     /// Draws the <see cref="ControlPoint"/> if <see cref="Visible"/>
     /// </summary>
     public override void Draw(Graphics graphics)
     {
       if (!Visible) return;
-      var center = new Point(POINT_DIAMETER / 2, POINT_DIAMETER / 2);
-      var topLeftPoint = ToPoint.Subtract(center);
-      var bottomRightPoint = ToPoint.Add(center);
-      graphics.DrawRectangle(new Pen(Color.Black, 1), topLeftPoint.X, topLeftPoint.Y, POINT_DIAMETER, POINT_DIAMETER);
+      graphics.DrawPath(OUTLINE_PEN, Path);
     }
 
     /// <summary>

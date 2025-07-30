@@ -1,5 +1,7 @@
 ﻿using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
+using TNT.Commons;
 using TNT.Drawing.Extensions;
 using TNT.Drawing.Layers;
 using TNT.Drawing.Objects;
@@ -25,12 +27,18 @@ public class LineMode(Canvas canvas, CanvasLayer layer, BezierPath defaultObject
   public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
   {
     var location = Canvas.SnapToInterval ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
+    var isClosed = false;
 
     // Add a new vertex at the mouse location
     vertices.Add(new Vertex(location));
 
+    vertices.Select(v => v as CanvasPoint).ToList().Also(canvasPoints =>
+    {
+      canvasPoints.FirstOrDefault()?.Also(first => canvasPoints.FindCoincident(first)?.Also(_ => isClosed = true));
+    });
+
     // If CTRL is held, finish the line
-    if (modifierKeys == Keys.Control && vertices.Count > 1)
+    if (isClosed || modifierKeys == Keys.Control && vertices.Count > 1)
     {
       if (vertices.Count > 1)
       {
@@ -48,7 +56,6 @@ public class LineMode(Canvas canvas, CanvasLayer layer, BezierPath defaultObject
     Canvas.Invalidate();
 
     base.OnMouseUp(e, modifierKeys);
-
   }
 
   public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)

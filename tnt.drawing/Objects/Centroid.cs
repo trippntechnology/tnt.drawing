@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using TNT.Drawing.Extensions;
 
 namespace TNT.Drawing.Objects;
@@ -41,14 +42,38 @@ public class Centroid : Vertex
   public override CanvasObject Clone() => new Centroid(this);
 
   /// <summary>
+  /// Gets the <see cref="GraphicsPath"/> representing the shape of this <see cref="Centroid"/> (circle and crosshairs).
+  /// </summary>
+  protected override GraphicsPath Path
+  {
+    get
+    {
+      var center = new Point(POINT_DIAMETER / 2, POINT_DIAMETER / 2);
+      var topLeftPoint = ToPoint.Subtract(center);
+      var circleRect = new Rectangle(topLeftPoint.X, topLeftPoint.Y, POINT_DIAMETER, POINT_DIAMETER);
+      var path = new GraphicsPath();
+      // Add circle
+      path.AddEllipse(circleRect);
+      // Add crosshairs
+      int cx = ToPoint.X;
+      int cy = ToPoint.Y;
+      int r = POINT_DIAMETER / 2;
+      // Horizontal line
+      path.StartFigure();
+      path.AddLine(cx - r, cy, cx + r, cy);
+      // Vertical line
+      path.StartFigure();
+      path.AddLine(cx, cy - r, cx, cy + r);
+      return path;
+    }
+  }
+
+  /// <summary>
   /// Draws the centroid as a transparent outlined circle with cross hairs.
   /// </summary>
   public override void Draw(Graphics graphics)
   {
     if (!Visible) return;
-    var center = new Point(POINT_DIAMETER / 2, POINT_DIAMETER / 2);
-    var topLeftPoint = ToPoint.Subtract(center); // Uses PointExt.Subtract
-    var circleRect = new Rectangle(topLeftPoint.X, topLeftPoint.Y, POINT_DIAMETER, POINT_DIAMETER);
 
     // Use a distinct color and thickness if selected
     Color outlineColor = IsSelected ? Color.OrangeRed : OutlineColor;
@@ -56,22 +81,9 @@ public class Centroid : Vertex
     Color crosshairColor = IsSelected ? Color.OrangeRed : CrosshairColor;
     float crosshairWidth = IsSelected ? 2f : 1f;
 
-    // Draw transparent outlined circle
     using (var pen = new Pen(outlineColor, outlineWidth))
     {
-      graphics.DrawEllipse(pen, circleRect);
-    }
-
-    // Draw cross hairs
-    int cx = ToPoint.X;
-    int cy = ToPoint.Y;
-    int r = POINT_DIAMETER / 2;
-    using (var pen = new Pen(crosshairColor, crosshairWidth))
-    {
-      // Horizontal line
-      graphics.DrawLine(pen, cx - r, cy, cx + r, cy);
-      // Vertical line
-      graphics.DrawLine(pen, cx, cy - r, cx, cy + r);
+      graphics.DrawPath(pen, Path);
     }
   }
 }

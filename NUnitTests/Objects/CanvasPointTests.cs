@@ -26,7 +26,7 @@ public class CanvasPointTests
   public void IsNear_ReturnsFalse_WhenPointsOutsideDefaultThreshold()
   {
     var p1 = new CanvasPoint(0, 0);
-    var p2 = new CanvasPoint(9, 0); // distance = 9 > 8
+    var p2 = new CanvasPoint(11, 0); // distance = 11 > 10
     Assert.That(p1.IsNear(p2), Is.False, "IsNear should return false when points are outside default threshold.");
   }
 

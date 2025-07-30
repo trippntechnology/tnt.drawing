@@ -87,6 +87,8 @@ public static class ListExt
   /// <returns>The coincident <see cref="Vertex"/> at the opposite end, or <c>null</c> if not found or not first/last.</returns>
   public static CanvasPoint? FindCoincident(this List<CanvasPoint> points, CanvasPoint point, int threshold = 8)
   {
+    if (points.Count < 3) return null;
+
     if (points.IsFirst(point))
     {
       //var last = points.LastOrDefault();

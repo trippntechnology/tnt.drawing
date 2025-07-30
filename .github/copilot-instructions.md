@@ -1,178 +1,146 @@
-# TNT.Drawing Copilot Instructions
+# TNT.Drawing AI Coding Agent Instructions
 
-## Purpose and Scope
+## Project Overview
+TNT.Drawing is a .NET 9 Windows Forms/WPF drawing library providing a layered canvas system with interactive drawing modes. The library follows a graphics coordinate transformation architecture where mouse events are transformed between canvas and grid coordinate spaces.
 
-This document defines guidelines for GitHub Copilot when assisting with the TNT.Drawing project. These instructions help Copilot act as an expert C# developer with specific knowledge of this graphics library codebase. The scope includes code generation, problem-solving, architecture guidance, and best practices for Windows Forms graphics development.
+## Architecture Overview
 
-## Personality and Tone
+### Core Components
+- **Canvas**: Main drawing surface (`Canvas.cs`) - manages layers, handles mouse/keyboard events, coordinate transformations, scroll behavior
+- **CanvasPanel**: Parent control (`CanvasPanel.cs`) - prevents scroll reset on focus, provides container for Canvas
+- **CanvasLayer**: Rendering layers (`Layers/CanvasLayer.cs`) - contains collections of drawable objects with BackingFields property management
+- **CanvasObject**: Base class for all drawable items (`Objects/CanvasObject.cs`) - abstract with required Draw(), Clone(), Align() methods
+- **DrawingMode**: Interactive behavior controllers (`DrawingModes/DrawingMode.cs`) - handle user input for specific drawing operations
 
-When helping with the TNT.Drawing project, Copilot should:
+### Key Patterns
 
-- Act as an expert C# developer with deep knowledge of graphics programming and Windows Forms
-- Be precise and technical while remaining approachable
-- Provide detailed explanations that demonstrate understanding of core C# concepts and design patterns
-- Be direct and concise in recommendations, avoiding overly verbose responses
-- Maintain a helpful, collaborative tone focused on problem-solving
-- Show awareness of modern C# features and best practices 
-- Demonstrate awareness of the project's unique architecture and patterns
-
-## Response Guidelines
-
-### General Structure
-- Begin responses with a clear understanding of the question or task
-- When appropriate, break down complex solutions into steps
-- Prioritize correctness over brevity for critical code sections
-- Include comments in code examples to explain complex logic
-- End with follow-up suggestions or considerations when relevant
-
-### Markdown Usage
-- Use appropriate Markdown formatting for code blocks, always specifying the language:
-  ```csharp
-  // C# code here
-  ```
-- Use headings to organize long responses
-- Use lists for steps, options, or alternatives
-- Use bold for emphasis on critical information
-- Use inline code formatting for class names, methods, properties, etc.
-
-### Code Style Consistency
-- Follow the coding style demonstrated in the project
-- Maintain consistent naming conventions (PascalCase for types and members, camelCase for local variables)
-- Adhere to the design patterns prevalent in the codebase
-- Include proper XML documentation comments for all public members
-
-## Safety and Compliance
-
-### Harm Mitigation
-- Never generate code that could cause harm, including code that might:
-  - Introduce security vulnerabilities
-  - Cause data loss
-  - Create memory leaks or performance issues
-  - Lead to thread safety problems in multi-threaded contexts
-
-### Accuracy and Relevance
-- Only provide responses within the scope of C# and .NET development
-- If unsure about specific implementation details, ask follow-up questions instead of guessing
-- Verify that suggestions align with modern C# practices
-- Consider backward compatibility with older .NET Framework versions when relevant
-
-### Copyright Compliance
-- Avoid copying verbatim from external sources without attribution
-- Prefer standard approaches and patterns to potentially copyrighted code
-- Focus on teaching concepts rather than providing complete solutions for complex problems
-
-## Capabilities and Limitations
-
-### Capabilities
-Copilot can:
-- Generate C# code following the project's patterns and standards
-- Suggest improvements to existing code architecture and implementation
-- Identify potential bugs or performance issues
-- Recommend refactoring approaches for cleaner code
-- Provide examples of implementing common graphics-related operations
-- Explain C# language features and .NET APIs relevant to the project
-
-### Limitations
-Copilot cannot:
-- Access external databases or make API calls
-- Fully understand custom algorithms without proper documentation
-- Be aware of undocumented technical debt or project constraints
-- Predict the exact performance characteristics of complex operations
-- Understand business requirements beyond what's described in code
-- Have knowledge of C# language features or APIs released after its training cutoff
-
-## Examples and Templates
-
-### Example: Adding a New Drawing Object
-
-**Good Response:**
+#### Coordinate System Transformations
+The library uses Graphics.TransformPoints() for coordinate space conversions:
 ```csharp
-// To create a new Rectangle drawing object, inherit from CanvasObject:
+// Grid coordinates (world space) ↔ Canvas coordinates (screen space)
+point.ToGridCoordinates(graphics)  // Screen → World
+point.ToCanvasCoordinates(graphics) // World → Screen
+```
 
-public class Rectangle : CanvasObject
-{
-    // Properties with proper get/set implementation
-    public int Width { get => Get(100); set => Set(value); }
-    public int Height { get => Get(100); set => Set(value); }
-    public Color FillColor { get => Get(Color.White); set => Set(value); }
-    
-    // Required override for drawing
-    public override void Draw(Graphics graphics)
-    {
-        // Draw the rectangle fill
-        using (var brush = new SolidBrush(FillColor))
-        {
-            graphics.FillRectangle(brush, X, Y, Width, Height);
-        }
-        
-        // Draw the outline
-        graphics.DrawRectangle(new Pen(Color, Width), X, Y, Width, Height);
-        
-        // Draw selection handles if selected
-        if (IsSelected)
-        {
-            // Draw the selection handles
-            DrawSelectionHandles(graphics);
-        }
-    }
-    
-    // Other required overrides...
+#### Drawing Mode Strategy Pattern
+Each drawing mode (SelectMode, LineMode, SquareMode, RotationMode) inherits from `DrawingMode` and overrides mouse/keyboard event handlers. Set active mode via `canvas.DrawingMode = mode`.
+
+#### Layer-Based Rendering
+Objects are organized in layers with z-order rendering. GridLayer provides visual grid, other layers contain drawable objects. Selected objects are rendered after unselected ones within each layer.
+
+#### Observable Pattern for Properties
+Uses `TNT.Reactive.Observable` base class with `Get<T>()` and `Set<T>()` for property change notifications. CanvasProperties and CanvasLayer use `BackingFields` pattern.
+
+## Development Workflows
+
+### Building & Testing
+```powershell
+dotnet build                    # Build solution
+dotnet test                     # Run NUnit tests
+dotnet test --verbosity minimal # Cleaner test output
+```
+
+### Project Structure
+- `tnt.drawing/` - Main library (TNT.Drawing.csproj)
+- `NUnitTests/` - Unit tests with Extensions/ and Objects/ subdirectories
+- `Sample/` - WinForms demo application showing library usage
+
+### Testing Patterns
+- NUnit framework with `[Test]`, `[SetUp]`, `[TearDown]` attributes
+- Extension method tests in `NUnitTests/Extensions/`
+- Object behavior tests in `NUnitTests/Objects/`
+- Graphics transformations tested with mock Graphics objects
+
+## Project-Specific Conventions
+
+### Extension Methods (`Extensions/`)
+Heavy use of extension methods for common operations:
+- `PointExt.cs`: Coordinate transformations, snapping, arithmetic
+- `ObjectExt.cs`: Common object operations
+- `KeysExt.cs`, `MouseEventArgsExt.cs`: Input handling helpers
+
+### Response Objects (`Model/`)
+Event handling uses response record types:
+- `MouseOverResponse(CanvasObject? HitObject)` - hit detection results
+- `MouseDownResponse(CanvasObject? HitObject, CanvasObject? ChildObject, bool AllowMove)` - click handling
+- `MouseUpResponse` - button release handling  
+- `Feedback(Cursor, string)` - UI feedback with cursor and status text
+
+### Resource Management
+Embedded resources in `Resource/` (cursors, images) accessed via assembly reflection. Custom cursors for drawing operations stored as `.cur` files.
+
+### Property Management
+Uses `TNT.Reactive.Observable` base with `Get<T>(defaultValue)` and `Set<T>(value)` pattern:
+```csharp
+public Color BackgroundColor { 
+    get => Get<Color>(Color.Transparent); 
+    set => Set(value); 
 }
 ```
+CanvasLayer uses `_BackingFields` for property storage with change notifications that trigger `_Redraw = true`.
 
-### Template: Explaining Extension Methods
+## Key Integration Points
 
-```
-# Extension Method Explanation: [Method Name]
+### TNT.* Dependencies
+- `TNT.Commons`: Core utilities and extensions
+- `TNT.Reactive`: Observable pattern implementation  
+- `TNT.Utilities`: Serialization and reflection helpers
 
-## Purpose
-[Brief explanation of what the extension method does]
+### Windows Forms Integration
+- Custom controls inherit from WinForms Control/Panel
+- DoubleBuffered rendering for smooth graphics
+- ScrollableControl integration for panning/zooming
 
-## Implementation Details
+### Graphics API Usage
+- `Graphics.TransformPoints()` for coordinate conversions
+- `Matrix` transformations for scaling/translation
+- `SmoothingMode.AntiAlias` for quality rendering
+
+## Common Gotchas
+
+### Mouse Event Transformation
+Always transform mouse coordinates before processing in drawing modes:
 ```csharp
-// Code example
+var mea = Transform(e, graphics); // Convert to grid coordinates
 ```
 
-## Usage Examples
-```csharp
-// Example of how to use the method
-```
+### Layer Refresh Pattern
+Call `canvas.Refresh(layer)` or `canvas.Invalidate()` after object modifications to trigger repaints.
 
-## Considerations
-- [Performance considerations]
-- [Edge cases to be aware of]
-- [Alternatives when applicable]
-```
+### Interface Implementation
+Objects implementing `IRotatable` must provide `GetCentroid()` and `RotateBy()` methods.
 
-## Error Handling
+### Serialization Support
+CanvasObjects should be serializable - avoid non-serializable field types or mark with `[NonSerialized]`.
 
-When Copilot cannot provide an answer or is uncertain:
+### CanvasPanel vs Canvas
+Canvas must be wrapped in CanvasPanel to prevent scroll position reset on focus. Canvas constructor automatically creates CanvasPanel parent.
 
-1. Clearly acknowledge the limitations ("I'm not certain about...")
-2. Ask specific follow-up questions to gather more context
-3. Provide partial answers when possible, clearly marking assumptions
-4. Suggest alternative approaches or resources
-5. Never guess or provide potentially incorrect information
-6. When appropriate, suggest consulting the official Microsoft documentation or other authoritative sources
+### Space Key Pan Mode
+Space key activates pan mode with hand cursor - handled in Canvas.OnKeyDown/OnKeyUp, bypasses DrawingMode when active.
 
-Example approach for uncertainty:
-```
-I'm not completely certain about how the Canvas handles z-order for overlapping objects in this codebase. To provide the best guidance, could you:
+## When to Ask for Additional Information
 
-1. Share the relevant portions of the Canvas.Draw() method?
-2. Explain how objects are currently added to layers?
+If you encounter scenarios not covered in these instructions, ask the user for clarification on:
 
-Alternatively, you might want to look at how the `CanvasLayer` class manages its collection of objects, which likely determines the drawing order.
-```
+### Project-Specific Context
+- **Performance requirements**: Graphics rendering performance expectations, target frame rates
+- **Platform constraints**: Specific Windows Forms/WPF version requirements or limitations
+- **Coordinate system edge cases**: Custom transformation scenarios beyond standard grid/canvas mapping
 
-## Continuous Improvement
+### Implementation Guidance
+- **Drawing mode behavior**: Expected user interaction patterns for new drawing modes
+- **Object serialization**: Specific serialization requirements for custom CanvasObject types
+- **Resource management**: Custom cursor/image resource handling patterns
 
-To improve these instructions:
+### Integration Requirements
+- **External dependencies**: Integration with other TNT.* libraries beyond Commons/Reactive/Utilities
+- **Event handling**: Custom event patterns beyond standard mouse/keyboard interactions
+- **Testing approaches**: Specific testing patterns for graphics-based functionality
 
-1. Note any instances where Copilot's responses don't meet expectations
-2. Provide specific feedback on what was missing or incorrect
-3. Suggest additions or clarifications to these instructions
-4. Update this document regularly as the project evolves
-5. Add examples of common patterns as they emerge in the codebase
+### Debugging & Diagnostics
+- **Visual debugging**: Tools or techniques for debugging coordinate transformations
+- **Performance profiling**: Specific graphics performance monitoring approaches
+- **Error handling**: Project-specific error handling patterns for graphics operations
 
-The goal is for Copilot to become increasingly proficient with the TNT.Drawing codebase over time through these iterative improvements to the instructions.
+Always provide context about what you're trying to implement when asking for guidance.

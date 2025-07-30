@@ -12,14 +12,21 @@ namespace TNT.Drawing.Objects;
 /// </summary>
 public class CanvasPoint() : CanvasObject
 {
+  // Constants
   protected const int POINT_DIAMETER = 10;
 
+  // Fields
+  protected static readonly Brush FILL_BRUSH = new SolidBrush(Color.FromArgb(128, Color.Black));
+  protected static readonly Pen OUTLINE_PEN = new Pen(Color.Black, 1);
+
+  // Events/Delegates
   /// <summary>
   /// <see cref="Action{CanvasPoint, Int, Int, Keys}"/> delegate that is called when the <see cref="CanvasPoint"/>
   /// moves
   /// </summary>
   public Action<CanvasPoint, int, int, Keys> OnMoved = (canvasPoint, dx, dy, modifierKeys) => { };
 
+  // Properties
   /// <summary>
   /// X coordinate
   /// </summary>
@@ -41,6 +48,23 @@ public class CanvasPoint() : CanvasObject
   public virtual bool Visible { get => true; }
 
   /// <summary>
+  /// Gets the <see cref="GraphicsPath"/> representing the shape of this <see cref="CanvasPoint"/>.
+  /// Can be overridden by derived classes to customize the shape.
+  /// </summary>
+  protected virtual GraphicsPath Path
+  {
+    get
+    {
+      var centerPoint = new Point(POINT_DIAMETER / 2, POINT_DIAMETER / 2);
+      var topLeftPoint = ToPoint.Subtract(centerPoint);
+      var path = new GraphicsPath();
+      path.AddEllipse(topLeftPoint.X, topLeftPoint.Y, POINT_DIAMETER, POINT_DIAMETER);
+      return path;
+    }
+  }
+
+  // Constructors
+  /// <summary>
   /// Initializes the <see cref="X"/> and <see cref="Y"/> coordinates
   /// </summary>
   public CanvasPoint(int x, int y) : this() { X = x; Y = y; }
@@ -50,25 +74,21 @@ public class CanvasPoint() : CanvasObject
   /// </summary>
   public CanvasPoint(CanvasPoint canvasPoint) : this(canvasPoint.X, canvasPoint.Y) { }
 
+  // Methods
   /// <summary>
   /// Creates a deep copy of this <see cref="CanvasPoint"/> instance.
   /// </summary>
   /// <returns>A new <see cref="CanvasPoint"/> with identical state to this instance.</returns>
   public override CanvasObject Clone() => new CanvasPoint(this);
 
-  /// <summary>
-  /// Draws the <see cref="CanvasPoint"/>
-  /// </summary>
   public override void Draw(Graphics graphics)
   {
     if (!Visible) return;
-    var center = new Point(POINT_DIAMETER / 2, POINT_DIAMETER / 2);
-    var topLeftPoint = ToPoint.Subtract(center);
 
     if (IsSelected)
-      graphics.FillEllipse(new SolidBrush(Color.FromArgb(128, Color.Black)), topLeftPoint.X, topLeftPoint.Y, POINT_DIAMETER, POINT_DIAMETER);
-    else
-      graphics.DrawEllipse(new Pen(Color.Black, 1), topLeftPoint.X, topLeftPoint.Y, POINT_DIAMETER, POINT_DIAMETER);
+      graphics.FillPath(FILL_BRUSH, Path);
+    
+    graphics.DrawPath(OUTLINE_PEN, Path);
   }
 
   /// <summary>
@@ -97,10 +117,8 @@ public class CanvasPoint() : CanvasObject
   /// <returns><see cref="CanvasPoint"/> when mouse is over the this</returns>
   public override MouseOverResponse MouseOver(Point mousePosition, Keys modifierKeys)
   {
-    var topLeftPoint = ToPoint.Subtract(new Point(POINT_DIAMETER / 2, POINT_DIAMETER / 2));
-    var path = new GraphicsPath();
-    path.AddEllipse(topLeftPoint.X, topLeftPoint.Y, POINT_DIAMETER, POINT_DIAMETER);
-    return path.IsVisible(mousePosition) ? new MouseOverResponse(this) : MouseOverResponse.Default;
+    var response = MouseOverResponse.Default;
+    return Path.IsVisible(mousePosition) ? response with { HitObject = this } : response;
   }
 
   /// <summary>
