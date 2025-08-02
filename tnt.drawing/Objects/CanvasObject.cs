@@ -12,6 +12,9 @@ namespace TNT.Drawing.Objects;
 /// </summary>
 public abstract class CanvasObject : Observable
 {
+  protected const float OUTLINE_HIT_WIDTH = 10F;
+  protected readonly Pen OUTLINE_PEN_HIT_WITDTH = new Pen(Color.Black, OUTLINE_HIT_WIDTH);
+
   /// <summary>
   /// <see cref="Guid"/> of the object
   /// </summary>
@@ -58,7 +61,13 @@ public abstract class CanvasObject : Observable
   /// <summary>
   /// Implement by subclass to indicate mouse is over object. Should return the object that is under mouse.
   /// </summary>
-  public abstract MouseOverResponse MouseOver(Point mousePosition, Keys modifierKeys);
+  public virtual MouseOverResponse MouseOver(Point mousePosition, Keys modifierKeys) => MouseOverResponse.Default;
+
+  /// <summary>
+  /// Determines whether the mouse is currently positioned over this object.
+  /// Subclasses should implement hit-testing logic based on their geometry and state.
+  /// </summary>
+  public abstract bool IsMouseOver(Point mousePosition, Keys modifierKeys);
 
   /// <summary>
   /// Implement by subclass to move the object by <paramref name="dx"/> and <paramref name="dy"/>
@@ -95,7 +104,7 @@ public abstract class CanvasObject : Observable
   /// Subclasses should override this method to provide the centroid for their specific geometry.
   /// Returns null if the centroid is not defined for this object.
   /// </summary>
-  public virtual Point? GetCentroid() => null;
+  public virtual Point? GetCentroidPosition() => null;
 
   /// <summary>
   /// Determines whether the specified object is equal to the current <see cref="CanvasObject"/>.

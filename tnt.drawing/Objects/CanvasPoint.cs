@@ -81,13 +81,18 @@ public class CanvasPoint() : CanvasObject
   /// <returns>A new <see cref="CanvasPoint"/> with identical state to this instance.</returns>
   public override CanvasObject Clone() => new CanvasPoint(this);
 
+  /// <summary>
+  /// Draws the <see cref="CanvasPoint"/> on the provided <see cref="Graphics"/> surface.
+  /// If the point is selected, fills its shape; always draws its outline.
+  /// Skips drawing if the point is not visible.
+  /// </summary>
   public override void Draw(Graphics graphics)
   {
     if (!Visible) return;
 
     if (IsSelected)
       graphics.FillPath(FILL_BRUSH, Path);
-    
+
     graphics.DrawPath(OUTLINE_PEN, Path);
   }
 
@@ -120,6 +125,12 @@ public class CanvasPoint() : CanvasObject
     var response = MouseOverResponse.Default;
     return Path.IsVisible(mousePosition) ? response with { HitObject = this } : response;
   }
+
+  /// <summary>
+  /// Determines whether the mouse pointer is currently over this <see cref="CanvasPoint"/>.
+  /// Returns <c>true</c> if the mouse position is within the shape defined by <see cref="Path"/>; otherwise, <c>false</c>.
+  /// </summary>
+  public override bool IsMouseOver(Point mousePosition, Keys modifierKeys) => Path.IsVisible(mousePosition);
 
   /// <summary>
   /// Aligns this <see cref="CanvasPoint"/> with the <paramref name="alignInterval"/>

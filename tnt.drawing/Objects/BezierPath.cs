@@ -7,7 +7,6 @@ using System.Linq;
 using System.Windows.Forms;
 using TNT.Commons;
 using TNT.Drawing.Extensions;
-using TNT.Drawing.Interface;
 using TNT.Drawing.Model;
 using TNT.Drawing.Resource;
 
@@ -16,8 +15,12 @@ namespace TNT.Drawing.Objects;
 /// <summary>
 /// Represents a line on the <see cref="Canvas"/>
 /// </summary>
-public class BezierPath : CanvasObject, IRotatable
+public class BezierPath : CanvasObject
 {
+  private readonly Centroid _centroid = new Centroid();
+  private static readonly Pen _ControlPointConnectorPen = new Pen(Color.FromArgb(100, Color.Black), 1);
+  private static readonly Pen _OutlinePen = new Pen(Color.Black, 1);
+
   /// <summary>
   /// Indicates the width of the <see cref="BezierPath"/>
   /// </summary>
@@ -48,7 +51,11 @@ public class BezierPath : CanvasObject, IRotatable
   [DisplayName("Line Style")]
   public DashStyle LineStyle { get => Get(DashStyle.Solid); set => Set(value); }
 
-  private bool IsClosedPath => CanvasPoints.FirstOrDefault()?.Let(firstPoint => CanvasPoints.FindCoincident(firstPoint) != null) ?? false;
+  /// <summary>
+  /// Indicates whether the Bezier path is a closed figure.
+  /// When true, the path is closed and can be filled; when false, it is open.
+  /// </summary>
+  private bool IsClosedPath = false;
 
   /// <summary>
   /// The <see cref="List{CanvasPoint}"/> represented by this <see cref="BezierPath"/>
@@ -86,9 +93,6 @@ public class BezierPath : CanvasObject, IRotatable
     }
   }
 
-  private readonly Pen _ControlPointConnectorPen = new Pen(Color.FromArgb(100, Color.Black), 1);
-  private Pen _OutlinePen = new Pen(Color.Black, 1);
-
   /// <summary>
   /// Represents the <see cref="OutlinePen"/> used when generating this <see cref="BezierPath"/>
   /// </summary>
@@ -103,13 +107,21 @@ public class BezierPath : CanvasObject, IRotatable
     }
   }
 
+  /// <summary>
+  /// Gets or sets whether the BezierPath is selected.
+  /// When unselected, all points and the centroid are also deselected.
+  /// </summary>
   public override bool IsSelected
   {
     get => base.IsSelected;
     set
     {
       // Make sure all selected points are deselected when the path is unselected
-      CanvasPoints.ForEach(p => p.IsSelected = false);
+      if (!value)
+      {
+        CanvasPoints.ForEach(p => p.IsSelected = value);
+        _centroid.IsSelected = value;
+      }
       base.IsSelected = value;
     }
   }
@@ -140,6 +152,8 @@ public class BezierPath : CanvasObject, IRotatable
         // Reset the rotation angle to 0 after transformation
         base.Set(0.0, nameof(RotationAngle));
       }
+
+      GetCentroidPosition()?.Also(p => _centroid.MoveTo(p, Keys.None, true));
     };
   }
 
@@ -161,7 +175,12 @@ public class BezierPath : CanvasObject, IRotatable
         CanvasPoints.Add(c2);
       });
     }
+
     CanvasPoints.Add(vertex);
+
+    IsClosedPath = CanvasPoints.FindCoincident(vertex) != null;
+
+    TNTLogger.Info($"Adding vertex {vertex} to BezierPath. IsClosedPath: {IsClosedPath}");
   }
 
   /// <summary>
@@ -177,9 +196,45 @@ public class BezierPath : CanvasObject, IRotatable
 
   /// <summary>
   /// Called when the <paramref name="canvasPoint"/> is moved
+  /// Calculates the angle from the previous location of the canvasPoint (using dx and dy) and the current location to the _centroid.
   /// </summary>
   private void OnMoved(CanvasPoint canvasPoint, int dx, int dy, Keys modifierKeys)
   {
+
+    if (_centroid.IsSelected)
+    {
+      // Calculate angle from previous and current location to the centroid
+      var centroidPos = GetCentroidPosition();
+
+      if (centroidPos != null)
+      {
+        Point prevLocation = new Point(canvasPoint.X - dx, canvasPoint.Y - dy);
+        Point currLocation = canvasPoint.ToPoint;
+        int cx = centroidPos.Value.X;
+        int cy = centroidPos.Value.Y;
+        // Vectors from centroid to previous and current locations
+        double v1x = prevLocation.X - cx;
+        double v1y = prevLocation.Y - cy;
+        double v2x = currLocation.X - cx;
+        double v2y = currLocation.Y - cy;
+
+        // Calculate angle between vectors
+        double dot = v1x * v2x + v1y * v2y;
+        double det = v1x * v2y - v1y * v2x;
+        double angleRadians = Math.Atan2(det, dot);
+        double angleDegrees = angleRadians * (180.0 / Math.PI);
+
+        // angleDegrees is the signed angle from previous to current location, relative to centroid
+        // You can use angleDegrees as needed (e.g., log, store, etc.)
+        TNTLogger.Info($"Angle from previous to current location to centroid: {angleDegrees:F2} degrees");
+
+        canvasPoint.MoveTo(prevLocation, modifierKeys, true);
+        //CanvasPoints.AdjacentTo(canvasPoint).ForEach(cp=> cp.MoveTo(prevLocation, modifierKeys));
+        RotateBy(angleDegrees, modifierKeys);
+      }
+      return;
+    }
+
     if (canvasPoint is ControlPoint ctrlPoint)
     {
       if (modifierKeys.ContainsAll(Keys.Shift))
@@ -204,7 +259,26 @@ public class BezierPath : CanvasObject, IRotatable
     else if (canvasPoint is Vertex vertex)
     {
       CanvasPoints.AdjacentTo(vertex).ForEach(ctrlPoint => ctrlPoint.MoveBy(dx, dy, Keys.None, true));
+
+      if (IsClosedPath && CanvasPoints.IsFirstOrLast(vertex))
+      {
+        var coincidentPoint = CanvasPoints.FirstOrDefault() == vertex ? CanvasPoints.LastOrDefault() as Vertex : CanvasPoints.FirstOrDefault();
+        coincidentPoint?.Also(point =>
+          {
+            CanvasPoints.AdjacentTo(point).ForEach(ctrlPoint => ctrlPoint.MoveBy(dx, dy, Keys.None, true));
+            point.MoveTo(vertex.ToPoint, Keys.None, true);
+          }
+        );
+      }
+
+      CanvasPoints.FindAll(p => p != vertex && p.IsSelected).ForEach(p =>
+      {
+        CanvasPoints.AdjacentTo(p).ForEach(cp => cp.MoveBy(dx, dy, Keys.None, true));
+        p.MoveBy(dx, dy, modifierKeys, true);
+      });
     }
+
+    GetCentroidPosition()?.Also(p => _centroid.MoveTo(p, Keys.None, false));
   }
 
   /// <summary>
@@ -223,84 +297,61 @@ public class BezierPath : CanvasObject, IRotatable
     orphanedCtrlPoint?.Also(p => CanvasPoints.Remove(p));
   }
 
-  /// <summary>
-  /// Handles the mouse down event for the <see cref="BezierPath"/> object.
-  /// This method determines the interaction with the line or its points based on the mouse location
-  /// and modifier keys pressed. It supports adding, deleting, selecting, and moving vertices or control points.
-  /// </summary>
-  /// <param name="location">The location of the mouse pointer.</param>
-  /// <param name="modifierKeys">The modifier keys pressed during the event.</param>
-  /// <returns>A <see cref="MouseDownResponse"/> object indicating the result of the mouse down event.</returns>
   public override MouseDownResponse OnMouseDown(Point location, Keys modifierKeys)
   {
-    var response = new MouseDownResponse(this, null, true);
+    var response = base.OnMouseDown(location, modifierKeys) with { HitObject = IsMouseOver(location, modifierKeys) ? this : null };
+    CanvasPoint? innerHitObject = null;
 
     if (IsSelected)
     {
-      // Check if the mouse is over any of the points
-      var hitVertex = CanvasPoints.FirstOrDefault(p => p is Vertex && p.MouseOver(location, modifierKeys).HitObject != null) as Vertex;
+      Centroid? hitCentroid = _centroid.MouseOver(location, modifierKeys).HitObject as Centroid;
+      Vertex? hitVertex = CanvasPoints.FirstOrDefault(p => p is Vertex && p.MouseOver(location, modifierKeys).HitObject != null) as Vertex;
       ControlPoint? hitCtrlPoint = CanvasPoints.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys).HitObject != null) as ControlPoint;
 
-      CanvasPoint? hitPoint = hitVertex ?? hitCtrlPoint as CanvasPoint;
+      CanvasPoint? deletablePoint = hitVertex as CanvasPoint ?? hitCtrlPoint;
 
-      if (hitPoint == null && modifierKeys.ContainsAll(Keys.Control, Keys.Shift))
+      if (hitCentroid != null)
       {
-        // Add vertex
+        CanvasPoints.ForEach(p => p.IsSelected = false);
+        hitCentroid.IsSelected = !hitCentroid.IsSelected;
+        innerHitObject = hitCentroid.IsSelected ? hitCentroid : null;
+      }
+      else if (modifierKeys == Keys.Shift && hitCtrlPoint != null)
+      {
+        hitCtrlPoint.IsSelected = true;
+        innerHitObject = hitCtrlPoint.IsSelected ? hitCtrlPoint : null;
+      }
+      else if (modifierKeys == (Keys.Control | Keys.Shift) && deletablePoint != null)
+      {
+        DeletePoint(deletablePoint);
+        CanvasPoints.ForEach(p => p.IsSelected = false);
+        response = response with { AllowMove = false };
+      }
+      else if (modifierKeys == (Keys.Control | Keys.Shift) && deletablePoint == null)
+      {
         TryAddVertex(location);
         CanvasPoints.ForEach(p => p.IsSelected = false);
         response = response with { AllowMove = false };
       }
-      else if (hitPoint != null && modifierKeys.ContainsAll(Keys.Control, Keys.Shift))
+      else if (modifierKeys == Keys.Control && hitVertex != null)
       {
-        // Delete vertex
-        DeletePoint(hitPoint);
-        CanvasPoints.ForEach(p => p.IsSelected = false);
-        response = response with { AllowMove = false };
+        hitVertex.IsSelected = !hitVertex.IsSelected;
+        innerHitObject = hitVertex.IsSelected ? hitVertex : null;
       }
-      else if (hitVertex != null && modifierKeys == Keys.Control)
-      {
-        var vertices = new List<Vertex>() { hitVertex };
-        CanvasPoints.FindCoincident(hitVertex).Also(coincidentPoint =>
-        {
-          if (coincidentPoint is Vertex coincidentVertex)
-          {
-            vertices.Add(coincidentVertex);
-          }
-        });
-
-        // Select/unselect vertex
-        vertices.ForEach(v => v.IsSelected = !v.IsSelected);
-
-        response = response with { InnerHitObject = hitVertex, AllowMove = false };
-      }
-      else if (hitCtrlPoint != null && modifierKeys.ContainsAll(Keys.Shift))
+      else if (hitVertex != null)
       {
         CanvasPoints.ForEach(p => p.IsSelected = false);
-        hitCtrlPoint.IsSelected = true;
+        //hitVertex.IsSelected = true;
+        innerHitObject = hitVertex;//.IsSelected ? hitVertex : null;
       }
-      else if (hitVertex != null && !hitVertex.IsSelected)
+      else if (hitCtrlPoint != null)
       {
-        CanvasPoints.ForEach(p => p.IsSelected = false);
-        hitVertex.IsSelected = true;
-        CanvasPoints.FindCoincident(hitVertex)?.Also(coincidentPoint => coincidentPoint.IsSelected = true);
+        hitCtrlPoint.IsSelected = !hitCtrlPoint.IsSelected;
+        innerHitObject = hitCtrlPoint.IsSelected ? hitCtrlPoint : null;
       }
-      else if (hitPoint?.IsSelected == false)
-      {
-        // Select single vertex
-        CanvasPoints.ForEach(p => p.IsSelected = false);
-        hitPoint.IsSelected = true;
-        response = response with { InnerHitObject = hitPoint };
-      }
-      else if (hitPoint == null || hitPoint.IsSelected == false)
-      {
-        // Select all vertices
-        CanvasPoints.ForEach(p => p.IsSelected = false);
-      }
-
-      response = response with { InnerHitObject = hitPoint };
     }
 
-    return response;
+    return response with { InnerHitObject = innerHitObject };
   }
 
   /// <summary>
@@ -362,27 +413,15 @@ public class BezierPath : CanvasObject, IRotatable
   public override CanvasObject Clone() => new BezierPath(this);
 
   /// <summary>
-  /// Checks if <paramref name="mousePosition"/> is over any part of this <see cref="BezierPath"/> and return the 
-  /// <see cref="CanvasObject"/> within the line that it is over
+  /// Determines whether the mouse pointer is currently over any part of this <see cref="BezierPath"/>.
+  /// Checks if the mouse is over any control point, vertex, the centroid, the outline of the path, or the filled area (if closed).
   /// </summary>
-  /// <returns><see cref="CanvasObject"/> within the line that it is over</returns>
-  public override MouseOverResponse MouseOver(Point mousePosition, Keys modifierKeys)
+  public override bool IsMouseOver(Point mousePosition, Keys modifierKeys)
   {
-    CanvasObject? hitObject = null;
-
-    if (CanvasPoints.Count > 3)
-    {
-      // Check if over this line
-      hitObject = Path.IsOutlineVisible(mousePosition, new Pen(Color.Black, 10F)) || (IsClosedPath && Path.IsVisible(mousePosition)) ? this : null;
-
-      if (hitObject == null)
-      {
-        // Check if over any points that might be outside of the line
-        hitObject = CanvasPoints.FirstOrDefault(p => p.MouseOver(mousePosition, modifierKeys).HitObject != null) != null ? this : null;
-      }
-    }
-
-    return hitObject?.Let(it => new MouseOverResponse(it)) ?? MouseOverResponse.Default;
+    return CanvasPoints.Any(p => (p is ControlPoint || p is Vertex) && p.IsMouseOver(mousePosition, modifierKeys))
+        || _centroid.IsMouseOver(mousePosition, modifierKeys)
+        || Path.IsOutlineVisible(mousePosition, OUTLINE_PEN_HIT_WITDTH)
+        || (IsClosedPath && Path.IsVisible(mousePosition));
   }
 
   /// <summary>
@@ -393,7 +432,7 @@ public class BezierPath : CanvasObject, IRotatable
   public override Feedback GetFeedback(Point location, Keys modifierKeys)
   {
     var cursor = Cursors.Hand;
-    var hint = "Click to select. SHIFT for multiple objects.";
+    var hint = "Click to select. CTRL for multiple objects.";
 
     // Check if over any points
     if (IsSelected)
@@ -430,6 +469,10 @@ public class BezierPath : CanvasObject, IRotatable
         }
       }
     }
+    else if (modifierKeys == Keys.Control)
+    {
+      hint = "Click to toggle selection.";
+    }
 
     return new Feedback(cursor, hint);
   }
@@ -453,6 +496,8 @@ public class BezierPath : CanvasObject, IRotatable
           graphics.DrawLine(_ControlPointConnectorPen, v.ToPoint, a.ToPoint);
         });
       });
+
+      _centroid.Draw(graphics);
     }
   }
 
@@ -466,14 +511,12 @@ public class BezierPath : CanvasObject, IRotatable
   /// <param name="supressCallback">Indicates whether to suppress the callback during the move operation.</param>  
   public override void MoveBy(int dx, int dy, Keys modifierKeys, bool supressCallback = false)
   {
-    var selectedPoints = CanvasPoints.FindAll(p => p.IsSelected);
-    if (selectedPoints.Any())
+    TNTLogger.Info($"Moving BezierPath by ({dx}, {dy}) with modifier keys: {modifierKeys}");
+    if (!_centroid.IsSelected)
     {
-      selectedPoints.ForEach(v => v.MoveBy(dx, dy, modifierKeys));
-    }
-    else
-    {
-      CanvasPoints.Select(p => p as Vertex).ToList().ForEach(v => v?.MoveBy(dx, dy, modifierKeys));
+      var vertices = CanvasPoints.Select(p => p as Vertex).Let(points => IsClosedPath ? points.SkipLast(1) : points).ToList();
+      vertices.ForEach(v => v?.MoveBy(dx, dy, modifierKeys, supressCallback));
+      GetCentroidPosition()?.Also(p => _centroid.MoveTo(p, Keys.None, false));
     }
   }
 
@@ -485,7 +528,7 @@ public class BezierPath : CanvasObject, IRotatable
   public void RotateBy(double dx, Keys modifierKeys)
   {
     // Get the centroid of the path to use as rotation center
-    var centroid = GetCentroid();
+    var centroid = GetCentroidPosition();
     if (centroid == null || CanvasPoints.Count == 0)
       return;
 
@@ -525,7 +568,7 @@ public class BezierPath : CanvasObject, IRotatable
   /// The centroid is computed by flattening the Bezier path into a polygon and applying the standard polygon centroid formula.
   /// Returns null if the path is not closed or has insufficient points to define an area.
   /// </summary>
-  public override Point? GetCentroid()
+  public override Point? GetCentroidPosition()
   {
     // 1. Flatten the path to a polygon
     var path = Path;
