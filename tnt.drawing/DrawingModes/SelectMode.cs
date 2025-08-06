@@ -18,32 +18,36 @@ namespace TNT.Drawing.DrawingModes;
 /// </remarks>
 /// <param name="canvas">The canvas to interact with</param>
 /// <param name="layer">The canvas layer containing objects</param>
-public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, layer)
+public class SelectMode : DrawingMode
 {
-  private List<CanvasObject> _activeObjects = new List<CanvasObject>();
-  private bool _allowMove = false;
-  private CanvasObject? _innerHitObject = null;
-  private CanvasObject? _hitObject = null;
+  // Fields
+  private readonly List<CanvasObject> _activeObjects = new();
   private CanvasObject? _objectUnderMouse = null;
+  private bool _allowMove = false;
   private Point _lastMouseLocation = Point.Empty;
 
   /// <summary>
-  /// Handles mouse down event for selection
+  /// Initializes a new instance of the <see cref="SelectMode"/> class.
+  /// </summary>
+  /// <param name="canvas">The canvas to interact with.</param>
+  /// <param name="layer">The canvas layer containing objects.</param>
+  public SelectMode(Canvas canvas, CanvasLayer layer) : base(canvas, layer) { }
+
+  /// <summary>
+  /// Handles mouse down event for selection.
   /// </summary>
   public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
   {
-    // Call base.OnMouseDown to ensure proper mouse down state tracking
     base.OnMouseDown(e, modifierKeys);
 
     if (_objectUnderMouse == null)
     {
-      Layer.CanvasObjects.ForEach(o => o.IsSelected = o == _objectUnderMouse);
+      Layer.CanvasObjects.ForEach(o => o.IsSelected = false);
     }
     else
     {
       var (_, innerHitObject, allowMove) = _objectUnderMouse.OnMouseDown(e.Location, modifierKeys);
       _allowMove = allowMove;
-
       _activeObjects.Clear();
 
       if (innerHitObject != null)
@@ -63,22 +67,17 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
           Layer.CanvasObjects.ForEach(o => o.IsSelected = false);
           _objectUnderMouse.IsSelected = true;
         }
-
         _activeObjects.AddRange(Layer.CanvasObjects.FindAll(o => o.IsSelected));
       }
     }
 
     Layer.CanvasObjects.FindAll(o => o.IsSelected)?.Cast<object>().ToList()?.Also(o => Canvas.OnObjectsSelected(o));
-
     Canvas.Invalidate();
-
-    // Update the feedback
     UpdateFeedback(e.Location, modifierKeys);
   }
 
   /// <summary>
-  /// Handles mouse movement during selection mode. When the mouse is down and movement is allowed,
-  /// it moves selected objects by the distance the mouse has moved. Otherwise, updates feedback and object under mouse.
+  /// Handles mouse movement during selection mode. Moves selected objects if allowed, otherwise updates feedback and object under mouse.
   /// </summary>
   public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
   {
@@ -88,45 +87,21 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
     {
       var dx = location.X - _lastMouseLocation.X;
       var dy = location.Y - _lastMouseLocation.Y;
-
       _activeObjects.ForEach(o => o.MoveBy(dx, dy, modifierKeys));
-
       Canvas.Invalidate();
     }
     else
     {
-      // Update object under mouse when not dragging
       _objectUnderMouse = GetObjectUnderMouse(e.Location, modifierKeys);
-      //TNTLogger.Info($"Object under mouse: {_objectUnderMouse?.ToString() ?? "None"}");
       UpdateFeedback(e.Location, modifierKeys);
     }
-
-    // Update the saved mouse location
     _lastMouseLocation = location;
-
     base.OnMouseMove(e, modifierKeys);
   }
 
   /// <summary>
-  /// Finds the topmost <see cref="CanvasObject"/> at the specified location, prioritizing selected objects.
-  /// Returns the first selected object found that is under the mouse, or if none, the first unselected object found.
+  /// Handles mouse up events, ending any ongoing operations.
   /// </summary>
-  /// <param name="location">The location to test for object presence.</param>
-  /// <param name="modifierKeys">The current keyboard modifier keys.</param>
-  /// <returns>The <see cref="CanvasObject"/> under the specified location, or null if none found.</returns>
-  private CanvasObject? GetObjectUnderMouse(Point location, Keys modifierKeys)
-  {
-    var canvasObjects = Layer.CanvasObjects;
-    var selectedObjects = canvasObjects.FindAll(o => o.IsSelected);
-
-    return selectedObjects.LastOrDefault(o => o.IsMouseOver(location, modifierKeys)) ?? canvasObjects.LastOrDefault(o => o.IsMouseOver(location, modifierKeys));
-  }
-
-  /// <summary>
-  /// Handles mouse up events, ending any ongoing operations
-  /// </summary>
-  /// <param name="e">Contains mouse button information</param>
-  /// <param name="modifierKeys">Current keyboard modifier keys being pressed</param>
   public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
   {
     Canvas.Invalidate();
@@ -134,23 +109,31 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   }
 
   /// <summary>
-  /// Draws the selected objects
+  /// Draws the selected objects.
   /// </summary>
   public override void OnDraw(Graphics graphics)
   {
-    // Draw all selected objects
     var selectedObjects = Layer.CanvasObjects.FindAll(o => o.IsSelected);
     selectedObjects.ForEach(o => o.Draw(graphics));
     base.OnDraw(graphics);
   }
 
   /// <summary>
-  /// Updates feedback cursor and tooltip based on what's under the mouse
+  /// Updates feedback cursor and tooltip based on what's under the mouse.
   /// </summary>
   protected void UpdateFeedback(Point location, Keys modifierKeys)
   {
-    // Default behavior for other areas
     var feedback = _objectUnderMouse?.GetFeedback(location, modifierKeys) ?? Feedback.Default;
     Canvas.OnFeedbackChanged(feedback);
+  }
+
+  /// <summary>
+  /// Finds the topmost <see cref="CanvasObject"/> at the specified location, prioritizing selected objects.
+  /// </summary>
+  private CanvasObject? GetObjectUnderMouse(Point location, Keys modifierKeys)
+  {
+    var canvasObjects = Layer.CanvasObjects;
+    var selectedObjects = canvasObjects.FindAll(o => o.IsSelected);
+    return selectedObjects.LastOrDefault(o => o.IsMouseOver(location, modifierKeys)) ?? canvasObjects.LastOrDefault(o => o.IsMouseOver(location, modifierKeys));
   }
 }

@@ -8,19 +8,21 @@ using TNT.Drawing.Objects;
 namespace TNT.Drawing.DrawingModes;
 
 /// <summary>
-/// Drawing mode for creating rectangles (squares) on the canvas.
+/// Provides a drawing mode for creating rectangles (squares) on the canvas.
+/// Users can click and drag to define the rectangle's bounds, which is rendered as a closed <see cref="BezierPath"/>.
 /// </summary>
-/// <remarks>
-/// Initializes a new instance of the <see cref="SquareMode"/> class.
-/// </remarks>
-/// <param name="canvas">The canvas to draw on.</param>
-/// <param name="layer">The layer to add rectangles to.</param>
-/// <param name="defaultObject">The default rectangle object template (optional).</param>
-public class SquareMode(Canvas canvas, CanvasLayer layer, CanvasObject? defaultObject = null) : DrawingMode(canvas, layer, defaultObject)
+public class RectangleMode(Canvas canvas, CanvasLayer layer, CanvasObject? defaultObject = null) : DrawingMode(canvas, layer, defaultObject)
 {
+  /// <summary>
+  /// Gets the default <see cref="BezierPath"/> template used for new rectangles.
+  /// </summary>
   private BezierPath DefaultBezierPath => (DefaultObject as BezierPath)!;
 
   private Pen _linesPen = new Pen(Color.Black, 1);
+
+  /// <summary>
+  /// Gets a <see cref="Pen"/> configured with the current line color, width, and style for drawing rectangle outlines.
+  /// </summary>
   private Pen LinesPen
   {
     get
@@ -32,7 +34,12 @@ public class SquareMode(Canvas canvas, CanvasLayer layer, CanvasObject? defaultO
     }
   }
 
-  /// <inheritdoc />
+  /// <summary>
+  /// Handles the mouse button release event to finalize or start a rectangle.
+  /// If vertices exist, creates a closed <see cref="BezierPath"/> and adds it to the layer; otherwise, initializes rectangle vertices.
+  /// </summary>
+  /// <param name="e">Mouse event arguments.</param>
+  /// <param name="modifierKeys">Modifier keys pressed during the event.</param>
   public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
   {
     var location = Canvas.SnapToInterval ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
@@ -63,7 +70,12 @@ public class SquareMode(Canvas canvas, CanvasLayer layer, CanvasObject? defaultO
     base.OnMouseDown(e, modifierKeys);
   }
 
-  /// <inheritdoc />
+  /// <summary>
+  /// Handles mouse movement to update the preview rectangle as the user drags.
+  /// Adjusts the positions of rectangle vertices to reflect the current mouse location.
+  /// </summary>
+  /// <param name="e">Mouse event arguments.</param>
+  /// <param name="modifierKeys">Modifier keys pressed during the event.</param>
   public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
   {
     base.OnMouseMove(e, modifierKeys);
@@ -92,7 +104,11 @@ public class SquareMode(Canvas canvas, CanvasLayer layer, CanvasObject? defaultO
     Canvas.Invalidate();
   }
 
-  /// <inheritdoc />
+  /// <summary>
+  /// Draws the preview or finalized rectangle on the canvas.
+  /// Renders the rectangle fill, outline, and optionally the vertices for visual feedback.
+  /// </summary>
+  /// <param name="graphics">The <see cref="Graphics"/> context to draw on.</param>
   public override void OnDraw(Graphics graphics)
   {
     base.OnDraw(graphics);
