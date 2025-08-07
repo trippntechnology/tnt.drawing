@@ -345,53 +345,62 @@ public class BezierPath : CanvasObject
   public override MouseDownResponse OnMouseDown(Point location, Keys modifierKeys)
   {
     var response = base.OnMouseDown(location, modifierKeys) with { HitObject = IsMouseOver(location, modifierKeys) ? this : null };
-    CanvasPoint? innerHitObject = null;
+
     if (IsSelected)
     {
       Centroid? hitCentroid = _centroid.MouseOver(location, modifierKeys).HitObject as Centroid;
       Vertex? hitVertex = CanvasPoints.FirstOrDefault(p => p is Vertex && p.MouseOver(location, modifierKeys).HitObject != null) as Vertex;
       ControlPoint? hitCtrlPoint = CanvasPoints.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys).HitObject != null) as ControlPoint;
       CanvasPoint? deletablePoint = hitVertex as CanvasPoint ?? hitCtrlPoint;
+
       if (hitCentroid != null)
       {
+        // If the centroid is hit, toggle its selection and deselect all points
         CanvasPoints.ForEach(p => p.IsSelected = false);
         hitCentroid.IsSelected = !hitCentroid.IsSelected;
-        innerHitObject = hitCentroid.IsSelected ? hitCentroid : null;
+        response = response with { InnerHitObject = hitCentroid.IsSelected ? hitCentroid : null, AllowMove = false };
       }
       else if (modifierKeys == Keys.Shift && hitCtrlPoint != null)
       {
+        // If Shift is held and a control point is hit, select it
         hitCtrlPoint.IsSelected = true;
-        innerHitObject = hitCtrlPoint.IsSelected ? hitCtrlPoint : null;
+        response = response with { InnerHitObject = hitCtrlPoint.IsSelected ? hitCtrlPoint : null };
       }
       else if (modifierKeys == (Keys.Control | Keys.Shift) && deletablePoint != null)
       {
+        // If Ctrl+Shift is held and a deletable point is hit, delete it and clear selection
         DeletePoint(deletablePoint);
         CanvasPoints.ForEach(p => p.IsSelected = false);
         response = response with { AllowMove = false };
       }
       else if (modifierKeys == (Keys.Control | Keys.Shift) && deletablePoint == null)
       {
+        // If Ctrl+Shift is held and no deletable point is hit, try to add a vertex at the location
         TryAddVertex(location);
         CanvasPoints.ForEach(p => p.IsSelected = false);
         response = response with { AllowMove = false };
       }
       else if (modifierKeys == Keys.Control && hitVertex != null)
       {
+        // If Ctrl is held and a vertex is hit, toggle its selection
         hitVertex.IsSelected = !hitVertex.IsSelected;
-        innerHitObject = hitVertex.IsSelected ? hitVertex : null;
+        response = response with { InnerHitObject = hitVertex.IsSelected ? hitVertex : null };
       }
       else if (hitVertex != null)
       {
+        // If a vertex is hit (no modifiers), select only it
         CanvasPoints.ForEach(p => p.IsSelected = false);
-        innerHitObject = hitVertex;
+        response = response with { InnerHitObject = hitVertex };
       }
       else if (hitCtrlPoint != null)
       {
+        // If a control point is hit (no modifiers), toggle its selection
         hitCtrlPoint.IsSelected = !hitCtrlPoint.IsSelected;
-        innerHitObject = hitCtrlPoint.IsSelected ? hitCtrlPoint : null;
+        response = response with { InnerHitObject = hitCtrlPoint.IsSelected ? hitCtrlPoint : null };
       }
     }
-    return response with { InnerHitObject = innerHitObject };
+
+    return response;
   }
 
   // Private Methods
@@ -432,6 +441,7 @@ public class BezierPath : CanvasObject
       }
       return;
     }
+
     if (canvasPoint is ControlPoint ctrlPoint)
     {
       if (modifierKeys.ContainsAll(Keys.Shift))
@@ -465,6 +475,7 @@ public class BezierPath : CanvasObject
         p.MoveBy(dx, dy, modifierKeys, true);
       });
     }
+
     GetCentroidPosition()?.Also(p => _centroid.MoveTo(p, Keys.None, false));
   }
 
