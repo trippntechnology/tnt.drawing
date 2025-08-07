@@ -514,7 +514,7 @@ public class BezierPath : CanvasObject
     TNTLogger.Info($"Moving BezierPath by ({dx}, {dy}) with modifier keys: {modifierKeys}");
     if (!_centroid.IsSelected)
     {
-      var vertices = CanvasPoints.Select(p => p as Vertex).Let(points => IsClosedPath ? points.SkipLast(1) : points).ToList();
+      var vertices = CanvasPoints.OfType<Vertex>().Let(points => IsClosedPath ? points.SkipLast(1) : points).ToList();
       vertices.ForEach(v => v?.MoveBy(dx, dy, modifierKeys, supressCallback));
       GetCentroidPosition()?.Also(p => _centroid.MoveTo(p, Keys.None, false));
     }

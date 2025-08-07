@@ -43,6 +43,7 @@ public class SelectMode : DrawingMode
     if (_objectUnderMouse == null)
     {
       Layer.CanvasObjects.ForEach(o => o.IsSelected = false);
+      _activeObjects.Clear();
     }
     else
     {
