@@ -382,9 +382,8 @@ public class BezierPath : CanvasObject
       }
       else if (hitCtrlPoint != null)
       {
-        // If a control point is hit (no modifiers), toggle its selection
-        hitCtrlPoint.IsSelected = !hitCtrlPoint.IsSelected;
-        response = response with { InnerHitObject = hitCtrlPoint.IsSelected ? hitCtrlPoint : null };
+        // If a control point is hit (no modifiers), set it as the inner hit object in the response
+        response = response with { InnerHitObject = hitCtrlPoint };
       }
     }
 
