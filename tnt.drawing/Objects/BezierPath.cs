@@ -22,6 +22,7 @@ public class BezierPath : CanvasObject
   private static readonly Pen _ControlPointConnectorPen = new Pen(Color.FromArgb(100, Color.Black), 1);
   private static readonly Pen _OutlinePen = new Pen(Color.Black, 1);
   private bool _isClosedPath = false;
+  private bool _isMultiSelectMode = false;
 
   // Properties
   /// <summary>
@@ -341,6 +342,11 @@ public class BezierPath : CanvasObject
       ControlPoint? hitCtrlPoint = CanvasPoints.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys).HitObject != null) as ControlPoint;
       CanvasPoint? deletablePoint = hitVertex as CanvasPoint ?? hitCtrlPoint;
 
+      if (_isMultiSelectMode && hitVertex == null)
+      {
+        CanvasPoints.OfType<Vertex>().ToList().ForEach(v => IsSelected = false);
+      }
+
       if (hitCentroid != null)
       {
         // If the centroid is hit, toggle its selection and deselect all points
@@ -372,12 +378,19 @@ public class BezierPath : CanvasObject
       {
         // If Ctrl is held and a vertex is hit, toggle its selection
         hitVertex.IsSelected = !hitVertex.IsSelected;
-        response = response with { InnerHitObject = hitVertex.IsSelected ? hitVertex : null };
+
+        // If the vertex is first or last and has a coincident vertex, match selection state
+        if (CanvasPoints.IsFirstOrLast(hitVertex))
+        {
+          (CanvasPoints.FindCoincident(hitVertex) as Vertex)?.Also(v => v.IsSelected = hitVertex.IsSelected);
+        }
+
+        response = response with { InnerHitObject = hitVertex, AllowMove = false };
       }
       else if (hitVertex != null)
       {
         // If a vertex is hit (no modifiers), select only it
-        CanvasPoints.ForEach(p => p.IsSelected = false);
+        if (!hitVertex.IsSelected) CanvasPoints.ForEach(p => p.IsSelected = false);
         response = response with { InnerHitObject = hitVertex };
       }
       else if (hitCtrlPoint != null)
@@ -385,6 +398,9 @@ public class BezierPath : CanvasObject
         // If a control point is hit (no modifiers), set it as the inner hit object in the response
         response = response with { InnerHitObject = hitCtrlPoint };
       }
+
+      // Set _isMultiSelectMode to true if any vertex is selected, otherwise false
+      _isMultiSelectMode = CanvasPoints.OfType<Vertex>().Any(v => v.IsSelected);
     }
 
     return response;
@@ -446,6 +462,16 @@ public class BezierPath : CanvasObject
     }
     else if (canvasPoint is Vertex vertex)
     {
+      // If multi-select mode is active and this vertex is selected, move all other selected vertices
+      if (_isMultiSelectMode && vertex.IsSelected)
+      {
+        foreach (var v in CanvasPoints.OfType<Vertex>().Where(v => v.IsSelected && v != vertex))
+        {
+          v.MoveBy(dx, dy, modifierKeys, true);
+          CanvasPoints.AdjacentTo(v).ForEach(ctrl => ctrl.MoveBy(dx, dy, Keys.None, true));
+        }
+      }
+
       CanvasPoints.AdjacentTo(vertex).ForEach(ctrlPoint => ctrlPoint.MoveBy(dx, dy, Keys.None, true));
       if (_isClosedPath && CanvasPoints.IsFirstOrLast(vertex))
       {
