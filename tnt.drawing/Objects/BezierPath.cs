@@ -457,11 +457,10 @@ public class BezierPath : CanvasObject
           point.MoveTo(vertex.ToPoint, Keys.None, true);
         });
       }
-      CanvasPoints.FindAll(p => p != vertex && p.IsSelected).ForEach(p =>
+      else if (CanvasPoints.IsFirstOrLast(vertex))
       {
-        CanvasPoints.AdjacentTo(p).ForEach(cp => cp.MoveBy(dx, dy, Keys.None, true));
-        p.MoveBy(dx, dy, modifierKeys, true);
-      });
+        _isClosedPath = CanvasPoints.FindCoincident(vertex) != null;
+      }
     }
 
     GetCentroidPosition()?.Also(p => _centroid.MoveTo(p, Keys.None, false));
@@ -519,7 +518,7 @@ public class BezierPath : CanvasObject
       {
         // If closed and deleting first or last vertex, remove coincident point and open the path
         if (_isClosedPath && CanvasPoints.IsFirstOrLast(vertex))
-      {
+        {
           (CanvasPoints.FindCoincident(vertex) as Vertex)?.Also(v => RemoveVertex(v));
           _isClosedPath = false;
         }
