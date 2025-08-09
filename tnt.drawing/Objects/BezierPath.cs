@@ -173,18 +173,6 @@ public class BezierPath : CanvasObject
   }
 
   /// <summary>
-  /// Removes a <see cref="Vertex"/> from this <see cref="BezierPath"/>
-  /// </summary>
-  public void RemoveVertex(Vertex vertex)
-  {
-    var vertexIndex = CanvasPoints.IndexOf(vertex);
-    var count = vertexIndex == 0 || vertexIndex == CanvasPoints.Count - 1 ? 2 : 3;
-    CanvasPoints.RemoveRange(Math.Max(0, vertexIndex - 1), count);
-    var orphanedCtrlPoint = CanvasPoints.FirstOrDefault() as ControlPoint ?? CanvasPoints.LastOrDefault() as ControlPoint;
-    orphanedCtrlPoint?.Also(p => CanvasPoints.Remove(p));
-  }
-
-  /// <summary>
   /// Copies this <see cref="BezierPath"/>
   /// </summary>
   public override CanvasObject Clone() => new BezierPath(this);
@@ -504,14 +492,38 @@ public class BezierPath : CanvasObject
   }
 
   /// <summary>
-  /// Deletes the <paramref name="point"/> from <see cref="BezierPath"/>
+  /// Removes the specified <see cref="Vertex"/> and its associated <see cref="ControlPoint"/>s from this <see cref="BezierPath"/>.
+  /// If the vertex is at the start or end of the path, removes 2 points (the vertex and one control point);
+  /// otherwise, removes 3 points (the vertex and its two adjacent control points).
+  /// Also removes any orphaned control point at the start or end of the path if present.
+  /// </summary>
+  public void RemoveVertex(Vertex vertex)
+  {
+    var vertexIndex = CanvasPoints.IndexOf(vertex);
+    var count = vertexIndex == 0 || vertexIndex == CanvasPoints.Count - 1 ? 2 : 3;
+    CanvasPoints.RemoveRange(Math.Max(0, vertexIndex - 1), count);
+    var orphanedCtrlPoint = CanvasPoints.FirstOrDefault() as ControlPoint ?? CanvasPoints.LastOrDefault() as ControlPoint;
+    orphanedCtrlPoint?.Also(p => CanvasPoints.Remove(p));
+  }
+
+  /// <summary>
+  /// Removes a <see cref="Vertex"/> or <see cref="ControlPoint"/> from this <see cref="BezierPath"/>.
+  /// If the point is a vertex and the path is closed, handles coincident points and opens the path if needed.
+  /// If the point is a control point, resets its position to the adjacent vertex.
   /// </summary>
   private void DeletePoint(CanvasPoint point)
   {
     if (point is Vertex vertex)
     {
-      if (CanvasPoints.Sum(p => p is Vertex ? 1 : 0) > 2)
+      if (CanvasPoints.Count(p => p is Vertex) > 2)
       {
+        // If closed and deleting first or last vertex, remove coincident point and open the path
+        if (_isClosedPath && CanvasPoints.IsFirstOrLast(vertex))
+      {
+          (CanvasPoints.FindCoincident(vertex) as Vertex)?.Also(v => RemoveVertex(v));
+          _isClosedPath = false;
+        }
+
         RemoveVertex(vertex);
       }
     }
