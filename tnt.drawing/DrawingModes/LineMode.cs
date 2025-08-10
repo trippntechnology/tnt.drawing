@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using TNT.Commons;
@@ -26,11 +27,10 @@ public class LineMode(Canvas canvas, CanvasLayer layer, BezierPath defaultObject
 
   public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
   {
-    var location = Canvas.SnapToInterval ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
     var isClosed = false;
 
     // Add a new vertex at the mouse location
-    vertices.Add(new Vertex(location));
+    vertices.Add(new Vertex(activeVertex));
 
     vertices.Select(v => v as CanvasPoint).ToList().Also(canvasPoints =>
     {
@@ -38,7 +38,7 @@ public class LineMode(Canvas canvas, CanvasLayer layer, BezierPath defaultObject
     });
 
     // If CTRL is held, finish the line
-    if (isClosed || modifierKeys == Keys.Control && vertices.Count > 1)
+    if (isClosed || (modifierKeys & Keys.Control) == Keys.Control && vertices.Count > 1)
     {
       if (vertices.Count > 1)
       {
@@ -62,7 +62,29 @@ public class LineMode(Canvas canvas, CanvasLayer layer, BezierPath defaultObject
   {
     base.OnMouseMove(e, modifierKeys);
 
-    var location = Canvas.SnapToInterval ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
+    var location = e.Location;
+
+    // If SHIFT is pressed, constrain to every 15 degrees from the origin vertex
+    if ((modifierKeys & Keys.Shift) == Keys.Shift && vertices.Count > 0)
+    {
+      var origin = vertices.Last().ToPoint;
+      var dx = location.X - origin.X;
+      var dy = location.Y - origin.Y;
+      var distance = Math.Sqrt(dx * dx + dy * dy);
+      if (distance > 0)
+      {
+        var angle = Math.Atan2(dy, dx); // radians
+        var angleDeg = angle * 180.0 / Math.PI;
+        var snappedAngleDeg = Math.Round(angleDeg / 15.0) * 15.0;
+        var snappedAngleRad = snappedAngleDeg * Math.PI / 180.0;
+        var snappedX = origin.X + (int)Math.Round(distance * Math.Cos(snappedAngleRad));
+        var snappedY = origin.Y + (int)Math.Round(distance * Math.Sin(snappedAngleRad));
+        location = new Point(snappedX, snappedY);
+      }
+    }
+
+    location = Canvas.SnapToInterval ? location.Snap(Canvas.SnapInterval) : location;
+
     activeVertex.MoveTo(location, modifierKeys);
     Canvas.Invalidate();
   }
