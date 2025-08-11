@@ -11,27 +11,24 @@ using TNT.Drawing.Objects;
 namespace TNT.Drawing.DrawingModes;
 
 /// <summary>
-/// Select <see cref="DrawingMode"/> for selecting and moving objects on the canvas.
+/// Provides a drawing mode for selecting and moving objects on the canvas.
 /// </summary>
-/// <remarks>
-/// Constructor for SelectMode
-/// </remarks>
-/// <param name="canvas">The canvas to interact with</param>
-/// <param name="layer">The canvas layer containing objects</param>
-public class SelectMode : DrawingMode
+public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, layer)
 {
-  // Fields
-  private readonly List<CanvasObject> _activeObjects = new();
-  private CanvasObject? _objectUnderMouse = null;
   private bool _allowMove = false;
+  private readonly List<CanvasObject> _activeObjects = new();
   private Point _lastMouseLocation = Point.Empty;
+  private CanvasObject? _objectUnderMouse = null;
 
   /// <summary>
-  /// Initializes a new instance of the <see cref="SelectMode"/> class.
+  /// Draws the selected objects.
   /// </summary>
-  /// <param name="canvas">The canvas to interact with.</param>
-  /// <param name="layer">The canvas layer containing objects.</param>
-  public SelectMode(Canvas canvas, CanvasLayer layer) : base(canvas, layer) { }
+  public override void OnDraw(Graphics graphics)
+  {
+    var selectedObjects = Layer.CanvasObjects.FindAll(o => o.IsSelected);
+    selectedObjects.ForEach(o => o.Draw(graphics));
+    base.OnDraw(graphics);
+  }
 
   /// <summary>
   /// Handles mouse down event for selection.
@@ -110,13 +107,13 @@ public class SelectMode : DrawingMode
   }
 
   /// <summary>
-  /// Draws the selected objects.
+  /// Clears the current selection and resets the active objects in selection mode.
   /// </summary>
-  public override void OnDraw(Graphics graphics)
+  public override void Reset()
   {
-    var selectedObjects = Layer.CanvasObjects.FindAll(o => o.IsSelected);
-    selectedObjects.ForEach(o => o.Draw(graphics));
-    base.OnDraw(graphics);
+    _activeObjects.Clear();
+    Layer.CanvasObjects.ForEach(o => o.IsSelected = false);
+    base.Reset();
   }
 
   /// <summary>
