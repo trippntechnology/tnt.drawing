@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -20,13 +21,25 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   private Point _lastMouseLocation = Point.Empty;
   private CanvasObject? _objectUnderMouse = null;
 
+  // Selection box state
+  private bool _isSelecting = false;
+  private Point _selectionAnchor = Point.Empty;
+  private Point _selectionCurrent = Point.Empty;
+
   /// <summary>
-  /// Draws the selected objects.
+  /// Draws the selected objects and selection box if active.
   /// </summary>
   public override void OnDraw(Graphics graphics)
   {
     var selectedObjects = Layer.CanvasObjects.FindAll(o => o.IsSelected);
     selectedObjects.ForEach(o => o.Draw(graphics));
+    // Draw selection rectangle if active
+    if (_isSelecting)
+    {
+      var rect = GetSelectionRectangle();
+      using var pen = new Pen(Color.Blue) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dash };
+      graphics.DrawRectangle(pen, rect);
+    }
     base.OnDraw(graphics);
   }
 
@@ -39,11 +52,16 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
 
     if (_objectUnderMouse == null)
     {
-      Layer.CanvasObjects.ForEach(o => o.IsSelected = false);
+      // Start selection box
+      _isSelecting = true;
+      _selectionAnchor = e.Location;
+      _selectionCurrent = e.Location;
+      if ((modifierKeys & Keys.Control) != Keys.Control) Layer.CanvasObjects.ForEach(o => o.IsSelected = false);
       _activeObjects.Clear();
     }
     else
     {
+      _isSelecting = false;
       var (_, innerHitObject, allowMove) = _objectUnderMouse.OnMouseDown(e.Location, modifierKeys);
       _allowMove = allowMove;
       _activeObjects.Clear();
@@ -81,7 +99,12 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   {
     var location = Canvas.SnapToInterval == modifierKeys.DoesNotContain(Keys.Control) ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
 
-    if (IsMouseDown && _allowMove)
+    if (_isSelecting && IsMouseDown)
+    {
+      _selectionCurrent = location;
+      Canvas.Invalidate();
+    }
+    else if (IsMouseDown && _allowMove)
     {
       var dx = location.X - _lastMouseLocation.X;
       var dy = location.Y - _lastMouseLocation.Y;
@@ -102,7 +125,16 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   /// </summary>
   public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
   {
-    Canvas.Invalidate();
+    if (_isSelecting)
+    {
+      _isSelecting = false;
+      var rect = GetSelectionRectangle();
+      // Select all objects whose bounding box intersects the selection rectangle
+      var selected = Layer.CanvasObjects.Where(o => rect.IntersectsWith(GetObjectBounds(o))).ToList();
+      Layer.CanvasObjects.ForEach(o => o.IsSelected = (modifierKeys == Keys.Control && o.IsSelected) || selected.Contains(o));
+      Canvas.OnObjectsSelected(selected.Cast<object>().ToList());
+      Canvas.Invalidate();
+    }
     base.OnMouseUp(e, modifierKeys);
   }
 
@@ -113,6 +145,7 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   {
     _activeObjects.Clear();
     Layer.CanvasObjects.ForEach(o => o.IsSelected = false);
+    _isSelecting = false;
     base.Reset();
   }
 
@@ -133,5 +166,31 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
     var canvasObjects = Layer.CanvasObjects;
     var selectedObjects = canvasObjects.FindAll(o => o.IsSelected);
     return selectedObjects.LastOrDefault(o => o.IsMouseOver(location, modifierKeys)) ?? canvasObjects.LastOrDefault(o => o.IsMouseOver(location, modifierKeys));
+  }
+
+  /// <summary>
+  /// Returns the selection rectangle in normalized coordinates.
+  /// </summary>
+  private Rectangle GetSelectionRectangle()
+  {
+    int x1 = Math.Min(_selectionAnchor.X, _selectionCurrent.X);
+    int y1 = Math.Min(_selectionAnchor.Y, _selectionCurrent.Y);
+    int x2 = Math.Max(_selectionAnchor.X, _selectionCurrent.X);
+    int y2 = Math.Max(_selectionAnchor.Y, _selectionCurrent.Y);
+    return new Rectangle(x1, y1, x2 - x1, y2 - y1);
+  }
+
+  /// <summary>
+  /// Gets the bounding rectangle of a CanvasObject (override for more precise hit if needed).
+  /// </summary>
+  private Rectangle GetObjectBounds(CanvasObject obj)
+  {
+    // If CanvasObject exposes a bounding box, use it. Otherwise, fallback to a default.
+    // Here, we assume Draw uses the object's bounding box.
+    // If CanvasObject has a GetBounds() method, use that instead.
+    var centroid = obj.GetCentroidPosition();
+    if (centroid.HasValue)
+      return new Rectangle(centroid.Value.X - 10, centroid.Value.Y - 10, 20, 20); // fallback size
+    return new Rectangle(0, 0, 0, 0); // fallback
   }
 }
