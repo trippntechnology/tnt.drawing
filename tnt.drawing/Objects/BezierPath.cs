@@ -557,4 +557,37 @@ public class BezierPath : CanvasObject
       (CanvasPoints.ElementAtOrDefault(ctrlPointIndex - 1) as Vertex ?? CanvasPoints.ElementAtOrDefault(ctrlPointIndex + 1) as Vertex)?.Also(vertex => ctrlPoint.MoveTo(vertex.ToPoint, Keys.None));
     }
   }
+
+  /// <summary>
+  /// Determines whether this <see cref="BezierPath"/> intersects with the specified <see cref="Region"/>.
+  /// For open paths, returns true if any vertex is inside the region.
+  /// For closed paths, returns true if the region and the path's region intersect.
+  /// </summary>
+  /// <param name="region">The <see cref="Region"/> to test for intersection.</param>
+  /// <returns><c>true</c> if the path intersects with the region; otherwise, <c>false</c>.</returns>
+  public override bool IntersectsWith(Region region)
+  {
+    if (!_isClosedPath)
+    {
+      // For open paths, check if any vertex is inside the region
+      foreach (var vertex in CanvasPoints.OfType<Vertex>())
+      {
+        if (region.IsVisible(vertex.ToPoint))
+          return true;
+      }
+      return false;
+    }
+    else
+    {
+      // For closed paths, check if the region and the path's region intersect
+      using (var pathRegion = new Region(Path))
+      {
+        Region intersectRegion = region.Clone();
+        intersectRegion.Intersect(pathRegion);
+        bool result = !intersectRegion.IsEmpty(Graphics.FromHwnd(IntPtr.Zero));
+        intersectRegion.Dispose();
+        return result;
+      }
+    }
+  }
 }

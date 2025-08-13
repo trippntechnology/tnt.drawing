@@ -64,6 +64,13 @@ public abstract class CanvasObject : Observable
   public virtual MouseOverResponse MouseOver(Point mousePosition, Keys modifierKeys) => MouseOverResponse.Default;
 
   /// <summary>
+  /// Determines whether this object intersects with the specified <see cref="Region"/>.
+  /// Subclasses should override this method to provide intersection logic based on their geometry.
+  /// Returns <c>false</c> by default.
+  /// </summary>
+  public virtual bool IntersectsWith(Region region) => false;
+
+  /// <summary>
   /// Determines whether the mouse is currently positioned over this object.
   /// Subclasses should implement hit-testing logic based on their geometry and state.
   /// </summary>

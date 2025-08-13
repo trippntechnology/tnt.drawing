@@ -121,7 +121,7 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   }
 
   /// <summary>
-  /// Handles mouse up events, ending any ongoing operations.
+  /// Handles mouse up events, ending any ongoing selection or move operations.
   /// </summary>
   public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
   {
@@ -129,10 +129,13 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
     {
       _isSelecting = false;
       var rect = GetSelectionRectangle();
-      // Select all objects whose bounding box intersects the selection rectangle
-      var selected = Layer.CanvasObjects.Where(o => rect.IntersectsWith(GetObjectBounds(o))).ToList();
-      Layer.CanvasObjects.ForEach(o => o.IsSelected = (modifierKeys == Keys.Control && o.IsSelected) || selected.Contains(o));
-      Canvas.OnObjectsSelected(selected.Cast<object>().ToList());
+
+      using (var region = new Region(rect))
+      {
+        Layer.CanvasObjects.ForEach(o => o.IsSelected = (modifierKeys == Keys.Control && o.IsSelected) || o.IntersectsWith(region));
+      }
+
+      Canvas.OnObjectsSelected(Layer.CanvasObjects.Where(o => o.IsSelected).Cast<object>().ToList());
       Canvas.Invalidate();
     }
     base.OnMouseUp(e, modifierKeys);
@@ -178,19 +181,5 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
     int x2 = Math.Max(_selectionAnchor.X, _selectionCurrent.X);
     int y2 = Math.Max(_selectionAnchor.Y, _selectionCurrent.Y);
     return new Rectangle(x1, y1, x2 - x1, y2 - y1);
-  }
-
-  /// <summary>
-  /// Gets the bounding rectangle of a CanvasObject (override for more precise hit if needed).
-  /// </summary>
-  private Rectangle GetObjectBounds(CanvasObject obj)
-  {
-    // If CanvasObject exposes a bounding box, use it. Otherwise, fallback to a default.
-    // Here, we assume Draw uses the object's bounding box.
-    // If CanvasObject has a GetBounds() method, use that instead.
-    var centroid = obj.GetCentroidPosition();
-    if (centroid.HasValue)
-      return new Rectangle(centroid.Value.X - 10, centroid.Value.Y - 10, 20, 20); // fallback size
-    return new Rectangle(0, 0, 0, 0); // fallback
   }
 }
