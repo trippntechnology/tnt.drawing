@@ -1,9 +1,11 @@
 ﻿using Microsoft.Win32;
+using Sample.Group;
 using TNT.Commons;
 using TNT.Drawing;
 using TNT.Drawing.DrawingModes;
 using TNT.Drawing.Layers;
 using TNT.Drawing.Objects;
+using TNT.ToolStripItemManager;
 using TNT.Utilities;
 
 
@@ -13,56 +15,42 @@ public partial class Form1 : Form
 {
   private ApplicationRegistry? applicationRegistery = null;
   private readonly Canvas canvas;
+  private ToolStripItemCheckboxGroupManager? ModeGroupManager;
+  private ToolStripItemGroupManager? GroupManager;
 
   public Form1()
   {
     InitializeComponent();
+
     applicationRegistery = new ApplicationRegistry(this, Registry.CurrentUser, "Tripp'n Technology", "CenteredDrawing");
-    canvas = new Canvas(splitContainer1.Panel1);
+    canvas = new Canvas(toolStripContainer1.ContentPanel);
     canvas.Properties = new CanvasProperties(); ;
-
-    var line1 = new BezierPath();
-    line1.AddVertex(new Vertex(300, 100));
-    line1.AddVertex(new Vertex(400, 300));
-    line1.AddVertex(new Vertex(500, 100));
-
-    var line2 = new BezierPath();
-    line2.AddVertex(new Vertex(500, 100));
-    line2.AddVertex(new Vertex(600, 300));
-    line2.AddVertex(new Vertex(700, 100));
 
     var backgroundLayer = new CanvasLayer(canvas)
     {
       Name = "Background",
-      CanvasObjects = new List<CanvasObject>() { CreateSquarePath(150, 150, 50, Color.Green) },
+      CanvasObjects = new List<CanvasObject>() { GetSquarePath(150, 150, 50, Color.Green) },
       BackgroundColor = Color.White,
     };
 
     var gridLayer = new GridLayer(canvas) { Name = "Grid", LineColor = Color.Aqua };
-
-    // Demonstrate ClosedBezierPath
-    var closedBezier = new BezierPath();
-    closedBezier.AddVertex(new Vertex(200, 400));
-    closedBezier.AddVertex(new Vertex(300, 600));
-    closedBezier.AddVertex(new Vertex(500, 600));
-    closedBezier.AddVertex(new Vertex(600, 400));
-    closedBezier.AddVertex(new Vertex(200, 400));
-    closedBezier.FillColor = Color.FromArgb(128, Color.Orange);
 
     var objectsLayer = new CanvasLayer(canvas)
     {
       Name = "Object",
       CanvasObjects = new List<CanvasObject>()
       {
-        CreateSquarePath(100,100,100, Color.Blue),
-        CreateSquarePath(500,500,200, Color.Red),
-        line1,
-        line2,
-        closedBezier, // Add ClosedBezierPath to the sample
+        GetSquarePath(100,100,100, Color.Blue),
+        GetSquarePath(500,500,200, Color.Red),
+        GetLine(300,100),
+        GetLine(500,100),
+        GetClosedBezierPath(200,400),
       }
     };
 
     canvas.Layers = new List<CanvasLayer>() { backgroundLayer, gridLayer, objectsLayer };
+
+    SetupToolStripItems(objectsLayer);
 
     canvas.Layers.ForEach(layer =>
     {
@@ -75,21 +63,8 @@ public partial class Form1 : Form
 
     propertyGrid1.SelectedObject = canvas.Properties;
 
-    var modes = new List<DrawingMode> {
-      new SelectMode(canvas, objectsLayer),
-      new LineMode(canvas, objectsLayer, new BezierPath()),
-      new RectangleMode(canvas, objectsLayer, new BezierPath())
-    };
+    canvas.DrawingMode = new SelectMode(canvas, objectsLayer);
 
-    modes.ForEach(mode =>
-    {
-      var menuItem = new ToolStripMenuItem(mode.ToString());
-      menuItem.Tag = mode;
-      menuItem.Click += LineToolStripMenuItem_Click;
-      modeToolStripMenuItem.DropDownItems.Add(menuItem);
-    });
-
-    canvas.DrawingMode = modes.First();
     canvas.OnSelected = (objs) =>
     {
       try
@@ -108,22 +83,40 @@ public partial class Form1 : Form
     };
   }
 
-  private BezierPath CreateSquarePath(int x, int y, int size, Color fillColor)
+  private BezierPath GetClosedBezierPath(int x, int y)
   {
-    var path = new BezierPath
+    return new BezierPath().Also(path =>
     {
-      FillColor = fillColor,
-    };
-    path.AddVertex(new Vertex(x, y));
-    path.AddVertex(new Vertex(x + size, y));
-    path.AddVertex(new Vertex(x + size, y + size));
-    path.AddVertex(new Vertex(x, y + size));
-    path.AddVertex(new Vertex(x, y)); // Close the square
-
-    return path;
+      path.AddVertex(new Vertex(x, y));
+      path.AddVertex(new Vertex(x + 100, y + 200));
+      path.AddVertex(new Vertex(x + 300, y + 200));
+      path.AddVertex(new Vertex(x + 400, y));
+      path.AddVertex(new Vertex(x, y));
+      path.FillColor = Color.FromArgb(128, Color.Orange);
+    });
+  }
+  private BezierPath GetLine(int x, int y)
+  {
+    return new BezierPath().Also(line =>
+    {
+      line.AddVertex(new Vertex(x, y));
+      line.AddVertex(new Vertex(x + 100, y + 200));
+      line.AddVertex(new Vertex(x + 200, y));
+    });
   }
 
-  private void FitToolStripMenuItem_Click(object sender, System.EventArgs e) => canvas?.Fit();
+  private BezierPath GetSquarePath(int x, int y, int size, Color fillColor)
+  {
+    return new BezierPath().Also(path =>
+    {
+      path.FillColor = fillColor;
+      path.AddVertex(new Vertex(x, y));
+      path.AddVertex(new Vertex(x + size, y));
+      path.AddVertex(new Vertex(x + size, y + size));
+      path.AddVertex(new Vertex(x, y + size));
+      path.AddVertex(new Vertex(x, y)); // Close the square
+    });
+  }
 
   private void SaveToolStripMenuItem_Click(object sender, System.EventArgs e)
   {
@@ -181,4 +174,32 @@ public partial class Form1 : Form
   private void AlignToolStripMenuItem_Click(object sender, System.EventArgs e) => canvas.AlignToSnapInterval();
 
   private void bringToFrontToolStripMenuItem_Click(object sender, EventArgs e) => canvas.BringToFront();
+
+  private void SetupToolStripItems(CanvasLayer canvasLayer)
+  {
+    ModeGroupManager = new ToolStripItemCheckboxGroupManager(toolStripStatusLabel1)
+    {
+      OnClick = item =>
+      {
+        if (item.Tag is DrawingMode mode)
+        {
+          propertyGrid1.SelectedObject = mode.DefaultObject;
+          canvas.DrawingMode.Reset();
+          canvas.DrawingMode = mode;
+        }
+      },
+    };
+    ModeGroupManager.Create<Select>(new ToolStripItem[] { toolStripButton1, toolStripMenuItem1 }).Also(group => { group.Tag = new SelectMode(canvas, canvasLayer); });
+    ModeGroupManager.Create<Line>(new ToolStripItem[] { toolStripButton2, toolStripMenuItem2 }).Also(group => { group.Tag = new LineMode(canvas, canvasLayer, new BezierPath()); });
+    ModeGroupManager.Create<Group.Rectangle>(new ToolStripItem[] { toolStripButton3, toolStripMenuItem3 }).Also(group => { group.Tag = new RectangleMode(canvas, canvasLayer, new BezierPath()); });
+
+    GroupManager = new ToolStripItemGroupManager(toolStripStatusLabel1)
+    {
+      OnClick = item =>
+      {
+        if (item is Fit) canvas.Fit();
+      },
+    };
+    GroupManager.Create<Fit>(new ToolStripItem[] { fitToolStripButton, fitToolStripMenuItem });
+  }
 }
