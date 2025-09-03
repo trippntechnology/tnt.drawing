@@ -108,7 +108,7 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
     {
       var dx = location.X - _lastMouseLocation.X;
       var dy = location.Y - _lastMouseLocation.Y;
-      _activeObjects.ForEach(o => o.MoveBy(dx, dy, modifierKeys));
+      _activeObjects.ForEach(o => o.Move(new MoveInfo(location, dx, dy), modifierKeys));
       Canvas.Invalidate();
     }
     else

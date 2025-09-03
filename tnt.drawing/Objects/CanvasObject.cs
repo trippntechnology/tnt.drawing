@@ -77,9 +77,11 @@ public abstract class CanvasObject : Observable
   public abstract bool IsMouseOver(Point mousePosition, Keys modifierKeys);
 
   /// <summary>
-  /// Implement by subclass to move the object by <paramref name="dx"/> and <paramref name="dy"/>
+  /// Implemented by subclasses to move the object by the specified delta values in <paramref name="moveInfo"/>.
+  /// The movement may depend on the current <paramref name="modifierKeys"/> (e.g., for snapping or constrained movement).
+  /// If <paramref name="supressCallback"/> is true, property change notifications or redraw callbacks may be suppressed.
   /// </summary>
-  public abstract void MoveBy(int dx, int dy, Keys modifierKeys, bool supressCallback = false);
+  public abstract void Move(MoveInfo moveInfo, Keys modifierKeys, bool supressCallback = false);
 
   /// <summary>  
   /// Called when a button press event occurs over an object.  

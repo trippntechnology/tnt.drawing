@@ -363,15 +363,16 @@ public class BezierPath : CanvasObject
   }
 
   /// <summary>
-  /// Moves the <see cref="BezierPath"/> by the specified <paramref name="dx"/> and <paramref name="dy"/> values.  
+  /// Moves the <see cref="BezierPath"/> by the specified <paramref name="moveInfo"/> and <paramref name="modifierKeys"/> values.
+  /// Moves all vertices (except the closing duplicate if the path is closed) and updates the centroid position.
   /// </summary>
-  public override void MoveBy(int dx, int dy, Keys modifierKeys, bool supressCallback = false)
+  public override void Move(MoveInfo moveInfo, Keys modifierKeys, bool supressCallback = false)
   {
-    TNTLogger.Info($"Moving BezierPath by ({dx}, {dy}) with modifier keys: {modifierKeys}");
+    TNTLogger.Info($"Moving BezierPath by ({moveInfo}) with modifier keys: {modifierKeys}");
     if (!_centroid.IsSelected)
     {
       var vertices = CanvasPoints.OfType<Vertex>().Let(points => _isClosedPath ? points.SkipLast(1) : points).ToList();
-      vertices.ForEach(v => v?.MoveBy(dx, dy, modifierKeys, supressCallback));
+      vertices.ForEach(v => v?.Move(moveInfo, modifierKeys, supressCallback));
       GetCentroidPosition()?.Also(p => _centroid.MoveTo(p, Keys.None, false));
     }
   }
@@ -460,6 +461,8 @@ public class BezierPath : CanvasObject
   /// </summary>
   private void OnMoved(CanvasPoint canvasPoint, int dx, int dy, Keys modifierKeys)
   {
+    var moveInfo = new MoveInfo(Point.Empty, dx, dy);
+
     if (_centroid.IsSelected)
     {
       var centroidPos = GetCentroidPosition();
@@ -506,18 +509,18 @@ public class BezierPath : CanvasObject
       {
         foreach (var v in CanvasPoints.OfType<Vertex>().Where(v => v.IsSelected && v != vertex))
         {
-          v.MoveBy(dx, dy, modifierKeys, true);
-          CanvasPoints.AdjacentTo(v).ForEach(ctrl => ctrl.MoveBy(dx, dy, Keys.None, true));
+          v.Move(moveInfo, modifierKeys, true);
+          CanvasPoints.AdjacentTo(v).ForEach(ctrl => ctrl.Move(moveInfo, Keys.None, true));
         }
       }
 
-      CanvasPoints.AdjacentTo(vertex).ForEach(ctrlPoint => ctrlPoint.MoveBy(dx, dy, Keys.None, true));
+      CanvasPoints.AdjacentTo(vertex).ForEach(ctrlPoint => ctrlPoint.Move(moveInfo, Keys.None, true));
       if (_isClosedPath && CanvasPoints.IsFirstOrLast(vertex))
       {
         var coincidentPoint = CanvasPoints.FirstOrDefault() == vertex ? CanvasPoints.LastOrDefault() as Vertex : CanvasPoints.FirstOrDefault();
         coincidentPoint?.Also(point =>
         {
-          CanvasPoints.AdjacentTo(point).ForEach(ctrlPoint => ctrlPoint.MoveBy(dx, dy, Keys.None, true));
+          CanvasPoints.AdjacentTo(point).ForEach(ctrlPoint => ctrlPoint.Move(moveInfo, Keys.None, true));
           point.MoveTo(vertex.ToPoint, Keys.None, true);
         });
       }

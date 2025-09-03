@@ -97,9 +97,9 @@ public class CanvasPoint() : CanvasObject
   }
 
   /// <summary>
-  /// Moves this <see cref="CanvasPoint"/> by <paramref name="dx"/> and <paramref name="dy"/>
+  /// Moves this <see cref="CanvasPoint"/> by the specified delta in <paramref name="moveInfo"/>.
   /// </summary>
-  public override void MoveBy(int dx, int dy, Keys modifierKeys, bool supressCallback = false) => MoveTo(new Point(X + dx, Y + dy), modifierKeys, supressCallback);
+  public override void Move(MoveInfo moveInfo, Keys modifierKeys, bool supressCallback = false) => MoveTo(new Point(X + moveInfo.Dx, Y + moveInfo.Dy), modifierKeys, supressCallback);
 
   /// <summary>
   /// Moves this <see cref="CanvasPoint"/> to the location specified by <paramref name="point"/>
