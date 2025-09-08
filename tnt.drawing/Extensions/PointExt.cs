@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Drawing2D;
 
 namespace TNT.Drawing.Extensions;
@@ -58,4 +57,9 @@ public static class PointExt
   /// </summary>
   /// <returns>Deconstructed components of a <see cref="Point"/></returns>
   public static (int, int) Deconstruct(this Point point) => (point.X, point.Y);
+
+  /// <summary>
+  /// Returns the value of <paramref name="point"/> or <see cref="Point.Empty"/> if null.
+  /// </summary>
+  public static Point OrEmpty(this Point? point) => point ?? Point.Empty;
 }

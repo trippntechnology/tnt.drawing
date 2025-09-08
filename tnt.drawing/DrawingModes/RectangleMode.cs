@@ -92,13 +92,13 @@ public class RectangleMode(Canvas canvas, CanvasLayer layer, CanvasObject? defau
 
       var p2 = new Point(startVertex.X + width, startVertex.Y);
       var p4 = new Point(startVertex.X, startVertex.Y + height);
-      vertices[1].MoveTo(p2, Keys.None);
-      vertices[2].MoveTo(location, Keys.None);
-      vertices[3].MoveTo(p4, Keys.None);
+      vertices[1].MoveTo(p2.X, p2.Y, Keys.None);
+      vertices[2].MoveTo(location.X, location.Y, Keys.None);
+      vertices[3].MoveTo(p4.X, p4.Y, Keys.None);
     }
     else
     {
-      activeVertex.MoveTo(location, modifierKeys);
+      activeVertex.MoveTo(location.X, location.Y, modifierKeys);
     }
 
     Canvas.Invalidate();

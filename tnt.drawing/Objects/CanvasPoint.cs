@@ -8,7 +8,7 @@ using TNT.Drawing.Model;
 namespace TNT.Drawing.Objects;
 
 /// <summary>
-/// Represents a <see cref="Point"/> on the <see cref="Canvas"/>
+/// Represents a point object on the canvas that can be drawn, moved, and interacted with.
 /// </summary>
 public class CanvasPoint() : CanvasObject
 {
@@ -24,7 +24,7 @@ public class CanvasPoint() : CanvasObject
   /// <see cref="Action{CanvasPoint, Int, Int, Keys}"/> delegate that is called when the <see cref="CanvasPoint"/>
   /// moves
   /// </summary>
-  public Action<CanvasPoint, int, int, Keys> OnMoved = (canvasPoint, dx, dy, modifierKeys) => { };
+  public Action<CanvasPoint, Point?, int, int, Keys> OnMoved = (canvasPoint, mouseLocation, dx, dy, modifierKeys) => { };
 
   // Properties
   /// <summary>
@@ -97,22 +97,23 @@ public class CanvasPoint() : CanvasObject
   }
 
   /// <summary>
-  /// Moves this <see cref="CanvasPoint"/> by the specified delta in <paramref name="moveInfo"/>.
+  /// Moves this <see cref="CanvasPoint"/> by the specified delta values in <paramref name="moveInfo"/>.
   /// </summary>
-  public override void Move(MoveInfo moveInfo, Keys modifierKeys, bool supressCallback = false) => MoveTo(new Point(X + moveInfo.Dx, Y + moveInfo.Dy), modifierKeys, supressCallback);
+  public override void Move(MoveInfo moveInfo, Keys modifierKeys, bool supressCallback = false) => MoveTo(X + moveInfo.Dx, Y + moveInfo.Dy, modifierKeys, supressCallback, moveInfo.MouseLocation);
 
   /// <summary>
-  /// Moves this <see cref="CanvasPoint"/> to the location specified by <paramref name="point"/>
+  /// Moves this <see cref="CanvasPoint"/> to the location specified by <paramref name="newLocation"/>
   /// </summary>
-  public virtual void MoveTo(Point point, Keys modifierKeys, bool supressCallback = false)
+  public virtual void MoveTo(int x, int y, Keys modifierKeys, bool supressCallback = false, Point? mouseLocation = null)
   {
+    var point = new Point(x, y);
     var delta = point.Subtract(ToPoint);
     X = point.X;
     Y = point.Y;
 
     if (!supressCallback)
     {
-      OnMoved(this, delta.X, delta.Y, modifierKeys);
+      OnMoved(this, mouseLocation, delta.X, delta.Y, modifierKeys);
     }
   }
 

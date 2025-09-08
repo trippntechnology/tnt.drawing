@@ -135,7 +135,7 @@ public class BezierPath : CanvasObject
         RotateBy(angle, Keys.None);
         base.Set(0.0, nameof(RotationAngle));
       }
-      GetCentroidPosition()?.Also(p => _centroid.MoveTo(p, Keys.None, true));
+      GetCentroidPosition()?.Also(p => _centroid.MoveTo(p.X, p.Y, Keys.None, true));
     };
   }
 
@@ -206,7 +206,7 @@ public class BezierPath : CanvasObject
     else if (point is ControlPoint ctrlPoint)
     {
       var ctrlPointIndex = CanvasPoints.IndexOf(point);
-      (CanvasPoints.ElementAtOrDefault(ctrlPointIndex - 1) as Vertex ?? CanvasPoints.ElementAtOrDefault(ctrlPointIndex + 1) as Vertex)?.Also(vertex => ctrlPoint.MoveTo(vertex.ToPoint, Keys.None));
+      (CanvasPoints.ElementAtOrDefault(ctrlPointIndex - 1) as Vertex ?? CanvasPoints.ElementAtOrDefault(ctrlPointIndex + 1) as Vertex)?.Also(vertex => ctrlPoint.MoveTo(vertex.X, vertex.Y, Keys.None));
     }
   }
 
@@ -373,7 +373,7 @@ public class BezierPath : CanvasObject
     {
       var vertices = CanvasPoints.OfType<Vertex>().Let(points => _isClosedPath ? points.SkipLast(1) : points).ToList();
       vertices.ForEach(v => v?.Move(moveInfo, modifierKeys, supressCallback));
-      GetCentroidPosition()?.Also(p => _centroid.MoveTo(p, Keys.None, false));
+      GetCentroidPosition()?.Also(p => _centroid.MoveTo(p.X, p.Y, Keys.None, false));
     }
   }
 
@@ -459,9 +459,9 @@ public class BezierPath : CanvasObject
   /// <summary>
   /// Called when the <paramref name="canvasPoint"/> is moved
   /// </summary>
-  private void OnMoved(CanvasPoint canvasPoint, int dx, int dy, Keys modifierKeys)
+  private void OnMoved(CanvasPoint canvasPoint, Point? mouseLocation, int dx, int dy, Keys modifierKeys)
   {
-    var moveInfo = new MoveInfo(Point.Empty, dx, dy);
+    var moveInfo = new MoveInfo(mouseLocation.OrEmpty(), dx, dy);
 
     if (_centroid.IsSelected)
     {
@@ -481,7 +481,7 @@ public class BezierPath : CanvasObject
         double angleRadians = Math.Atan2(det, dot);
         double angleDegrees = angleRadians * (180.0 / Math.PI);
         TNTLogger.Info($"Angle from previous to current location to centroid: {angleDegrees:F2} degrees");
-        canvasPoint.MoveTo(prevLocation, modifierKeys, true);
+        canvasPoint.MoveTo(prevLocation.X, prevLocation.Y, modifierKeys, true);
         RotateBy(angleDegrees, modifierKeys);
       }
       return;
@@ -499,7 +499,7 @@ public class BezierPath : CanvasObject
         if (oppositeCtrlPoint == null) return;
         var offset = ctrlPointVertex.ToPoint.Subtract(ctrlPoint.ToPoint);
         var newPoint = ctrlPointVertex.ToPoint.Add(offset);
-        oppositeCtrlPoint?.MoveTo(newPoint, modifierKeys, true);
+        oppositeCtrlPoint?.MoveTo(newPoint.X, newPoint.Y, modifierKeys, true);
       }
     }
     else if (canvasPoint is Vertex vertex)
@@ -521,7 +521,7 @@ public class BezierPath : CanvasObject
         coincidentPoint?.Also(point =>
         {
           CanvasPoints.AdjacentTo(point).ForEach(ctrlPoint => ctrlPoint.Move(moveInfo, Keys.None, true));
-          point.MoveTo(vertex.ToPoint, Keys.None, true);
+          point.MoveTo(vertex.X, vertex.Y, Keys.None, true);
         });
       }
       else if (CanvasPoints.IsFirstOrLast(vertex))
@@ -530,7 +530,7 @@ public class BezierPath : CanvasObject
       }
     }
 
-    GetCentroidPosition()?.Also(p => _centroid.MoveTo(p, Keys.None, false));
+    GetCentroidPosition()?.Also(p => _centroid.MoveTo(p.X, p.Y, Keys.None, false));
   }
 
   /// <summary>

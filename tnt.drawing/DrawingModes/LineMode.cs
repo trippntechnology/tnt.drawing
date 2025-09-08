@@ -85,7 +85,7 @@ public class LineMode(Canvas canvas, CanvasLayer layer, BezierPath defaultObject
 
     location = Canvas.SnapToInterval ? location.Snap(Canvas.SnapInterval) : location;
 
-    activeVertex.MoveTo(location, modifierKeys);
+    activeVertex.MoveTo(location.X, location.Y, modifierKeys);
     Canvas.Invalidate();
   }
 
