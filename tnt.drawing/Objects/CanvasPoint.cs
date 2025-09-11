@@ -24,7 +24,7 @@ public class CanvasPoint() : CanvasObject
   /// <see cref="Action{CanvasPoint, Int, Int, Keys}"/> delegate that is called when the <see cref="CanvasPoint"/>
   /// moves
   /// </summary>
-  public Action<CanvasPoint, Point?, int, int, Keys> OnMoved = (canvasPoint, mouseLocation, dx, dy, modifierKeys) => { };
+  public Action<CanvasPoint, Point, int, int, Keys> OnMoved = (canvasPoint, mouseLocation, dx, dy, modifierKeys) => { };
 
   // Properties
   /// <summary>
@@ -99,12 +99,12 @@ public class CanvasPoint() : CanvasObject
   /// <summary>
   /// Moves this <see cref="CanvasPoint"/> by the specified delta values in <paramref name="moveInfo"/>.
   /// </summary>
-  public override void Move(MoveInfo moveInfo, Keys modifierKeys, bool supressCallback = false) => MoveTo(X + moveInfo.Dx, Y + moveInfo.Dy, modifierKeys, supressCallback, moveInfo.MouseLocation);
+  public override void Move(MoveInfo moveInfo, Keys modifierKeys, bool supressCallback = false) => MoveTo(X + moveInfo.Dx, Y + moveInfo.Dy, modifierKeys, moveInfo.MouseLocation, supressCallback);
 
   /// <summary>
   /// Moves this <see cref="CanvasPoint"/> to the location specified by <paramref name="newLocation"/>
   /// </summary>
-  public virtual void MoveTo(int x, int y, Keys modifierKeys, bool supressCallback = false, Point? mouseLocation = null)
+  public virtual void MoveTo(int x, int y, Keys modifierKeys, Point mouseLocation, bool supressCallback = false)
   {
     var point = new Point(x, y);
     var delta = point.Subtract(ToPoint);
