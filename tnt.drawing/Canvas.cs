@@ -14,129 +14,43 @@ using TNT.Drawing.Model;
 namespace TNT.Drawing;
 
 /// <summary>
-/// <see cref="Control"/> that provides a grid that can be used to draw on
+/// Provides a grid-based drawing surface with layer and drawing mode support.
 /// </summary>
 public class Canvas : Control
 {
+  // Consts
+  private const int MINIMUM_PADDING = 1000;
+  private const int PADDING = 50;
+
+  // Fields
+  private Rectangle _layerRect = Rectangle.Empty;
+  private bool _fitOnPaint = false;
+  private bool _adjustPostion = false;
+  private KeyEventArgs? _keyEventArgs = null;
+  private Point _previousCursorPosition = Point.Empty;
+  private Point _previousGridPosition;
+  private ScrollableControl? _scrollableParent = null;
+  private CanvasProperties _properties = new CanvasProperties();
+  private List<CanvasLayer> _layers = new List<CanvasLayer>();
+
+  // Events/Delegates
+
   /// <summary>
-  /// Delegate that is called to signal that one or more <see cref="object"/> have been
-  /// selected within the <see cref="Canvas"/>
+  /// Invoked when one or more objects are selected within the canvas.
   /// </summary>
   public Action<List<object>> OnSelected = (obj) => { };
 
   /// <summary>
-  /// Delegate that is called to signal when feedback has changed within the <see cref="Canvas"/>
+  /// Invoked when feedback (cursor/hint) changes within the canvas.
   /// </summary>
   public Action<Feedback> OnFeedbackChanged = (feedback) => { };
 
-  private const int MINIMUM_PADDING = 1000;
-  private const int PADDING = 50;
-
-  private Rectangle _LayerRect = Rectangle.Empty;
-  private bool FitOnPaint = false;
-  private bool AdjustPostion = false;
-  private KeyEventArgs? keyEventArgs = null;
-  private Point PreviousCursorPosition = Point.Empty;
-  private Point PreviousGridPosition;
-  private ScrollableControl? ScrollableParent = null;
-  private CanvasProperties _Properties = new CanvasProperties();
-  private List<CanvasLayer> _Layers = new List<CanvasLayer>();
-
+  // Constructors
   /// <summary>
-  /// Persisted properties
-  /// </summary>
-  [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-  public CanvasProperties Properties
-  {
-    get { return _Properties; }
-    set
-    {
-      _Properties = value;
-      _Properties.OnPropertyChanged += (name, val) => { this.SetProperty(name, val); };
-      _Properties.SetProperties(this);
-    }
-  }
-
-  /// <summary>
-  /// <see cref="DrawingMode"/> interacting with the <see cref="Canvas"/>
-  /// </summary>
-  [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-  public DrawingMode DrawingMode { get; set; }
-
-  /// <summary>
-  /// <see cref="List{CanvasLayer}"/> managed by the <see cref="Canvas"/>
-  /// </summary>
-  [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-  public List<CanvasLayer> Layers { get { return _Layers; } set { _Layers = value; Refresh(); } }
-
-  /// <summary>
-  /// The <see cref="ScalePercentage"/> represented as a <see cref="float"/>
-  /// </summary>
-  [Browsable(false)]
-  private float Zoom => ScalePercentage / 100F;
-
-  /// <summary>
-  /// Amount the <see cref="Canvas"/> should be scaled
-  /// </summary>
-  [Category("Appearance")]
-  [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-  public int ScalePercentage { get => Properties.ScalePercentage; set { Properties.ScalePercentage = value; Invalidate(); } }
-
-  /// <summary>
-  /// <see cref="CanvasLayer"/> height
-  /// </summary>
-  [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-  public int LayerHeight
-  {
-    get => _LayerRect.Height;
-    set
-    {
-      _LayerRect.Height = value;
-      Layers.ForEach(l => l.Height = value);
-    }
-  }
-
-  /// <summary>
-  /// <see cref="CanvasLayer"/> width
-  /// </summary>
-  [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-  public int LayerWidth
-  {
-    get => _LayerRect.Width;
-    set
-    {
-      _LayerRect.Width = value;
-      Layers.ForEach(l => l.Width = value);
-    }
-  }
-
-  /// <summary>
-  /// Snap interval
-  /// </summary>
-  [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-  public int SnapInterval { get; set; } = 10;
-
-  /// <summary>
-  /// Indicates whether movement should be snapped to <see cref="SnapInterval"/>
-  /// </summary>
-  [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-  public bool SnapToInterval { get; set; }
-
-  /// <summary>
-  /// Scaled grid width
-  /// </summary>
-  protected int ScaledWidth => (int)(LayerWidth * Zoom);
-
-  /// <summary>
-  /// Scaled grid height
-  /// </summary>
-  protected int ScaledHeight => (int)(LayerHeight * Zoom);
-
-  /// <summary>
-  /// Initializes a <see cref="Canvas"/>
+  /// Initializes a new instance of the <see cref="Canvas"/> class and attaches it to the specified parent control.
   /// </summary>
   public Canvas(Control parent)
-    : base()
+      : base()
   {
     CanvasPanel canvasPanel = new CanvasPanel(parent);
     Parent = canvasPanel;
@@ -145,15 +59,108 @@ public class Canvas : Control
 
     DoubleBuffered = true;
     parent.SizeChanged += OnParentResize;
-    ScrollableParent = (Parent as ScrollableControl);
-    ScrollableParent?.Also(it => it.AutoScroll = true);
+    _scrollableParent = (Parent as ScrollableControl);
+    _scrollableParent?.Also(it => it.AutoScroll = true);
 
     // DrawingMode can't be null so set an initial DrawingMode
     DrawingMode = new DrawingMode(this, new CanvasLayer(this));
   }
 
+  // Properties
+
   /// <summary>
-  /// Fits the grid within the parent
+  /// Gets or sets the persisted properties for the canvas.
+  /// </summary>
+  [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+  public CanvasProperties Properties
+  {
+    get { return _properties; }
+    set
+    {
+      _properties = value;
+      _properties.OnPropertyChanged += (name, val) => { this.SetProperty(name, val); };
+      _properties.SetProperties(this);
+    }
+  }
+
+  /// <summary>
+  /// Gets or sets the current drawing mode interacting with the canvas.
+  /// </summary>
+  [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+  public DrawingMode DrawingMode { get; set; }
+
+  /// <summary>
+  /// Gets or sets the list of layers managed by the canvas.
+  /// </summary>
+  [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+  public List<CanvasLayer> Layers { get { return _layers; } set { _layers = value; Refresh(); } }
+
+  /// <summary>
+  /// Gets the scale factor as a float (percentage divided by 100).
+  /// </summary>
+  [Browsable(false)]
+  private float Zoom => ScalePercentage / 100F;
+
+  /// <summary>
+  /// Gets or sets the scale percentage for zooming the canvas.
+  /// </summary>
+  [Category("Appearance")]
+  [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+  public int ScalePercentage { get => Properties.ScalePercentage; set { Properties.ScalePercentage = value; Invalidate(); } }
+
+  /// <summary>
+  /// Gets or sets the height of the canvas layer.
+  /// </summary>
+  [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+  public int LayerHeight
+  {
+    get => _layerRect.Height;
+    set
+    {
+      _layerRect.Height = value;
+      Layers.ForEach(l => l.Height = value);
+    }
+  }
+
+  /// <summary>
+  /// Gets or sets the width of the canvas layer.
+  /// </summary>
+  [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+  public int LayerWidth
+  {
+    get => _layerRect.Width;
+    set
+    {
+      _layerRect.Width = value;
+      Layers.ForEach(l => l.Width = value);
+    }
+  }
+
+  /// <summary>
+  /// Gets or sets the snap interval for object alignment.
+  /// </summary>
+  [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+  public int SnapInterval { get; set; } = 10;
+
+  /// <summary>
+  /// Gets or sets whether movement should be snapped to the snap interval.
+  /// </summary>
+  [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+  public bool SnapToInterval { get; set; }
+
+  /// <summary>
+  /// Gets the scaled grid width based on the zoom factor.
+  /// </summary>
+  protected int ScaledWidth => (int)(LayerWidth * Zoom);
+
+  /// <summary>
+  /// Gets the scaled grid height based on the zoom factor.
+  /// </summary>
+  protected int ScaledHeight => (int)(LayerHeight * Zoom);
+
+  // Public Methods
+  /// <summary>
+  /// Fits the grid within the parent control, adjusting scale and scroll position.
   /// </summary>
   public void Fit()
   {
@@ -177,11 +184,11 @@ public class Canvas : Control
 
     ScalePercentage = Convert.ToInt32(newScale);
     var position = new Point(-(parent.Width / 2 - Width / 2), -(parent.Height / 2 - Height / 2));
-    ScrollableParent?.Also(it => it.AutoScrollPosition = position);
+    _scrollableParent?.Also(it => it.AutoScrollPosition = position);
   }
 
   /// <summary>
-  /// Aligns all selected objects to the <see cref="SnapInterval"/>
+  /// Aligns all selected objects to the snap interval.
   /// </summary>
   public void AlignToSnapInterval()
   {
@@ -190,24 +197,48 @@ public class Canvas : Control
     Invalidate();
   }
 
+  /// <summary>
+  /// Brings selected objects in all layers to the front (top of z-order).
+  /// </summary>
   public new void BringToFront()
   {
     Layers.ForEach(layer =>
     {
       var selectedObjects = layer.GetSelected();
       selectedObjects.ForEach(obj =>
-      {
-        layer.CanvasObjects.Remove(obj);
-        layer.CanvasObjects.Add(obj);
-      });
+          {
+            layer.CanvasObjects.Remove(obj);
+            layer.CanvasObjects.Add(obj);
+          });
     });
 
     Invalidate();
   }
 
   /// <summary>
-  /// Draws the grid on the canvas
+  /// Forces the control to immediately redraw itself for the specified layer.
   /// </summary>
+  /// <param name="layer">The layer to refresh.</param>
+  public void Refresh(CanvasLayer layer)
+  {
+    base.Refresh();
+  }
+
+  /// <summary>
+  /// Handles object selection and invokes the selection event.
+  /// </summary>
+  /// <param name="objs">The list of selected objects.</param>
+  public void OnObjectsSelected(List<object> objs)
+  {
+    var selected = objs.Count == 0 ? new List<Object>() { Properties } : objs;
+    OnSelected(selected);
+  }
+
+  // Protected/Override Methods
+  /// <summary>
+  /// Paints the canvas, drawing all layers and the current drawing mode.
+  /// </summary>
+  /// <param name="e">The paint event arguments.</param>
   protected override void OnPaint(PaintEventArgs e)
   {
     UpdateClientDimensions();
@@ -216,17 +247,17 @@ public class Canvas : Control
     // Draw layers
     Layers.ForEach(l => l.Draw(graphics));
 
-    if (AdjustPostion)
+    if (_adjustPostion)
     {
-      var previousCanvasPosition = PreviousGridPosition.ToCanvasCoordinates(graphics);
+      var previousCanvasPosition = _previousGridPosition.ToCanvasCoordinates(graphics);
       var currentCanvasPosition = PointToClient(Cursor.Position);
       RepositionToAlignWithMouse(previousCanvasPosition, currentCanvasPosition);
-      AdjustPostion = false;
+      _adjustPostion = false;
     }
 
-    if (!FitOnPaint)
+    if (!_fitOnPaint)
     {
-      FitOnPaint = true;
+      _fitOnPaint = true;
       Fit();
     }
 
@@ -236,8 +267,125 @@ public class Canvas : Control
   }
 
   /// <summary>
-  /// Repositions the <see cref="Canvas"/> to keep the mouse at the same postion within the <see cref="Canvas"/>
+  /// Focuses this control when mouse movements are detected and handles mouse move events.
   /// </summary>
+  /// <param name="e">The mouse event arguments.</param>
+  protected override void OnMouseMove(MouseEventArgs e)
+  {
+    var graphics = CreateTransformedGraphics();
+    var mea = Transform(e, graphics);
+
+    if (_keyEventArgs?.KeyCode != Keys.Space) DrawingMode.OnMouseMove(mea, ModifierKeys);
+
+    var currentCursorPosition = Cursor.Position;
+    var mousePosition = new Point(e.X, e.Y);
+    _previousGridPosition = mousePosition.ToGridCoordinates(graphics);
+
+    if (_keyEventArgs?.KeyCode == Keys.Space)
+    {
+      RepositionToAlignWithMouse(_previousCursorPosition, currentCursorPosition);
+    }
+
+    _previousCursorPosition = currentCursorPosition;
+
+    Focus();
+    base.OnMouseMove(e);
+  }
+
+  /// <summary>
+  /// Handles key down events, switching to pan mode if space is pressed.
+  /// </summary>
+  /// <param name="e">The key event arguments.</param>
+  protected override void OnKeyDown(KeyEventArgs e)
+  {
+    _keyEventArgs = e;
+    switch (_keyEventArgs.KeyCode)
+    {
+      case Keys.Space:
+        Cursor = Cursors.Hand;
+        break;
+      default:
+        DrawingMode.OnKeyDown(e);
+        break;
+    }
+  }
+
+  /// <summary>
+  /// Handles key up events, restoring cursor and passing to drawing mode.
+  /// </summary>
+  /// <param name="e">The key event arguments.</param>
+  protected override void OnKeyUp(KeyEventArgs e)
+  {
+    _keyEventArgs = null;
+    Cursor = Cursors.Default;
+    DrawingMode.OnKeyUp(e);
+  }
+
+  /// <summary>
+  /// Relays the mouse double-click event to the current drawing mode.
+  /// </summary>
+  /// <param name="e">The mouse event arguments.</param>
+  protected override void OnMouseDoubleClick(MouseEventArgs e)
+  {
+    base.OnMouseDoubleClick(e);
+    DrawingMode.OnMouseDoubleClick(e);
+  }
+
+  /// <summary>
+  /// Relays the mouse down event to the current drawing mode.
+  /// </summary>
+  /// <param name="e">The mouse event arguments.</param>
+  protected override void OnMouseDown(MouseEventArgs e)
+  {
+    MouseEventArgs mea = Transform(e);
+    DrawingMode.OnMouseDown(mea, ModifierKeys);
+    base.OnMouseDown(e);
+  }
+
+  /// <summary>
+  /// Relays the mouse up event to the current drawing mode.
+  /// </summary>
+  /// <param name="e">The mouse event arguments.</param>
+  protected override void OnMouseUp(MouseEventArgs e)
+  {
+    base.OnMouseUp(e);
+    var graphics = CreateTransformedGraphics();
+    var mea = Transform(e, graphics);
+    DrawingMode.OnMouseUp(mea, ModifierKeys);
+  }
+
+  /// <summary>
+  /// Handles mouse wheel events for zooming the canvas.
+  /// </summary>
+  /// <param name="e">The mouse event arguments.</param>
+  protected override void OnMouseWheel(MouseEventArgs e)
+  {
+    // Size of a scroll delta (seems to be 120)
+    var wheelDelta = SystemInformation.MouseWheelScrollDelta;
+    // Change, smaller (-1) or larger (1)
+    var change = e.Delta / wheelDelta;
+    // Amount of change that should be applied to the scale percentage
+    //var detents = change / (keyEventArgs?.Shift == true ? 100.0f : 10.0f);
+    var detents = change * (_keyEventArgs?.Shift == true ? 1 : 10);
+
+    if (_keyEventArgs?.Control == true && ScalePercentage + detents > 0)
+    {
+      // Adjust position when Paint() is called
+      _adjustPostion = true;
+      var graphics = CreateTransformedGraphics();
+      var positionOnCanvas = new Point(e.X, e.Y);
+      _previousGridPosition = positionOnCanvas.ToGridCoordinates(graphics);
+      ScalePercentage += detents;
+      (e as HandledMouseEventArgs)?.Let(h => h.Handled = true);
+    }
+  }
+
+  // Private Methods
+  /// <summary>
+  /// Repositions the canvas to keep the mouse at the same position within the canvas after zoom/pan.
+  /// </summary>
+  /// <param name="previousPosition">The previous mouse position in canvas coordinates.</param>
+  /// <param name="currentPosition">The current mouse position in canvas coordinates.</param>
   private void RepositionToAlignWithMouse(Point previousPosition, Point currentPosition)
   {
     var parent = Parent!;
@@ -270,11 +418,11 @@ public class Canvas : Control
       newLocation.Y = parent.Height - min - Height;
     }
 
-    ScrollableParent?.Also(it => it.AutoScrollPosition = new Point(-newLocation.X, -newLocation.Y));
+    _scrollableParent?.Also(it => it.AutoScrollPosition = new Point(-newLocation.X, -newLocation.Y));
   }
 
   /// <summary>
-  /// Updates the client's dimensions
+  /// Updates the client dimensions to fit the drawing canvas and padding.
   /// </summary>
   private void UpdateClientDimensions()
   {
@@ -289,99 +437,18 @@ public class Canvas : Control
   }
 
   /// <summary>
-  /// Focus this control when mouse movements are detected
+  /// Redraws the canvas when the parent's size changes.
   /// </summary>
-  protected override void OnMouseMove(MouseEventArgs e)
-  {
-    var graphics = CreateTransformedGraphics();
-    var mea = Transform(e, graphics);
-
-    if (keyEventArgs?.KeyCode != Keys.Space) DrawingMode.OnMouseMove(mea, ModifierKeys);
-
-    var currentCursorPosition = Cursor.Position;
-    var mousePosition = new Point(e.X, e.Y);
-    PreviousGridPosition = mousePosition.ToGridCoordinates(graphics);
-
-    if (keyEventArgs?.KeyCode == Keys.Space)
-    {
-      RepositionToAlignWithMouse(PreviousCursorPosition, currentCursorPosition);
-    }
-
-    PreviousCursorPosition = currentCursorPosition;
-
-    Focus();
-    base.OnMouseMove(e);
-  }
+  /// <param name="sender">The event sender.</param>
+  /// <param name="e">The event arguments.</param>
+  private void OnParentResize(object? sender, EventArgs e) => Refresh();
 
   /// <summary>
-  /// Forces control to immediately redraw itself
+  /// Transforms the location within the <see cref="MouseEventArgs"/> using the specified graphics transformation.
   /// </summary>
-  public void Refresh(CanvasLayer layer)
-  {
-    base.Refresh();
-  }
-
-  /// <summary>
-  /// Sets <see cref="KeyEventArgs"/>
-  /// </summary>
-  protected override void OnKeyDown(KeyEventArgs e)
-  {
-    keyEventArgs = e;
-    switch (keyEventArgs.KeyCode)
-    {
-      case Keys.Space:
-        Cursor = Cursors.Hand;
-        break;
-      default:
-        DrawingMode.OnKeyDown(e);
-        break;
-    }
-  }
-
-  /// <summary>
-  /// Sets <see cref="KeyEventArgs"/>
-  /// </summary>
-  protected override void OnKeyUp(KeyEventArgs e)
-  {
-    keyEventArgs = null;
-    Cursor = Cursors.Default;
-    DrawingMode.OnKeyUp(e);
-  }
-
-  /// <summary>
-  /// Relays the OnMouseDoubleClick to the <see cref="DrawingMode"/>
-  /// </summary>
-  protected override void OnMouseDoubleClick(MouseEventArgs e)
-  {
-    base.OnMouseDoubleClick(e);
-    DrawingMode.OnMouseDoubleClick(e);
-  }
-
-  /// <summary>
-  /// Relays the OnMouseDown to the <see cref="DrawingMode"/>
-  /// </summary>
-  protected override void OnMouseDown(MouseEventArgs e)
-  {
-    MouseEventArgs mea = Transform(e);
-    DrawingMode.OnMouseDown(mea, ModifierKeys);
-    base.OnMouseDown(e);
-  }
-
-  /// <summary>
-  /// Relays the OnMouseUp to the <see cref="DrawingMode"/>
-  /// </summary>
-  protected override void OnMouseUp(MouseEventArgs e)
-  {
-    base.OnMouseUp(e);
-    var graphics = CreateTransformedGraphics();
-    var mea = Transform(e, graphics);
-    DrawingMode.OnMouseUp(mea, ModifierKeys);
-  }
-
-  /// <summary>
-  /// Transforms the location within the <see cref="MouseEventArgs"/> using the <paramref name="graphics"/>
-  /// </summary>
-  /// <returns><see cref="MouseEventArgs"/> with the transformed location</returns>
+  /// <param name="e">The mouse event arguments.</param>
+  /// <param name="graphics">The graphics context for transformation.</param>
+  /// <returns>A <see cref="MouseEventArgs"/> with the transformed location.</returns>
   private MouseEventArgs Transform(MouseEventArgs e, Graphics? graphics = null)
   {
     graphics = graphics ?? CreateTransformedGraphics();
@@ -390,48 +457,10 @@ public class Canvas : Control
   }
 
   /// <summary>
-  /// Changes <see cref="ScalePercentage"/>
+  /// Returns a <see cref="Graphics"/> object with the canvas's current scale and translation applied.
   /// </summary>
-  /// <param name="e"></param>
-  protected override void OnMouseWheel(MouseEventArgs e)
-  {
-    // Size of a scroll delta (seems to be 120)
-    var wheelDelta = SystemInformation.MouseWheelScrollDelta;
-    // Change, smaller (-1) or larger (1)
-    var change = e.Delta / wheelDelta;
-    // Amount of change that should be applied to the scale percentage
-    //var detents = change / (keyEventArgs?.Shift == true ? 100.0f : 10.0f);
-    var detents = change * (keyEventArgs?.Shift == true ? 1 : 10);
-
-    if (keyEventArgs?.Control == true && ScalePercentage + detents > 0)
-    {
-      // Adjust position when Paint() is called
-      AdjustPostion = true;
-      var graphics = CreateTransformedGraphics();
-      var positionOnCanvas = new Point(e.X, e.Y);
-      PreviousGridPosition = positionOnCanvas.ToGridCoordinates(graphics);
-      ScalePercentage += detents;
-      (e as HandledMouseEventArgs)?.Let(h => h.Handled = true);
-    }
-  }
-
-  /// <summary>
-  /// Redraws <see cref="Canvas"/> when the parent's size changes.
-  /// </summary>
-  private void OnParentResize(object? sender, EventArgs e) => Refresh();
-
-  /// <summary>
-  /// Called when objects have been selected
-  /// </summary>
-  public void OnObjectsSelected(List<object> objs)
-  {
-    var selected = objs.Count == 0 ? new List<Object>() { Properties } : objs;
-    OnSelected(selected);
-  }
-
-  /// <summary>
-  /// Returns a <see cref="Graphics"/> that has been transformed
-  /// </summary>
+  /// <param name="graphics">An optional graphics context to apply transformations to.</param>
+  /// <returns>The transformed <see cref="Graphics"/> object.</returns>
   private Graphics CreateTransformedGraphics(Graphics? graphics = null)
   {
     graphics = graphics ?? CreateGraphics();
