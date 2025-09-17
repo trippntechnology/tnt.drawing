@@ -13,29 +13,27 @@ namespace Sample;
 
 public partial class Form1 : Form
 {
-  private ApplicationRegistry? applicationRegistery = null;
-  private readonly Canvas canvas;
-  private ToolStripItemCheckboxGroupManager? ModeGroupManager;
-  private ToolStripItemGroupManager? GroupManager;
+  private ApplicationRegistry? _applicationRegistery = null;
+  private readonly Canvas _canvas;
 
   public Form1()
   {
     InitializeComponent();
 
-    applicationRegistery = new ApplicationRegistry(this, Registry.CurrentUser, "Tripp'n Technology", "CenteredDrawing");
-    canvas = new Canvas(toolStripContainer1.ContentPanel);
-    canvas.Properties = new CanvasProperties(); ;
+    _applicationRegistery = new ApplicationRegistry(this, Registry.CurrentUser, "Tripp'n Technology", "CenteredDrawing");
+    _canvas = new Canvas(toolStripContainer1.ContentPanel);
+    _canvas.Properties = new CanvasProperties(); ;
 
-    var backgroundLayer = new CanvasLayer(canvas)
+    var backgroundLayer = new CanvasLayer(_canvas)
     {
       Name = "Background",
       CanvasObjects = new List<CanvasObject>() { GetSquarePath(150, 150, 50, Color.Green) },
       BackgroundColor = Color.White,
     };
 
-    var gridLayer = new GridLayer(canvas) { Name = "Grid", LineColor = Color.Aqua };
+    var gridLayer = new GridLayer(_canvas) { Name = "Grid", LineColor = Color.Aqua };
 
-    var objectsLayer = new CanvasLayer(canvas)
+    var objectsLayer = new CanvasLayer(_canvas)
     {
       Name = "Object",
       CanvasObjects = new List<CanvasObject>()
@@ -48,11 +46,11 @@ public partial class Form1 : Form
       }
     };
 
-    canvas.Layers = new List<CanvasLayer>() { backgroundLayer, gridLayer, objectsLayer };
+    _canvas.Layers = new List<CanvasLayer>() { backgroundLayer, gridLayer, objectsLayer };
 
     SetupToolStripItems(objectsLayer);
 
-    canvas.Layers.ForEach(layer =>
+    _canvas.Layers.ForEach(layer =>
     {
       layerToolStripMenuItem.DropDownItems.Add(new ToolStripMenuItem(layer.ToString()).Also(it =>
       {
@@ -61,11 +59,11 @@ public partial class Form1 : Form
       }));
     });
 
-    propertyGrid1.SelectedObject = canvas.Properties;
+    propertyGrid1.SelectedObject = _canvas.Properties;
 
-    canvas.DrawingMode = new SelectMode(canvas, objectsLayer);
+    _canvas.DrawingMode = new SelectMode(_canvas, objectsLayer);
 
-    canvas.OnSelected = (objs) =>
+    _canvas.OnSelected = (objs) =>
     {
       try
       {
@@ -76,7 +74,7 @@ public partial class Form1 : Form
       }
     };
 
-    canvas.OnFeedbackChanged = (feedback) =>
+    _canvas.OnFeedbackChanged = (feedback) =>
     {
       Cursor = feedback.Cursor;
       toolStripStatusLabel1.Text = feedback.Hint;
@@ -118,44 +116,6 @@ public partial class Form1 : Form
     });
   }
 
-  private void SaveToolStripMenuItem_Click(object sender, System.EventArgs e)
-  {
-    using (var sfd = new System.Windows.Forms.SaveFileDialog())
-    {
-      if (sfd.ShowDialog() == DialogResult.OK)
-      {
-        //var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        //var assPath = Path.Combine(path, "tnt.drawing.dll");
-        //var types = Utilities.Utilities.GetTypes(assPath, t => !t.IsAbstract && (t.InheritsFrom(typeof(CanvasObject)) || t.InheritsFrom(typeof(CanvasLayer))));
-
-        //var layer = _Canvas.Layers.Find(l => l.Name == "Object");
-        //var ser = Utilities.Utilities.Serialize(layer, types);
-        //File.WriteAllText(sfd.FileName, ser);
-      }
-    }
-  }
-
-  private void OpenToolStripMenuItem_Click(object sender, System.EventArgs e)
-  {
-    using (var ofd = new System.Windows.Forms.OpenFileDialog())
-    {
-      if (ofd.ShowDialog() == DialogResult.OK)
-      {
-        //var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        //var assPath = Path.Combine(path, "tnt.drawing.dll");
-        //var types = Utilities.Utilities.GetTypes(assPath, t => !t.IsAbstract && (t.InheritsFrom(typeof(CanvasObject)) || t.InheritsFrom(typeof(CanvasLayer))));
-
-        //var layer = _Canvas.Layers.Find(l => l.Name == "Object");
-        //_Canvas.Layers.Remove(layer);
-        //var ser = File.ReadAllText(ofd.FileName);
-        //layer = Utilities.Utilities.Deserialize<CanvasLayer>(ser, types);
-        //_Canvas.Layers.Add(layer);
-        ////_CanvasPanel.Properties = Utilities.Utilities.Deserialize<CanvasProperties>(ser, new System.Type[] { });
-        //propertyGrid1.SelectedObject = _Canvas.Properties;
-      }
-    }
-  }
-
   private void LineToolStripMenuItem_Click(object? sender, System.EventArgs e)
   {
     if (sender is ToolStripMenuItem menuItem)
@@ -163,43 +123,86 @@ public partial class Form1 : Form
       if (menuItem.Tag is DrawingMode mode)
       {
         propertyGrid1.SelectedObject = mode.DefaultObject;
-        canvas.DrawingMode.Reset();
-        canvas.DrawingMode = mode;
+        _canvas.DrawingMode.Reset();
+        _canvas.DrawingMode = mode;
       }
     }
   }
 
-  private void PropertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e) => canvas.DrawingMode.Layer.Also(layer => canvas.Refresh(layer));
+  private void PropertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e) => _canvas.DrawingMode.Layer.Also(layer => _canvas.Refresh(layer));
 
-  private void AlignToolStripMenuItem_Click(object sender, System.EventArgs e) => canvas.AlignToSnapInterval();
+  private void AlignToolStripMenuItem_Click(object sender, System.EventArgs e) => _canvas.AlignToSnapInterval();
 
-  private void bringToFrontToolStripMenuItem_Click(object sender, EventArgs e) => canvas.BringToFront();
+  private void bringToFrontToolStripMenuItem_Click(object sender, EventArgs e) => _canvas.BringToFront();
 
   private void SetupToolStripItems(CanvasLayer canvasLayer)
   {
-    ModeGroupManager = new ToolStripItemCheckboxGroupManager(toolStripStatusLabel1)
+    var modeGroupManager = new ToolStripItemCheckboxGroupManager(toolStripStatusLabel1)
     {
       OnClick = item =>
       {
         if (item.Tag is DrawingMode mode)
         {
           propertyGrid1.SelectedObject = mode.DefaultObject;
-          canvas.DrawingMode.Reset();
-          canvas.DrawingMode = mode;
+          _canvas.DrawingMode.Reset();
+          _canvas.DrawingMode = mode;
         }
       },
     };
-    ModeGroupManager.Create<Select>(new ToolStripItem[] { toolStripButton1, toolStripMenuItem1 }).Also(group => { group.Tag = new SelectMode(canvas, canvasLayer); });
-    ModeGroupManager.Create<Line>(new ToolStripItem[] { toolStripButton2, toolStripMenuItem2 }).Also(group => { group.Tag = new LineMode(canvas, canvasLayer, new BezierPath()); });
-    ModeGroupManager.Create<Group.Rectangle>(new ToolStripItem[] { toolStripButton3, toolStripMenuItem3 }).Also(group => { group.Tag = new RectangleMode(canvas, canvasLayer, new BezierPath()); });
+    modeGroupManager.Create<Select>(new ToolStripItem[] { toolStripButton1, toolStripMenuItem1 }).Also(group => { group.Tag = new SelectMode(_canvas, canvasLayer); });
+    modeGroupManager.Create<Line>(new ToolStripItem[] { toolStripButton2, toolStripMenuItem2 }).Also(group => { group.Tag = new LineMode(_canvas, canvasLayer, new BezierPath()); });
+    modeGroupManager.Create<Group.Rectangle>(new ToolStripItem[] { toolStripButton3, toolStripMenuItem3 }).Also(group => { group.Tag = new RectangleMode(_canvas, canvasLayer, new BezierPath()); });
 
-    GroupManager = new ToolStripItemGroupManager(toolStripStatusLabel1)
+    var menuGroupManager = new ToolStripItemGroupManager(toolStripStatusLabel1)
     {
       OnClick = item =>
       {
-        if (item is Fit) canvas.Fit();
+        if (item is Fit)
+        {
+          _canvas.Fit();
+        }
+        else if (item is SaveFile)
+        {
+          using (var sfd = new System.Windows.Forms.SaveFileDialog())
+          {
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+              //var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+              //var assPath = Path.Combine(path, "tnt.drawing.dll");
+              //var types = Utilities.Utilities.GetTypes(assPath, t => !t.IsAbstract && (t.InheritsFrom(typeof(CanvasObject)) || t.InheritsFrom(typeof(CanvasLayer))));
+
+              var layer = _canvas.Layers.Find(l => l.Name == "Object");
+              var ser = TNT.Commons.Json.serializeObject(layer!);
+              File.WriteAllText(sfd.FileName, ser);
+            }
+          }
+        }
+        else if (item is OpenFile)
+        {
+          using (var ofd = new System.Windows.Forms.OpenFileDialog())
+          {
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+              //var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+              //var assPath = Path.Combine(path, "tnt.drawing.dll");
+              //var types = Utilities.Utilities.GetTypes(assPath, t => !t.IsAbstract && (t.InheritsFrom(typeof(CanvasObject)) || t.InheritsFrom(typeof(CanvasLayer))));
+
+              var layer = _canvas.Layers.Find(l => l.Name == "Object");
+              layer?.Also(l => _canvas.Layers.Remove(l));
+              var ser = File.ReadAllText(ofd.FileName);
+              var newLayer = Json.deserializeJson<CanvasLayer>(ser);
+              newLayer?.Also(l => {
+                l.Canvas = _canvas;
+                _canvas.Layers.Add(l); });
+              //_canvasPanel.Properties = Utilities.Utilities.Deserialize<CanvasProperties>(ser, new System.Type[] { });
+              propertyGrid1.SelectedObject = _canvas.Properties;
+            }
+          }
+        }
       },
     };
-    GroupManager.Create<Fit>(new ToolStripItem[] { fitToolStripButton, fitToolStripMenuItem });
+    menuGroupManager.Create<Fit>(new ToolStripItem[] { fitToolStripButton, fitToolStripMenuItem });
+    menuGroupManager.Create<SaveFile>(new ToolStripItem[] { saveToolStripMenuItem1 });
+    menuGroupManager.Create<OpenFile>(new ToolStripItem[] { openToolStripMenuItem1 });
   }
 }

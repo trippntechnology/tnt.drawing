@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <None Remove="Images\arrow_selector_tool_24.png" />
+    <None Remove="Images\file_open_24.png" />
+    <None Remove="Images\file_save_24.png" />
     <None Remove="Images\fit_screen_24.png" />
     <None Remove="Images\line_curve_24.png" />
     <None Remove="Images\rectangle_24.png" />
@@ -17,6 +19,8 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Images\arrow_selector_tool_24.png" />
+    <EmbeddedResource Include="Images\file_open_24.png" />
+    <EmbeddedResource Include="Images\file_save_24.png" />
     <EmbeddedResource Include="Images\fit_screen_24.png" />
     <EmbeddedResource Include="Images\line_curve_24.png" />
     <EmbeddedResource Include="Images\rectangle_24.png" />

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -24,12 +25,14 @@ public abstract class CanvasObject : Observable
   /// <summary>
   /// Indicates whether the object is selected or not
   /// </summary>
+  [JsonIgnore]
   public virtual bool IsSelected { get => Get(false); set => Set(value); }
 
   /// <summary>
   /// The rotation angle (in degrees) of the object.
   /// </summary>
   [DisplayName("Rotation Angle")]
+  [JsonIgnore]
   public double RotationAngle { get => Get(0.0); set => Set(value); }
 
   /// <summary>

@@ -30,6 +30,7 @@ partial class Form1
   {
     System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
     splitContainer1 = new SplitContainer();
+    toolStripContainer1 = new ToolStripContainer();
     toolStrip2 = new ToolStrip();
     fitToolStripButton = new ToolStripButton();
     toolStrip1 = new ToolStrip();
@@ -51,17 +52,16 @@ partial class Form1
     propertyGrid1 = new PropertyGrid();
     statusStrip1 = new StatusStrip();
     toolStripStatusLabel1 = new ToolStripStatusLabel();
-    toolStripContainer1 = new ToolStripContainer();
     ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
     splitContainer1.Panel1.SuspendLayout();
     splitContainer1.Panel2.SuspendLayout();
     splitContainer1.SuspendLayout();
+    toolStripContainer1.TopToolStripPanel.SuspendLayout();
+    toolStripContainer1.SuspendLayout();
     toolStrip2.SuspendLayout();
     toolStrip1.SuspendLayout();
     menuStrip1.SuspendLayout();
     statusStrip1.SuspendLayout();
-    toolStripContainer1.TopToolStripPanel.SuspendLayout();
-    toolStripContainer1.SuspendLayout();
     SuspendLayout();
     // 
     // splitContainer1
@@ -84,6 +84,24 @@ partial class Form1
     splitContainer1.SplitterDistance = 932;
     splitContainer1.SplitterWidth = 5;
     splitContainer1.TabIndex = 2;
+    // 
+    // toolStripContainer1
+    // 
+    // 
+    // toolStripContainer1.ContentPanel
+    // 
+    toolStripContainer1.ContentPanel.Size = new Size(932, 745);
+    toolStripContainer1.Dock = DockStyle.Fill;
+    toolStripContainer1.Location = new Point(0, 24);
+    toolStripContainer1.Name = "toolStripContainer1";
+    toolStripContainer1.Size = new Size(932, 770);
+    toolStripContainer1.TabIndex = 3;
+    toolStripContainer1.Text = "toolStripContainer1";
+    // 
+    // toolStripContainer1.TopToolStripPanel
+    // 
+    toolStripContainer1.TopToolStripPanel.Controls.Add(toolStrip1);
+    toolStripContainer1.TopToolStripPanel.Controls.Add(toolStrip2);
     // 
     // toolStrip2
     // 
@@ -161,34 +179,32 @@ partial class Form1
     // fitToolStripMenuItem
     // 
     fitToolStripMenuItem.Name = "fitToolStripMenuItem";
-    fitToolStripMenuItem.Size = new Size(147, 22);
+    fitToolStripMenuItem.Size = new Size(180, 22);
     fitToolStripMenuItem.Text = "Fit";
     // 
     // saveToolStripMenuItem1
     // 
     saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
-    saveToolStripMenuItem1.Size = new Size(147, 22);
+    saveToolStripMenuItem1.Size = new Size(180, 22);
     saveToolStripMenuItem1.Text = "Save";
-    saveToolStripMenuItem1.Click += SaveToolStripMenuItem_Click;
     // 
     // openToolStripMenuItem1
     // 
     openToolStripMenuItem1.Name = "openToolStripMenuItem1";
-    openToolStripMenuItem1.Size = new Size(147, 22);
+    openToolStripMenuItem1.Size = new Size(180, 22);
     openToolStripMenuItem1.Text = "Open";
-    openToolStripMenuItem1.Click += OpenToolStripMenuItem_Click;
     // 
     // alignToolStripMenuItem
     // 
     alignToolStripMenuItem.Name = "alignToolStripMenuItem";
-    alignToolStripMenuItem.Size = new Size(147, 22);
+    alignToolStripMenuItem.Size = new Size(180, 22);
     alignToolStripMenuItem.Text = "Align";
     alignToolStripMenuItem.Click += AlignToolStripMenuItem_Click;
     // 
     // bringToFrontToolStripMenuItem
     // 
     bringToFrontToolStripMenuItem.Name = "bringToFrontToolStripMenuItem";
-    bringToFrontToolStripMenuItem.Size = new Size(147, 22);
+    bringToFrontToolStripMenuItem.Size = new Size(180, 22);
     bringToFrontToolStripMenuItem.Text = "Bring to Front";
     bringToFrontToolStripMenuItem.Click += bringToFrontToolStripMenuItem_Click;
     // 
@@ -250,24 +266,6 @@ partial class Form1
     toolStripStatusLabel1.Size = new Size(118, 17);
     toolStripStatusLabel1.Text = "toolStripStatusLabel1";
     // 
-    // toolStripContainer1
-    // 
-    // 
-    // toolStripContainer1.ContentPanel
-    // 
-    toolStripContainer1.ContentPanel.Size = new Size(932, 745);
-    toolStripContainer1.Dock = DockStyle.Fill;
-    toolStripContainer1.Location = new Point(0, 24);
-    toolStripContainer1.Name = "toolStripContainer1";
-    toolStripContainer1.Size = new Size(932, 770);
-    toolStripContainer1.TabIndex = 3;
-    toolStripContainer1.Text = "toolStripContainer1";
-    // 
-    // toolStripContainer1.TopToolStripPanel
-    // 
-    toolStripContainer1.TopToolStripPanel.Controls.Add(toolStrip2);
-    toolStripContainer1.TopToolStripPanel.Controls.Add(toolStrip1);
-    // 
     // Form1
     // 
     AutoScaleDimensions = new SizeF(7F, 15F);
@@ -285,6 +283,10 @@ partial class Form1
     splitContainer1.Panel2.PerformLayout();
     ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
     splitContainer1.ResumeLayout(false);
+    toolStripContainer1.TopToolStripPanel.ResumeLayout(false);
+    toolStripContainer1.TopToolStripPanel.PerformLayout();
+    toolStripContainer1.ResumeLayout(false);
+    toolStripContainer1.PerformLayout();
     toolStrip2.ResumeLayout(false);
     toolStrip2.PerformLayout();
     toolStrip1.ResumeLayout(false);
@@ -293,10 +295,6 @@ partial class Form1
     menuStrip1.PerformLayout();
     statusStrip1.ResumeLayout(false);
     statusStrip1.PerformLayout();
-    toolStripContainer1.TopToolStripPanel.ResumeLayout(false);
-    toolStripContainer1.TopToolStripPanel.PerformLayout();
-    toolStripContainer1.ResumeLayout(false);
-    toolStripContainer1.PerformLayout();
     ResumeLayout(false);
 
   }

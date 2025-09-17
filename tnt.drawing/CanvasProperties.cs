@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Newtonsoft.Json;
+using System.ComponentModel;
 using System.Drawing;
 using TNT.Reactive;
 
@@ -7,24 +8,20 @@ namespace TNT.Drawing;
 /// <summary>
 /// Properties that can be changed in a <see cref="CanvasPanel"/>
 /// </summary>
-public class CanvasProperties : Observable
+public class CanvasProperties() : Observable()
 {
-  /// <summary>
-  /// Initializes default values
-  /// </summary>
-  public CanvasProperties() { }
-
   /// <summary>
   /// Background color of the <see cref="Canvas"/>
   /// </summary>
   [DisplayName("Back Color")]
+  [JsonIgnore]
   public Color BackColor { get { return Get(Color.Blue); } set { Set(value); } }
 
   /// <summary>
   /// Serializable for <see cref="BackColor"/>
   /// </summary>
   [Browsable(false)]
-  public int SerializableBackColor { get { return BackColor.ToArgb(); } set { BackColor = Color.FromArgb(value); } }
+  public int BackColorArgb { get { return BackColor.ToArgb(); } set { BackColor = Color.FromArgb(value); } }
 
   /// <summary>
   /// </summary>

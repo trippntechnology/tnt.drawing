@@ -32,7 +32,7 @@ public class CanvasLayer
   /// <summary>
   /// Reference the <see cref="Canvas"/>
   /// </summary>
-  protected Canvas Canvas;
+  public Canvas? Canvas;
 
   /// <summary>
   /// Indicates whether the <see cref="CanvasLayer"/> is visisble
@@ -70,12 +70,20 @@ public class CanvasLayer
   public string Name { get; set; } = string.Empty;
 
   /// <summary>
+  /// Default constructor for <see cref="CanvasLayer"/>.
+  /// Subscribes to property change notifications from <see cref="BackingFields"/> and sets the redraw flag when any property changes.
+  /// </summary>
+  public CanvasLayer()
+  {
+    _BackingFields.OnFieldChanged += (field, value) => { _Redraw = true; };
+  }
+
+  /// <summary>
   /// Initialization constructor
   /// </summary>
-  public CanvasLayer(Canvas canvas)
+  public CanvasLayer(Canvas canvas) : this()
   {
     Canvas = canvas;
-    _BackingFields.OnFieldChanged += (field, value) => { _Redraw = true; };
   }
 
   /// <summary>

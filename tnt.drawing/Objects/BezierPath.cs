@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -39,6 +40,7 @@ public class BezierPath : CanvasObject
   /// Indicates the fill color of the <see cref="BezierPath"/>. This color is used to fill the interior of the path if applicable.
   /// </summary>
   [DisplayName("Fill Color")]
+  [JsonIgnore]
   public Color FillColor { get => Get(Color.Transparent); set => Set(value); }
 
   /// <summary>
@@ -67,6 +69,7 @@ public class BezierPath : CanvasObject
   /// Indicates the <see cref="LineColor"/> of the <see cref="BezierPath"/>
   /// </summary>
   [DisplayName("Line Color")]
+  [JsonIgnore]
   public Color LineColor { get => Get(Color.Blue); set => Set(value); }
 
   /// <summary>
@@ -107,6 +110,7 @@ public class BezierPath : CanvasObject
   /// <summary>
   /// Needed for deserialization so that set gets called. 
   /// </summary>
+  [JsonIgnore]
   public CanvasPoint[] PointsArray
   {
     get => CanvasPoints.ToArray();

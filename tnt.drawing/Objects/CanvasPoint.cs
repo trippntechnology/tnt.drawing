@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -24,6 +25,7 @@ public class CanvasPoint() : CanvasObject
   /// <see cref="Action{CanvasPoint, Int, Int, Keys}"/> delegate that is called when the <see cref="CanvasPoint"/>
   /// moves
   /// </summary>
+  [JsonIgnore]
   public Action<CanvasPoint, Point, int, int, Keys> OnMoved = (canvasPoint, mouseLocation, dx, dy, modifierKeys) => { };
 
   // Properties
@@ -40,17 +42,20 @@ public class CanvasPoint() : CanvasObject
   /// <summary>
   /// Converts a <see cref="CanvasPoint"/> to a <see cref="Point"/>
   /// </summary>
+  [JsonIgnore]
   public virtual Point ToPoint => new Point(X, Y);
 
   /// <summary>
   /// Indicates whether the <see cref="CanvasPoint"/> is visible or not
   /// </summary>
+  [JsonIgnore]
   public virtual bool Visible { get => true; }
 
   /// <summary>
   /// Gets the <see cref="GraphicsPath"/> representing the shape of this <see cref="CanvasPoint"/>.
   /// Can be overridden by derived classes to customize the shape.
   /// </summary>
+  [JsonIgnore]
   protected virtual GraphicsPath Path
   {
     get
