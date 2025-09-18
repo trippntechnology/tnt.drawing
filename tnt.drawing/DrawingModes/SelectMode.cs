@@ -14,7 +14,7 @@ namespace TNT.Drawing.DrawingModes;
 /// <summary>
 /// Provides a drawing mode for selecting and moving objects on the canvas.
 /// </summary>
-public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, layer)
+public class SelectMode(CanvasLayer layer) : DrawingMode(layer)
 {
   private bool _allowMove = false;
   private readonly List<CanvasObject> _activeObjects = new();
@@ -29,7 +29,7 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
   /// <summary>
   /// Draws the selected objects and selection box if active.
   /// </summary>
-  public override void OnDraw(Graphics graphics)
+  public override void OnDraw(Graphics graphics, Canvas canvas)
   {
     var selectedObjects = Layer.CanvasObjects.FindAll(o => o.IsSelected);
     selectedObjects.ForEach(o => o.Draw(graphics));
@@ -40,15 +40,15 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
       using var pen = new Pen(Color.Blue) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dash };
       graphics.DrawRectangle(pen, rect);
     }
-    base.OnDraw(graphics);
+    base.OnDraw(graphics, canvas);
   }
 
   /// <summary>
   /// Handles mouse down event for selection.
   /// </summary>
-  public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys)
+  public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys, Canvas canvas)
   {
-    base.OnMouseDown(e, modifierKeys);
+    base.OnMouseDown(e, modifierKeys, canvas);
 
     if (_objectUnderMouse == null)
     {
@@ -87,43 +87,43 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
       }
     }
 
-    Layer.CanvasObjects.FindAll(o => o.IsSelected)?.Cast<object>().ToList()?.Also(o => Canvas.OnObjectsSelected(o));
-    Canvas.Invalidate();
-    UpdateFeedback(e.Location, modifierKeys);
+    Layer.CanvasObjects.FindAll(o => o.IsSelected)?.Cast<object>().ToList()?.Also(o => canvas.OnObjectsSelected(o));
+    canvas.Invalidate();
+    UpdateFeedback(e.Location, modifierKeys, canvas);
   }
 
   /// <summary>
   /// Handles mouse movement during selection mode. Moves selected objects if allowed, otherwise updates feedback and object under mouse.
   /// </summary>
-  public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
+  public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys, Canvas canvas)
   {
-    var location = Canvas.SnapToInterval == modifierKeys.DoesNotContain(Keys.Control) ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
+    var location = canvas.SnapToInterval == modifierKeys.DoesNotContain(Keys.Control) ? e.Location.Snap(canvas.SnapInterval) : e.Location;
 
     if (_isSelecting && IsMouseDown)
     {
       _selectionCurrent = location;
-      Canvas.Invalidate();
+      canvas.Invalidate();
     }
     else if (IsMouseDown && _allowMove)
     {
       var dx = location.X - _lastMouseLocation.X;
       var dy = location.Y - _lastMouseLocation.Y;
       _activeObjects.ForEach(o => o.Move(new MoveInfo(location, dx, dy), modifierKeys));
-      Canvas.Invalidate();
+      canvas.Invalidate();
     }
     else
     {
       _objectUnderMouse = GetObjectUnderMouse(e.Location, modifierKeys);
-      UpdateFeedback(e.Location, modifierKeys);
+      UpdateFeedback(e.Location, modifierKeys, canvas);
     }
     _lastMouseLocation = location;
-    base.OnMouseMove(e, modifierKeys);
+    base.OnMouseMove(e, modifierKeys, canvas);
   }
 
   /// <summary>
   /// Handles mouse up events, ending any ongoing selection or move operations.
   /// </summary>
-  public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
+  public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys, Canvas canvas)
   {
     if (_isSelecting)
     {
@@ -135,30 +135,30 @@ public class SelectMode(Canvas canvas, CanvasLayer layer) : DrawingMode(canvas, 
         Layer.CanvasObjects.ForEach(o => o.IsSelected = (modifierKeys == Keys.Control && o.IsSelected) || o.IntersectsWith(region));
       }
 
-      Canvas.OnObjectsSelected(Layer.CanvasObjects.Where(o => o.IsSelected).Cast<object>().ToList());
-      Canvas.Invalidate();
+      canvas.OnObjectsSelected(Layer.CanvasObjects.Where(o => o.IsSelected).Cast<object>().ToList());
+      canvas.Invalidate();
     }
-    base.OnMouseUp(e, modifierKeys);
+    base.OnMouseUp(e, modifierKeys, canvas);
   }
 
   /// <summary>
   /// Clears the current selection and resets the active objects in selection mode.
   /// </summary>
-  public override void Reset()
+  public override void Reset(Canvas canvas)
   {
     _activeObjects.Clear();
     Layer.CanvasObjects.ForEach(o => o.IsSelected = false);
     _isSelecting = false;
-    base.Reset();
+    base.Reset(canvas);
   }
 
   /// <summary>
   /// Updates feedback cursor and tooltip based on what's under the mouse.
   /// </summary>
-  protected void UpdateFeedback(Point location, Keys modifierKeys)
+  protected void UpdateFeedback(Point location, Keys modifierKeys, Canvas canvas)
   {
     var feedback = _objectUnderMouse?.GetFeedback(location, modifierKeys) ?? Feedback.Default;
-    Canvas.OnFeedbackChanged(feedback);
+    canvas.OnFeedbackChanged(feedback);
   }
 
   /// <summary>

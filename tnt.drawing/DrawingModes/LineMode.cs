@@ -9,7 +9,7 @@ using TNT.Drawing.Objects;
 
 namespace TNT.Drawing.DrawingModes;
 
-public class LineMode(Canvas canvas, CanvasLayer layer, BezierPath defaultObject) : DrawingMode(canvas, layer, defaultObject)
+public class LineMode(CanvasLayer layer, BezierPath defaultObject) : DrawingMode(layer, defaultObject)
 {
   private BezierPath DefaultBezierPath => (DefaultObject as BezierPath)!;
 
@@ -25,7 +25,7 @@ public class LineMode(Canvas canvas, CanvasLayer layer, BezierPath defaultObject
     }
   }
 
-  public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
+  public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys, Canvas canvas)
   {
     var isClosed = false;
 
@@ -53,14 +53,14 @@ public class LineMode(Canvas canvas, CanvasLayer layer, BezierPath defaultObject
       vertices.Clear();
     }
 
-    Canvas.Invalidate();
+    canvas.Invalidate();
 
-    base.OnMouseUp(e, modifierKeys);
+    base.OnMouseUp(e, modifierKeys, canvas);
   }
 
-  public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
+  public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys, Canvas canvas)
   {
-    base.OnMouseMove(e, modifierKeys);
+    base.OnMouseMove(e, modifierKeys, canvas);
 
     var location = e.Location;
 
@@ -83,15 +83,15 @@ public class LineMode(Canvas canvas, CanvasLayer layer, BezierPath defaultObject
       }
     }
 
-    location = Canvas.SnapToInterval ? location.Snap(Canvas.SnapInterval) : location;
+    location = canvas.SnapToInterval ? location.Snap(canvas.SnapInterval) : location;
 
     activeVertex.MoveTo(location.X, location.Y, modifierKeys, Point.Empty);
-    Canvas.Invalidate();
+    canvas.Invalidate();
   }
 
-  public override void OnDraw(Graphics graphics)
+  public override void OnDraw(Graphics graphics, Canvas canvas)
   {
-    base.OnDraw(graphics);
+    base.OnDraw(graphics, canvas);
 
     // Draw the lines connecting the vertices
     var points = vertices.ConvertAll(v => v.ToPoint);

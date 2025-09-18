@@ -11,7 +11,7 @@ namespace TNT.Drawing.DrawingModes;
 /// Provides a drawing mode for creating rectangles (squares) on the canvas.
 /// Users can click and drag to define the rectangle's bounds, which is rendered as a closed <see cref="BezierPath"/>.
 /// </summary>
-public class RectangleMode(Canvas canvas, CanvasLayer layer, CanvasObject? defaultObject = null) : DrawingMode(canvas, layer, defaultObject)
+public class RectangleMode(CanvasLayer layer, CanvasObject? defaultObject = null) : DrawingMode(layer, defaultObject)
 {
   /// <summary>
   /// Gets the default <see cref="BezierPath"/> template used for new rectangles.
@@ -38,11 +38,9 @@ public class RectangleMode(Canvas canvas, CanvasLayer layer, CanvasObject? defau
   /// Handles the mouse button release event to finalize or start a rectangle.
   /// If vertices exist, creates a closed <see cref="BezierPath"/> and adds it to the layer; otherwise, initializes rectangle vertices.
   /// </summary>
-  /// <param name="e">Mouse event arguments.</param>
-  /// <param name="modifierKeys">Modifier keys pressed during the event.</param>
-  public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys)
+  public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys, Canvas canvas)
   {
-    var location = Canvas.SnapToInterval ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
+    var location = canvas.SnapToInterval ? e.Location.Snap(canvas.SnapInterval) : e.Location;
 
     if (vertices.Count > 0)
     {
@@ -65,22 +63,20 @@ public class RectangleMode(Canvas canvas, CanvasLayer layer, CanvasObject? defau
       vertices.Add(new Vertex(location));
     }
 
-    Canvas.Invalidate();
+    canvas.Invalidate();
 
-    base.OnMouseDown(e, modifierKeys);
+    base.OnMouseDown(e, modifierKeys, canvas);
   }
 
   /// <summary>
   /// Handles mouse movement to update the preview rectangle as the user drags.
   /// Adjusts the positions of rectangle vertices to reflect the current mouse location.
   /// </summary>
-  /// <param name="e">Mouse event arguments.</param>
-  /// <param name="modifierKeys">Modifier keys pressed during the event.</param>
-  public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys)
+  public override void OnMouseMove(MouseEventArgs e, Keys modifierKeys, Canvas canvas)
   {
-    base.OnMouseMove(e, modifierKeys);
+    base.OnMouseMove(e, modifierKeys, canvas);
 
-    var location = Canvas.SnapToInterval ? e.Location.Snap(Canvas.SnapInterval) : e.Location;
+    var location = canvas.SnapToInterval ? e.Location.Snap(canvas.SnapInterval) : e.Location;
 
     if (vertices.Count != 0)
     {
@@ -101,17 +97,16 @@ public class RectangleMode(Canvas canvas, CanvasLayer layer, CanvasObject? defau
       activeVertex.MoveTo(location.X, location.Y, modifierKeys, Point.Empty);
     }
 
-    Canvas.Invalidate();
+    canvas.Invalidate();
   }
 
   /// <summary>
   /// Draws the preview or finalized rectangle on the canvas.
   /// Renders the rectangle fill, outline, and optionally the vertices for visual feedback.
   /// </summary>
-  /// <param name="graphics">The <see cref="Graphics"/> context to draw on.</param>
-  public override void OnDraw(Graphics graphics)
+  public override void OnDraw(Graphics graphics, Canvas canvas)
   {
-    base.OnDraw(graphics);
+    base.OnDraw(graphics, canvas);
 
     if (vertices.Count < 4)
     {
@@ -132,6 +127,6 @@ public class RectangleMode(Canvas canvas, CanvasLayer layer, CanvasObject? defau
       v.Draw(graphics);
     });
 
-    Canvas.Invalidate();
+    canvas.Invalidate();
   }
 }

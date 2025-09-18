@@ -151,7 +151,7 @@ public class TransformationTests
       SnapInterval = 20,
       SnapToInterval = true
     };
-    var state = new CanvasState(props);
+    var state = new CanvasState(props, new List<CanvasLayer>());
 
     // Act: serialize and deserialize
     var json = Json.serializeObject(state);

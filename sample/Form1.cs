@@ -62,7 +62,7 @@ public partial class Form1 : Form
 
     propertyGrid1.SelectedObject = _canvas.Properties;
 
-    _canvas.DrawingMode = new SelectMode(_canvas, objectsLayer);
+    _canvas.DrawingMode = new SelectMode(objectsLayer);
 
     _canvas.OnSelected = (objs) =>
     {
@@ -124,7 +124,7 @@ public partial class Form1 : Form
       if (menuItem.Tag is DrawingMode mode)
       {
         propertyGrid1.SelectedObject = mode.DefaultObject;
-        _canvas.DrawingMode.Reset();
+        _canvas.DrawingMode.Reset(_canvas);
         _canvas.DrawingMode = mode;
       }
     }
@@ -145,14 +145,14 @@ public partial class Form1 : Form
         if (item.Tag is DrawingMode mode)
         {
           propertyGrid1.SelectedObject = mode.DefaultObject;
-          _canvas.DrawingMode.Reset();
+          _canvas.DrawingMode.Reset(_canvas);
           _canvas.DrawingMode = mode;
         }
       },
     };
-    modeGroupManager.Create<Select>(new ToolStripItem[] { toolStripButton1, toolStripMenuItem1 }).Also(group => { group.Tag = new SelectMode(_canvas, canvasLayer); });
-    modeGroupManager.Create<Line>(new ToolStripItem[] { toolStripButton2, toolStripMenuItem2 }).Also(group => { group.Tag = new LineMode(_canvas, canvasLayer, new BezierPath()); });
-    modeGroupManager.Create<Group.Rectangle>(new ToolStripItem[] { toolStripButton3, toolStripMenuItem3 }).Also(group => { group.Tag = new RectangleMode(_canvas, canvasLayer, new BezierPath()); });
+    modeGroupManager.Create<Select>(new ToolStripItem[] { toolStripButton1, toolStripMenuItem1 }).Also(group => { group.Tag = new SelectMode(canvasLayer); });
+    modeGroupManager.Create<Line>(new ToolStripItem[] { toolStripButton2, toolStripMenuItem2 }).Also(group => { group.Tag = new LineMode(canvasLayer, new BezierPath()); });
+    modeGroupManager.Create<Group.Rectangle>(new ToolStripItem[] { toolStripButton3, toolStripMenuItem3 }).Also(group => { group.Tag = new RectangleMode(canvasLayer, new BezierPath()); });
 
     var menuGroupManager = new ToolStripItemGroupManager(toolStripStatusLabel1)
     {

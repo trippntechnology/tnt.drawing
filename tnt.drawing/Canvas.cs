@@ -63,7 +63,7 @@ public class Canvas : Control
     _scrollableParent?.Also(it => it.AutoScroll = true);
 
     // DrawingMode can't be null so set an initial DrawingMode
-    DrawingMode = new DrawingMode(this, new CanvasLayer());
+    DrawingMode = new DrawingMode(new CanvasLayer());
   }
 
   // Properties
@@ -164,10 +164,11 @@ public class Canvas : Control
   [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
   public CanvasState State
   {
-    get => new CanvasState(Properties);
+    get => new CanvasState(Properties, Layers);
     set
     {
-      Properties = value.canvasProperties;
+      Properties = value.properties;
+      Layers = value.layers;
     }
   }
 
@@ -274,7 +275,7 @@ public class Canvas : Control
       Fit();
     }
 
-    DrawingMode.OnDraw(graphics);
+    DrawingMode.OnDraw(graphics, this);
 
     base.OnPaint(e);
   }
@@ -288,7 +289,7 @@ public class Canvas : Control
     var graphics = CreateTransformedGraphics();
     var mea = Transform(e, graphics);
 
-    if (_keyEventArgs?.KeyCode != Keys.Space) DrawingMode.OnMouseMove(mea, ModifierKeys);
+    if (_keyEventArgs?.KeyCode != Keys.Space) DrawingMode.OnMouseMove(mea, ModifierKeys, this);
 
     var currentCursorPosition = Cursor.Position;
     var mousePosition = new Point(e.X, e.Y);
@@ -351,7 +352,7 @@ public class Canvas : Control
   protected override void OnMouseDown(MouseEventArgs e)
   {
     MouseEventArgs mea = Transform(e);
-    DrawingMode.OnMouseDown(mea, ModifierKeys);
+    DrawingMode.OnMouseDown(mea, ModifierKeys, this);
     base.OnMouseDown(e);
   }
 
@@ -364,7 +365,7 @@ public class Canvas : Control
     base.OnMouseUp(e);
     var graphics = CreateTransformedGraphics();
     var mea = Transform(e, graphics);
-    DrawingMode.OnMouseUp(mea, ModifierKeys);
+    DrawingMode.OnMouseUp(mea, ModifierKeys, this);
   }
 
   /// <summary>

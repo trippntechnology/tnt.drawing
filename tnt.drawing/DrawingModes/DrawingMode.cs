@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
@@ -11,7 +11,7 @@ namespace TNT.Drawing.DrawingModes;
 /// <summary>
 /// Base class for all drawing modes
 /// </summary>
-public class DrawingMode(Canvas canvas, CanvasLayer layer, CanvasObject? defaultObject = null)
+public class DrawingMode(CanvasLayer layer, CanvasObject? defaultObject = null)
 {
   /// <summary>
   /// Indicates when the mouse button is pressed
@@ -29,11 +29,6 @@ public class DrawingMode(Canvas canvas, CanvasLayer layer, CanvasObject? default
   protected List<Vertex> vertices = new List<Vertex>();
 
   /// <summary>
-  /// Reference to the <see cref="Canvas"/>
-  /// </summary>
-  protected Canvas Canvas { get; private set; } = canvas;
-
-  /// <summary>
   /// The <see cref="CanvasLayer"/> manipulated by this <see cref="DrawingMode"/>
   /// </summary>
   public CanvasLayer Layer { get; private set; } = layer;
@@ -44,28 +39,28 @@ public class DrawingMode(Canvas canvas, CanvasLayer layer, CanvasObject? default
   public CanvasObject? DefaultObject { get; } = defaultObject;
 
   /// <summary>
-  /// Refreshes the <see cref="Canvas"/> with the current <see cref="CanvasLayer"/>
+  /// Clears all vertices and refreshes the canvas display.
   /// </summary>
-  public virtual void Reset()
+  public virtual void Reset(Canvas canvas)
   {
     vertices.Clear();
-    Canvas.Invalidate();
+    canvas.Invalidate();
   }
 
   /// <summary>
-  /// Called when the mouse moves across the <see cref="Canvas"/>
+  /// Called when the mouse moves across the <see cref="Canvas"/>.
   /// </summary>
-  public virtual void OnMouseMove(MouseEventArgs e, Keys modifierKeys) => Log();
+  public virtual void OnMouseMove(MouseEventArgs e, Keys modifierKeys, Canvas canvas) => Log();
 
   /// <summary>
-  /// Called when the mouse button is pressed
+  /// Called when the mouse button is pressed.
   /// </summary>
-  public virtual void OnMouseDown(MouseEventArgs e, Keys modifierKeys) { IsMouseDown = true; Log(); }
+  public virtual void OnMouseDown(MouseEventArgs e, Keys modifierKeys, Canvas canvas) { IsMouseDown = true; Log(); }
 
   /// <summary>
-  /// Called when the mouse button is released
+  /// Called when the mouse button is released.
   /// </summary>
-  public virtual void OnMouseUp(MouseEventArgs e, Keys modifierKeys) { IsMouseDown = false; Log(); }
+  public virtual void OnMouseUp(MouseEventArgs e, Keys modifierKeys, Canvas canvas) { IsMouseDown = false; Log(); }
 
   /// <summary>
   /// Called when the mouse button is double clicked
@@ -83,9 +78,9 @@ public class DrawingMode(Canvas canvas, CanvasLayer layer, CanvasObject? default
   public virtual void OnKeyUp(KeyEventArgs e) => Log($"{e.KeyCode}");
 
   /// <summary>
-  /// Called when the <see cref="Canvas"/> is being painted
+  /// Called when the <see cref="Canvas"/> is being painted.
   /// </summary>
-  public virtual void OnDraw(Graphics graphics) => Log();
+  public virtual void OnDraw(Graphics graphics, Canvas canvas) => Log();
 
   /// <summary>
   /// Called to log to <see cref="Debug"/>
