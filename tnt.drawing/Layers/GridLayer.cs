@@ -15,19 +15,15 @@ public class GridLayer : CanvasLayer
   /// </summary>
   public Color LineColor { get => _BackingFields.Get(_Pen.Color); set => _BackingFields.Set(value); }
 
-  /// Copy constructor
-  /// </summary>
-  public GridLayer(Canvas canvas) : base(canvas) { }
-
   /// <summary>  
   /// Renders the grid layer onto the provided graphics context.  
   /// This includes drawing grid lines based on the canvas's snap interval and visibility settings.  
   /// </summary>  
-  public override void Draw(Graphics graphics)
+  public override void Draw(Graphics graphics, int snapInterval)
   {
     if (IsVisible)
     {
-      base.Draw(graphics);
+      base.Draw(graphics, snapInterval);
 
       if (_Redraw || _Bitmap == null)
       {
@@ -35,16 +31,16 @@ public class GridLayer : CanvasLayer
         _Bitmap = new Bitmap(Width, Height);
         using (var g = Graphics.FromImage(_Bitmap))
         {
-          var largeSegment = Canvas.SnapInterval * 10;
+          var largeSegment = snapInterval * 10;
           _Pen.Color = LineColor;
 
-          for (int x = 0; x < Width; x += Canvas.SnapInterval)
+          for (int x = 0; x < Width; x += snapInterval)
           {
             _Pen.Width = (x % largeSegment == 0) ? 3 : 1;
             g.DrawLine(_Pen, x, 0, x, Height);
           }
 
-          for (int y = 0; y < Height; y += Canvas.SnapInterval)
+          for (int y = 0; y < Height; y += snapInterval)
           {
             _Pen.Width = (y % largeSegment == 0) ? 3 : 1;
             g.DrawLine(_Pen, 0, y, Width, y);

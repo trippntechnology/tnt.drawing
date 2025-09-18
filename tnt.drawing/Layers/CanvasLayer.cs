@@ -30,11 +30,6 @@ public class CanvasLayer
   protected BackingFields _BackingFields = new BackingFields();
 
   /// <summary>
-  /// Reference the <see cref="Canvas"/>
-  /// </summary>
-  public Canvas? Canvas;
-
-  /// <summary>
   /// Indicates whether the <see cref="CanvasLayer"/> is visisble
   /// </summary>
   public bool IsVisible { get; set; } = true;
@@ -79,14 +74,6 @@ public class CanvasLayer
   }
 
   /// <summary>
-  /// Initialization constructor
-  /// </summary>
-  public CanvasLayer(Canvas canvas) : this()
-  {
-    Canvas = canvas;
-  }
-
-  /// <summary>
   /// Gets the selected <see cref="CanvasObject"/>
   /// </summary>
   /// <returns>Selected <see cref="CanvasObject"/></returns>
@@ -99,9 +86,13 @@ public class CanvasLayer
   public override string ToString() => Name;
 
   /// <summary>
-  /// Draws the layer
+  /// Draws the layer background and all non-selected objects if the layer is visible.
+  /// <para>
+  /// <paramref name="graphics"/> is the drawing surface.
+  /// <paramref name="snapInterval"/> is the grid snap interval for object alignment.
+  /// </para>
   /// </summary>
-  public virtual void Draw(Graphics graphics)
+  public virtual void Draw(Graphics graphics, int snapInterval)
   {
     if (IsVisible)
     {

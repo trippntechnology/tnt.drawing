@@ -63,7 +63,7 @@ public class Canvas : Control
     _scrollableParent?.Also(it => it.AutoScroll = true);
 
     // DrawingMode can't be null so set an initial DrawingMode
-    DrawingMode = new DrawingMode(this, new CanvasLayer(this));
+    DrawingMode = new DrawingMode(this, new CanvasLayer());
   }
 
   // Properties
@@ -258,7 +258,7 @@ public class Canvas : Control
     var graphics = CreateTransformedGraphics(e.Graphics);
 
     // Draw layers
-    Layers.ForEach(l => l.Draw(graphics));
+    Layers.ForEach(l => l.Draw(graphics, SnapInterval));
 
     if (_adjustPostion)
     {

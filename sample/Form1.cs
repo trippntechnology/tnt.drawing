@@ -25,16 +25,16 @@ public partial class Form1 : Form
     _canvas = new Canvas(toolStripContainer1.ContentPanel);
     _canvas.Properties = new CanvasProperties(); ;
 
-    var backgroundLayer = new CanvasLayer(_canvas)
+    var backgroundLayer = new CanvasLayer()
     {
       Name = "Background",
       CanvasObjects = new List<CanvasObject>() { GetSquarePath(150, 150, 50, Color.Green) },
       BackgroundColor = Color.White,
     };
 
-    var gridLayer = new GridLayer(_canvas) { Name = "Grid", LineColor = Color.Aqua };
+    var gridLayer = new GridLayer() { Name = "Grid", LineColor = Color.Aqua };
 
-    var objectsLayer = new CanvasLayer(_canvas)
+    var objectsLayer = new CanvasLayer()
     {
       Name = "Object",
       CanvasObjects = new List<CanvasObject>()

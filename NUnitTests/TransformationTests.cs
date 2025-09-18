@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using TNT.Commons;
+using TNT.Drawing.Layers;
 using TNT.Drawing.Model;
 using TNT.Drawing.Objects;
 
@@ -76,9 +77,7 @@ public class TransformationTests
   [Test]
   public void CanvasLayer_Serialization_RoundTrip()
   {
-    using var parent = new System.Windows.Forms.Panel();
-    var canvas = new TNT.Drawing.Canvas(parent);
-    var layer = new TNT.Drawing.Layers.CanvasLayer(canvas)
+    var layer = new CanvasLayer()
     {
       Name = "TestLayer",
       IsVisible = true,
@@ -99,9 +98,7 @@ public class TransformationTests
   [Test]
   public void GridLayer_Serialization_RoundTrip()
   {
-    using var parent = new System.Windows.Forms.Panel();
-    var canvas = new TNT.Drawing.Canvas(parent);
-    var gridLayer = new TNT.Drawing.Layers.GridLayer(canvas)
+    var gridLayer = new GridLayer()
     {
       Name = "GridLayer",
       IsVisible = true,
