@@ -2,8 +2,8 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using TNT.Commons;
+using TNT.Drawing.Model;
 using TNT.Drawing.Objects;
-using TNT.Drawing.Layers;
 
 namespace NUnitTests;
 
@@ -41,7 +41,7 @@ public class TransformationTests
     Assert.That(deserialized.Count, Is.EqualTo(points.Count));
     for (int i = 0; i < points.Count; i++)
     {
-        Assert.That(deserialized[i], Is.EqualTo(points[i]));
+      Assert.That(deserialized[i], Is.EqualTo(points[i]));
     }
   }
 
@@ -142,4 +142,26 @@ public class TransformationTests
     Assert.That(deserialized.SnapToInterval, Is.EqualTo(props.SnapToInterval));
   }
 
+  [Test]
+  public void CanvasState_Serialization_RoundTrip()
+  {
+    var props = new TNT.Drawing.CanvasProperties
+    {
+      BackColor = Color.MediumPurple,
+      LayerHeight = 600,
+      LayerWidth = 800,
+      ScalePercentage = 75,
+      SnapInterval = 20,
+      SnapToInterval = true
+    };
+    var state = new CanvasState(props);
+
+    // Act: serialize and deserialize
+    var json = Json.serializeObject(state);
+    var deserialized = Json.deserializeJson<TNT.Drawing.Model.CanvasState>(json);
+
+    // Assert: check that deserialized is not null and is of correct type
+    Assert.That(deserialized, Is.Not.Null);
+    Assert.That(deserialized, Is.InstanceOf<TNT.Drawing.Model.CanvasState>());
+  }
 }

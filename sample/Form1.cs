@@ -4,6 +4,7 @@ using TNT.Commons;
 using TNT.Drawing;
 using TNT.Drawing.DrawingModes;
 using TNT.Drawing.Layers;
+using TNT.Drawing.Model;
 using TNT.Drawing.Objects;
 using TNT.ToolStripItemManager;
 using TNT.Utilities;
@@ -167,13 +168,8 @@ public partial class Form1 : Form
           {
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-              //var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-              //var assPath = Path.Combine(path, "tnt.drawing.dll");
-              //var types = Utilities.Utilities.GetTypes(assPath, t => !t.IsAbstract && (t.InheritsFrom(typeof(CanvasObject)) || t.InheritsFrom(typeof(CanvasLayer))));
-
-              var layer = _canvas.Layers.Find(l => l.Name == "Object");
-              var ser = TNT.Commons.Json.serializeObject(layer!);
-              File.WriteAllText(sfd.FileName, ser);
+              var json = Json.serializeObject(_canvas.State);
+              File.WriteAllText(sfd.FileName, json);
             }
           }
         }
@@ -183,19 +179,10 @@ public partial class Form1 : Form
           {
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-              //var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-              //var assPath = Path.Combine(path, "tnt.drawing.dll");
-              //var types = Utilities.Utilities.GetTypes(assPath, t => !t.IsAbstract && (t.InheritsFrom(typeof(CanvasObject)) || t.InheritsFrom(typeof(CanvasLayer))));
-
-              var layer = _canvas.Layers.Find(l => l.Name == "Object");
-              layer?.Also(l => _canvas.Layers.Remove(l));
-              var ser = File.ReadAllText(ofd.FileName);
-              var newLayer = Json.deserializeJson<CanvasLayer>(ser);
-              newLayer?.Also(l => {
-                l.Canvas = _canvas;
-                _canvas.Layers.Add(l); });
-              //_canvasPanel.Properties = Utilities.Utilities.Deserialize<CanvasProperties>(ser, new System.Type[] { });
-              propertyGrid1.SelectedObject = _canvas.Properties;
+              var json = File.ReadAllText(ofd.FileName);
+              Json.deserializeJson<CanvasState>(json)?.Also(state =>
+                _canvas.State = state
+              );
             }
           }
         }

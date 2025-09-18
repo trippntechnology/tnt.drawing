@@ -158,6 +158,19 @@ public class Canvas : Control
   /// </summary>
   protected int ScaledHeight => (int)(LayerHeight * Zoom);
 
+  /// <summary>
+  /// Gets or sets the current state of the canvas, including all persisted properties.
+  /// </summary>
+  [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+  public CanvasState State
+  {
+    get => new CanvasState(Properties);
+    set
+    {
+      Properties = value.canvasProperties;
+    }
+  }
+
   // Public Methods
   /// <summary>
   /// Fits the grid within the parent control, adjusting scale and scroll position.
