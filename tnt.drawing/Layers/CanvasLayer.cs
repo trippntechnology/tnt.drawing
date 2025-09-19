@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Newtonsoft.Json;
 using System.Drawing;
 using TNT.Reactive;
 
@@ -7,17 +7,27 @@ namespace TNT.Drawing.Layers;
 /// <summary>
 /// Represents a layer managed by the <see cref="Canvas"/>
 /// </summary>
-[Serializable]
 public class CanvasLayer
 {
   /// <summary>
   /// Backing fields for properties
   /// </summary>
   protected BackingFields _BackingFields = new BackingFields();
+  private Rectangle _backgroundRect;
+
+  /// <summary>
+  /// Indicates whether a property managed by <see cref="_BackingFields"/> has changed and the layer needs to be repainted.
+  /// - Initialized to <c>true</c> so the layer is drawn on first render.
+  /// - Set to <c>true</c> whenever a property managed by <see cref="_BackingFields"/> changes (e.g., color, dimensions, visibility).
+  /// - Used in <see cref="Draw"/> to determine if the layer bitmap should be regenerated.
+  /// - Reset to <c>false</c> after redrawing, so the layer is only regenerated when necessary.
+  /// </summary>
+  protected bool _backingFieldChanged = true;
 
   /// <summary>
   /// Indicates whether the <see cref="CanvasLayer"/> is visisble
   /// </summary>
+  [JsonIgnore]
   public bool IsVisible { get; set; } = true;
 
   /// <summary>
@@ -28,17 +38,14 @@ public class CanvasLayer
   /// <summary>
   /// The width of the <see cref="CanvasLayer"/>
   /// </summary>
+  [JsonIgnore]
   public int Width { get => _BackingFields.Get(1024); set => _BackingFields.Set(value); }
 
   /// <summary>
   /// The height of the <see cref="CanvasLayer"/>
   /// </summary>
+  [JsonIgnore]
   public int Height { get => _BackingFields.Get(768); set => _BackingFields.Set(value); }
-
-  /// <summary>
-  /// A <see cref="Rectangle"/> that represents the area of this <see cref="CanvasLayer"/>
-  /// </summary>
-  public Rectangle Rect => new Rectangle(0, 0, Width, Height);
 
   /// <summary>
   /// Name of Layer
@@ -51,6 +58,16 @@ public class CanvasLayer
   /// <returns><see cref="Name"/></returns>
   public override string ToString() => Name;
 
+  // Constructors
+  /// <summary>
+  /// Initializes a new instance of <see cref="GridLayer"/>.
+  /// Subscribes to property change notifications to trigger grid redraws when properties change.
+  /// </summary>
+  public CanvasLayer()
+  {
+    _BackingFields.OnFieldChanged += (field, value) => { _backingFieldChanged = true; };
+  }
+
   /// <summary>
   /// Draws the layer background and all non-selected objects if the layer is visible.
   /// <para>
@@ -62,8 +79,12 @@ public class CanvasLayer
   {
     if (IsVisible)
     {
+      if (_backingFieldChanged)
+      {
+        _backgroundRect = new Rectangle(0, 0, Width, Height);
+      }
       // Draw background
-      graphics.FillRectangle(new SolidBrush(BackgroundColor), Rect);
+      graphics.FillRectangle(new SolidBrush(BackgroundColor), _backgroundRect);
     }
   }
 }

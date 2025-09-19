@@ -12,15 +12,6 @@ public class GridLayer : CanvasLayer
   private Pen _Pen = new Pen(Color.Black);
   private Bitmap? _Bitmap = null;
 
-  /// <summary>
-  /// Indicates whether the grid layer needs to be repainted.
-  /// - Initialized to <c>true</c> so the grid is drawn on first render.
-  /// - Set to <c>true</c> whenever a property managed by <see cref="_BackingFields"/> changes (e.g., color, dimensions, visibility).
-  /// - Used in <see cref="Draw"/> to determine if the grid bitmap should be regenerated.
-  /// - Reset to <c>false</c> after redrawing, so the grid is only regenerated when necessary.
-  /// </summary>
-  private bool _Redraw = true;
-
   // Properties
   /// <summary>
   /// Gets or sets the color of the grid lines.
@@ -30,16 +21,6 @@ public class GridLayer : CanvasLayer
   {
     get => _BackingFields.Get(_Pen.Color);
     set => _BackingFields.Set(value);
-  }
-
-  // Constructors
-  /// <summary>
-  /// Initializes a new instance of <see cref="GridLayer"/>.
-  /// Subscribes to property change notifications to trigger grid redraws when properties change.
-  /// </summary>
-  public GridLayer()
-  {
-    _BackingFields.OnFieldChanged += (field, value) => { _Redraw = true; };
   }
 
   // Methods
@@ -54,7 +35,7 @@ public class GridLayer : CanvasLayer
     {
       base.Draw(graphics, snapInterval);
 
-      if (_Redraw || _Bitmap == null)
+      if (_backingFieldChanged || _Bitmap == null)
       {
         _Bitmap?.Dispose();
         _Bitmap = new Bitmap(Width, Height);
@@ -76,7 +57,7 @@ public class GridLayer : CanvasLayer
           }
         }
 
-        _Redraw = false;
+        _backingFieldChanged = false;
       }
 
       graphics.DrawImage(_Bitmap, 0, 0);

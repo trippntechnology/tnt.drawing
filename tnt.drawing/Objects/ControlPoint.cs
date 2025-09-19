@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using TNT.Drawing.Extensions;
@@ -14,6 +15,7 @@ namespace TNT.Drawing.Objects
     /// <see cref="Func{ControlPoint, Boolean}"/> delegate called to see if this <see cref="ControlPoint"/>
     /// should be visible or not
     /// </summary>
+    [JsonIgnore]
     public Func<ControlPoint, bool> IsVisible { get; set; } = (_) => { return false; };
 
     /// <summary>

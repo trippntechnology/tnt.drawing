@@ -29,7 +29,7 @@ public class BezierPath : CanvasObject
   /// <summary>
   /// The <see cref="List{CanvasPoint}"/> represented by this <see cref="BezierPath"/>
   /// </summary>
-  protected List<CanvasPoint> CanvasPoints { get; set; } = new List<CanvasPoint>();
+  public List<CanvasPoint> CanvasPoints { get; set; } = new List<CanvasPoint>();
 
   /// <summary>
   /// Represents the <see cref="FillColor"/> as an ARGB value so that it can be persisted
@@ -47,6 +47,7 @@ public class BezierPath : CanvasObject
   /// Gets or sets whether the BezierPath is selected.
   /// When unselected, all points and the centroid are also deselected.
   /// </summary>
+  [JsonIgnore]
   public override bool IsSelected
   {
     get => base.IsSelected;
