@@ -31,17 +31,20 @@ partial class Form1
     System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
     splitContainer1 = new SplitContainer();
     toolStripContainer1 = new ToolStripContainer();
-    toolStrip2 = new ToolStrip();
-    fitToolStripButton = new ToolStripButton();
+    fileToolStrip = new ToolStrip();
+    openToolStripButton = new ToolStripButton();
+    saveToolStripButton = new ToolStripButton();
     toolStrip1 = new ToolStrip();
     toolStripButton1 = new ToolStripButton();
     toolStripButton2 = new ToolStripButton();
     toolStripButton3 = new ToolStripButton();
+    toolStrip2 = new ToolStrip();
+    fitToolStripButton = new ToolStripButton();
     menuStrip1 = new MenuStrip();
     menuToolStripMenuItem = new ToolStripMenuItem();
     fitToolStripMenuItem = new ToolStripMenuItem();
-    saveToolStripMenuItem1 = new ToolStripMenuItem();
-    openToolStripMenuItem1 = new ToolStripMenuItem();
+    saveToolStripMenuItem = new ToolStripMenuItem();
+    openToolStripMenuItem = new ToolStripMenuItem();
     alignToolStripMenuItem = new ToolStripMenuItem();
     bringToFrontToolStripMenuItem = new ToolStripMenuItem();
     modeToolStripMenuItem = new ToolStripMenuItem();
@@ -52,14 +55,17 @@ partial class Form1
     propertyGrid1 = new PropertyGrid();
     statusStrip1 = new StatusStrip();
     toolStripStatusLabel1 = new ToolStripStatusLabel();
+    alignToolStripButton = new ToolStripButton();
+    bringToFrontToolStripButton = new ToolStripButton();
     ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
     splitContainer1.Panel1.SuspendLayout();
     splitContainer1.Panel2.SuspendLayout();
     splitContainer1.SuspendLayout();
     toolStripContainer1.TopToolStripPanel.SuspendLayout();
     toolStripContainer1.SuspendLayout();
-    toolStrip2.SuspendLayout();
+    fileToolStrip.SuspendLayout();
     toolStrip1.SuspendLayout();
+    toolStrip2.SuspendLayout();
     menuStrip1.SuspendLayout();
     statusStrip1.SuspendLayout();
     SuspendLayout();
@@ -100,31 +106,40 @@ partial class Form1
     // 
     // toolStripContainer1.TopToolStripPanel
     // 
+    toolStripContainer1.TopToolStripPanel.Controls.Add(fileToolStrip);
     toolStripContainer1.TopToolStripPanel.Controls.Add(toolStrip1);
     toolStripContainer1.TopToolStripPanel.Controls.Add(toolStrip2);
     // 
-    // toolStrip2
+    // fileToolStrip
     // 
-    toolStrip2.Dock = DockStyle.None;
-    toolStrip2.Items.AddRange(new ToolStripItem[] { fitToolStripButton });
-    toolStrip2.Location = new Point(84, 0);
-    toolStrip2.Name = "toolStrip2";
-    toolStrip2.Size = new Size(35, 25);
-    toolStrip2.TabIndex = 2;
-    toolStrip2.Text = "toolStrip2";
+    fileToolStrip.Dock = DockStyle.Left;
+    fileToolStrip.Items.AddRange(new ToolStripItem[] { openToolStripButton, saveToolStripButton });
+    fileToolStrip.Location = new Point(84, 0);
+    fileToolStrip.Name = "fileToolStrip";
+    fileToolStrip.Size = new Size(58, 25);
+    fileToolStrip.TabIndex = 3;
     // 
-    // fitToolStripButton
+    // openToolStripButton
     // 
-    fitToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-    fitToolStripButton.Image = (Image)resources.GetObject("fitToolStripButton.Image");
-    fitToolStripButton.ImageTransparentColor = Color.Magenta;
-    fitToolStripButton.Name = "fitToolStripButton";
-    fitToolStripButton.Size = new Size(23, 22);
-    fitToolStripButton.Text = "toolStripButton4";
+    openToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+    openToolStripButton.Image = (Image)resources.GetObject("openToolStripButton.Image");
+    openToolStripButton.ImageTransparentColor = Color.Magenta;
+    openToolStripButton.Name = "openToolStripButton";
+    openToolStripButton.Size = new Size(23, 22);
+    openToolStripButton.Text = "toolStripButton4";
+    // 
+    // saveToolStripButton
+    // 
+    saveToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+    saveToolStripButton.Image = (Image)resources.GetObject("saveToolStripButton.Image");
+    saveToolStripButton.ImageTransparentColor = Color.Magenta;
+    saveToolStripButton.Name = "saveToolStripButton";
+    saveToolStripButton.Size = new Size(23, 22);
+    saveToolStripButton.Text = "toolStripButton5";
     // 
     // toolStrip1
     // 
-    toolStrip1.Dock = DockStyle.None;
+    toolStrip1.Dock = DockStyle.Left;
     toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButton1, toolStripButton2, toolStripButton3 });
     toolStrip1.Location = new Point(3, 0);
     toolStrip1.Name = "toolStrip1";
@@ -159,6 +174,25 @@ partial class Form1
     toolStripButton3.Size = new Size(23, 22);
     toolStripButton3.Text = "toolStripButton3";
     // 
+    // toolStrip2
+    // 
+    toolStrip2.Dock = DockStyle.Left;
+    toolStrip2.Items.AddRange(new ToolStripItem[] { fitToolStripButton, alignToolStripButton, bringToFrontToolStripButton });
+    toolStrip2.Location = new Point(142, 0);
+    toolStrip2.Name = "toolStrip2";
+    toolStrip2.Size = new Size(81, 25);
+    toolStrip2.TabIndex = 2;
+    toolStrip2.Text = "toolStrip2";
+    // 
+    // fitToolStripButton
+    // 
+    fitToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+    fitToolStripButton.Image = (Image)resources.GetObject("fitToolStripButton.Image");
+    fitToolStripButton.ImageTransparentColor = Color.Magenta;
+    fitToolStripButton.Name = "fitToolStripButton";
+    fitToolStripButton.Size = new Size(23, 22);
+    fitToolStripButton.Text = "toolStripButton4";
+    // 
     // menuStrip1
     // 
     menuStrip1.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem, modeToolStripMenuItem, layerToolStripMenuItem });
@@ -171,7 +205,7 @@ partial class Form1
     // 
     // menuToolStripMenuItem
     // 
-    menuToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { fitToolStripMenuItem, saveToolStripMenuItem1, openToolStripMenuItem1, alignToolStripMenuItem, bringToFrontToolStripMenuItem });
+    menuToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { fitToolStripMenuItem, saveToolStripMenuItem, openToolStripMenuItem, alignToolStripMenuItem, bringToFrontToolStripMenuItem });
     menuToolStripMenuItem.Name = "menuToolStripMenuItem";
     menuToolStripMenuItem.Size = new Size(50, 20);
     menuToolStripMenuItem.Text = "Menu";
@@ -182,31 +216,29 @@ partial class Form1
     fitToolStripMenuItem.Size = new Size(180, 22);
     fitToolStripMenuItem.Text = "Fit";
     // 
-    // saveToolStripMenuItem1
+    // saveToolStripMenuItem
     // 
-    saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
-    saveToolStripMenuItem1.Size = new Size(180, 22);
-    saveToolStripMenuItem1.Text = "Save";
+    saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+    saveToolStripMenuItem.Size = new Size(180, 22);
+    saveToolStripMenuItem.Text = "Save";
     // 
-    // openToolStripMenuItem1
+    // openToolStripMenuItem
     // 
-    openToolStripMenuItem1.Name = "openToolStripMenuItem1";
-    openToolStripMenuItem1.Size = new Size(180, 22);
-    openToolStripMenuItem1.Text = "Open";
+    openToolStripMenuItem.Name = "openToolStripMenuItem";
+    openToolStripMenuItem.Size = new Size(180, 22);
+    openToolStripMenuItem.Text = "Open";
     // 
     // alignToolStripMenuItem
     // 
     alignToolStripMenuItem.Name = "alignToolStripMenuItem";
     alignToolStripMenuItem.Size = new Size(180, 22);
     alignToolStripMenuItem.Text = "Align";
-    alignToolStripMenuItem.Click += AlignToolStripMenuItem_Click;
     // 
     // bringToFrontToolStripMenuItem
     // 
     bringToFrontToolStripMenuItem.Name = "bringToFrontToolStripMenuItem";
     bringToFrontToolStripMenuItem.Size = new Size(180, 22);
     bringToFrontToolStripMenuItem.Text = "Bring to Front";
-    bringToFrontToolStripMenuItem.Click += bringToFrontToolStripMenuItem_Click;
     // 
     // modeToolStripMenuItem
     // 
@@ -266,6 +298,24 @@ partial class Form1
     toolStripStatusLabel1.Size = new Size(118, 17);
     toolStripStatusLabel1.Text = "toolStripStatusLabel1";
     // 
+    // alignToolStripButton
+    // 
+    alignToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+    alignToolStripButton.Image = (Image)resources.GetObject("alignToolStripButton.Image");
+    alignToolStripButton.ImageTransparentColor = Color.Magenta;
+    alignToolStripButton.Name = "alignToolStripButton";
+    alignToolStripButton.Size = new Size(23, 22);
+    alignToolStripButton.Text = "toolStripButton4";
+    // 
+    // bringToFrontToolStripButton
+    // 
+    bringToFrontToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+    bringToFrontToolStripButton.Image = (Image)resources.GetObject("bringToFrontToolStripButton.Image");
+    bringToFrontToolStripButton.ImageTransparentColor = Color.Magenta;
+    bringToFrontToolStripButton.Name = "bringToFrontToolStripButton";
+    bringToFrontToolStripButton.Size = new Size(23, 22);
+    bringToFrontToolStripButton.Text = "toolStripButton4";
+    // 
     // Form1
     // 
     AutoScaleDimensions = new SizeF(7F, 15F);
@@ -287,10 +337,12 @@ partial class Form1
     toolStripContainer1.TopToolStripPanel.PerformLayout();
     toolStripContainer1.ResumeLayout(false);
     toolStripContainer1.PerformLayout();
-    toolStrip2.ResumeLayout(false);
-    toolStrip2.PerformLayout();
+    fileToolStrip.ResumeLayout(false);
+    fileToolStrip.PerformLayout();
     toolStrip1.ResumeLayout(false);
     toolStrip1.PerformLayout();
+    toolStrip2.ResumeLayout(false);
+    toolStrip2.PerformLayout();
     menuStrip1.ResumeLayout(false);
     menuStrip1.PerformLayout();
     statusStrip1.ResumeLayout(false);
@@ -308,8 +360,8 @@ partial class Form1
 	private System.Windows.Forms.MenuStrip menuStrip1;
 	private System.Windows.Forms.ToolStripMenuItem menuToolStripMenuItem;
 	private System.Windows.Forms.ToolStripMenuItem fitToolStripMenuItem;
-	private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem1;
-	private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem1;
+	private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
+	private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
 	private System.Windows.Forms.ToolStripMenuItem modeToolStripMenuItem;
 	private System.Windows.Forms.ToolStripMenuItem layerToolStripMenuItem;
 	private System.Windows.Forms.ToolStripMenuItem alignToolStripMenuItem;
@@ -324,5 +376,10 @@ partial class Form1
   private ToolStrip toolStrip2;
   private ToolStripButton fitToolStripButton;
   private ToolStripContainer toolStripContainer1;
+  private ToolStrip fileToolStrip;
+  private ToolStripButton openToolStripButton;
+  private ToolStripButton saveToolStripButton;
+  private ToolStripButton alignToolStripButton;
+  private ToolStripButton bringToFrontToolStripButton;
 }
 

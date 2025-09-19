@@ -16,19 +16,19 @@ public partial class Form1 : Form
 {
   private ApplicationRegistry? _applicationRegistery = null;
   private readonly Canvas _canvas;
+  private readonly DrawingMode _selectMode = new DrawingMode(new CanvasLayer());
+  private readonly DrawingMode _rectangularMode = new DrawingMode(new CanvasLayer());
+  private readonly DrawingMode _lineMode = new DrawingMode(new CanvasLayer());
 
   public Form1()
   {
     InitializeComponent();
 
     _applicationRegistery = new ApplicationRegistry(this, Registry.CurrentUser, "Tripp'n Technology", "CenteredDrawing");
-    _canvas = new Canvas(toolStripContainer1.ContentPanel);
-    _canvas.Properties = new CanvasProperties(); ;
 
     var backgroundLayer = new CanvasLayer()
     {
       Name = "Background",
-      CanvasObjects = new List<CanvasObject>() { GetSquarePath(150, 150, 50, Color.Green) },
       BackgroundColor = Color.White,
     };
 
@@ -47,9 +47,24 @@ public partial class Form1 : Form
       }
     };
 
-    _canvas.Layers = new List<CanvasLayer>() { backgroundLayer, gridLayer, objectsLayer };
+    _lineMode = new LineMode(objectsLayer, new BezierPath());
+    _rectangularMode = new RectangleMode(objectsLayer, new BezierPath());
+    _selectMode = new SelectMode(objectsLayer);
 
-    SetupToolStripItems(objectsLayer);
+    _canvas = new Canvas(toolStripContainer1.ContentPanel)
+    {
+      Layers = new List<CanvasLayer>() { backgroundLayer, gridLayer, objectsLayer },
+      Properties = new CanvasProperties(),
+      DrawingMode = _selectMode,
+      OnSelected = (objs) => { propertyGrid1.SelectedObjects = objs.ToArray(); },
+      OnFeedbackChanged = (feedback) =>
+      {
+        Cursor = feedback.Cursor;
+        toolStripStatusLabel1.Text = feedback.Hint;
+      },
+    };
+
+    SetupToolStripItems();
 
     _canvas.Layers.ForEach(layer =>
     {
@@ -59,27 +74,6 @@ public partial class Form1 : Form
         it.Click += (sender, e) => { propertyGrid1.SelectedObject = (sender as ToolStripMenuItem)?.Tag; };
       }));
     });
-
-    propertyGrid1.SelectedObject = _canvas.Properties;
-
-    _canvas.DrawingMode = new SelectMode(objectsLayer);
-
-    _canvas.OnSelected = (objs) =>
-    {
-      try
-      {
-        propertyGrid1.SelectedObjects = objs.ToArray();
-      }
-      catch (System.Exception)
-      {
-      }
-    };
-
-    _canvas.OnFeedbackChanged = (feedback) =>
-    {
-      Cursor = feedback.Cursor;
-      toolStripStatusLabel1.Text = feedback.Hint;
-    };
   }
 
   private BezierPath GetClosedBezierPath(int x, int y)
@@ -132,11 +126,7 @@ public partial class Form1 : Form
 
   private void PropertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e) => _canvas.DrawingMode.Layer.Also(layer => _canvas.Refresh(layer));
 
-  private void AlignToolStripMenuItem_Click(object sender, System.EventArgs e) => _canvas.AlignToSnapInterval();
-
-  private void bringToFrontToolStripMenuItem_Click(object sender, EventArgs e) => _canvas.BringToFront();
-
-  private void SetupToolStripItems(CanvasLayer canvasLayer)
+  private void SetupToolStripItems()
   {
     var modeGroupManager = new ToolStripItemCheckboxGroupManager(toolStripStatusLabel1)
     {
@@ -150,46 +140,58 @@ public partial class Form1 : Form
         }
       },
     };
-    modeGroupManager.Create<Select>(new ToolStripItem[] { toolStripButton1, toolStripMenuItem1 }).Also(group => { group.Tag = new SelectMode(canvasLayer); });
-    modeGroupManager.Create<Line>(new ToolStripItem[] { toolStripButton2, toolStripMenuItem2 }).Also(group => { group.Tag = new LineMode(canvasLayer, new BezierPath()); });
-    modeGroupManager.Create<Group.Rectangle>(new ToolStripItem[] { toolStripButton3, toolStripMenuItem3 }).Also(group => { group.Tag = new RectangleMode(canvasLayer, new BezierPath()); });
+    modeGroupManager.Create<Select>(new ToolStripItem[] { toolStripButton1, toolStripMenuItem1 }).Also(group => { group.Tag = _selectMode; });
+    modeGroupManager.Create<Line>(new ToolStripItem[] { toolStripButton2, toolStripMenuItem2 }).Also(group => { group.Tag = _lineMode; });
+    modeGroupManager.Create<Group.Rectangle>(new ToolStripItem[] { toolStripButton3, toolStripMenuItem3 }).Also(group => { group.Tag = _rectangularMode; });
 
     var menuGroupManager = new ToolStripItemGroupManager(toolStripStatusLabel1)
     {
       OnClick = item =>
       {
-        if (item is Fit)
+        switch (item)
         {
-          _canvas.Fit();
-        }
-        else if (item is SaveFile)
-        {
-          using (var sfd = new System.Windows.Forms.SaveFileDialog())
-          {
-            if (sfd.ShowDialog() == DialogResult.OK)
-            {
-              var json = Json.serializeObject(_canvas.State);
-              File.WriteAllText(sfd.FileName, json);
-            }
-          }
-        }
-        else if (item is OpenFile)
-        {
-          using (var ofd = new System.Windows.Forms.OpenFileDialog())
-          {
-            if (ofd.ShowDialog() == DialogResult.OK)
-            {
-              var json = File.ReadAllText(ofd.FileName);
-              Json.deserializeJson<CanvasState>(json)?.Also(state =>
-                _canvas.State = state
-              );
-            }
-          }
+          case Fit:
+            _canvas.Fit();
+            break;
+          case SaveFile:
+            Save();
+            break;
+          case OpenFile:
+            Open();
+            break;
+          case AlignToGrid:
+            _canvas.AlignToSnapInterval();
+            break;
+          case Group.BringToFront:
+            _canvas.BringToFront();
+            break;
         }
       },
     };
     menuGroupManager.Create<Fit>(new ToolStripItem[] { fitToolStripButton, fitToolStripMenuItem });
-    menuGroupManager.Create<SaveFile>(new ToolStripItem[] { saveToolStripMenuItem1 });
-    menuGroupManager.Create<OpenFile>(new ToolStripItem[] { openToolStripMenuItem1 });
+    menuGroupManager.Create<SaveFile>(new ToolStripItem[] { saveToolStripMenuItem, saveToolStripButton });
+    menuGroupManager.Create<OpenFile>(new ToolStripItem[] { openToolStripMenuItem, openToolStripButton });
+    menuGroupManager.Create<AlignToGrid>(new ToolStripItem[] { alignToolStripButton, alignToolStripMenuItem });
+    menuGroupManager.Create<BringToFront>(new ToolStripItem[] { bringToFrontToolStripButton, bringToFrontToolStripMenuItem });
+  }
+
+  private void Save()
+  {
+    using var sfd = new System.Windows.Forms.SaveFileDialog();
+    if (sfd.ShowDialog() == DialogResult.OK)
+    {
+      var json = Json.serializeObject(_canvas.State);
+      File.WriteAllText(sfd.FileName, json);
+    }
+  }
+
+  private void Open()
+  {
+    using var ofd = new System.Windows.Forms.OpenFileDialog();
+    if (ofd.ShowDialog() == DialogResult.OK)
+    {
+      var json = File.ReadAllText(ofd.FileName);
+      Json.deserializeJson<CanvasState>(json)?.Also(state => _canvas.State = state);
+    }
   }
 }

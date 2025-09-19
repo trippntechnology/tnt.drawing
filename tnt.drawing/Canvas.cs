@@ -30,20 +30,20 @@ public class Canvas : Control
   private Point _previousCursorPosition = Point.Empty;
   private Point _previousGridPosition;
   private ScrollableControl? _scrollableParent = null;
-  private CanvasProperties _properties = new CanvasProperties();
-  private List<CanvasLayer> _layers = new List<CanvasLayer>();
+  private CanvasProperties? _properties;
+  private List<CanvasLayer>? _layers;
 
   // Events/Delegates
 
   /// <summary>
   /// Invoked when one or more objects are selected within the canvas.
   /// </summary>
-  public Action<List<object>> OnSelected = (obj) => { };
+  public required Action<List<object>> OnSelected = (obj) => { };
 
   /// <summary>
   /// Invoked when feedback (cursor/hint) changes within the canvas.
   /// </summary>
-  public Action<Feedback> OnFeedbackChanged = (feedback) => { };
+  public required Action<Feedback> OnFeedbackChanged = (feedback) => { };
 
   // Constructors
   /// <summary>
@@ -72,9 +72,9 @@ public class Canvas : Control
   /// Gets or sets the persisted properties for the canvas.
   /// </summary>
   [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-  public CanvasProperties Properties
+  public required CanvasProperties Properties
   {
-    get { return _properties; }
+    get { return _properties ?? throw new NullReferenceException(); }
     set
     {
       _properties = value;
@@ -87,13 +87,17 @@ public class Canvas : Control
   /// Gets or sets the current drawing mode interacting with the canvas.
   /// </summary>
   [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-  public DrawingMode DrawingMode { get; set; }
+  public required DrawingMode DrawingMode { get; set; }
 
   /// <summary>
   /// Gets or sets the list of layers managed by the canvas.
   /// </summary>
   [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-  public List<CanvasLayer> Layers { get { return _layers; } set { _layers = value; Refresh(); } }
+  public required List<CanvasLayer> Layers
+  {
+    get { return _layers ?? throw new NullReferenceException(); }
+    set { _layers = value; Refresh(); }
+  }
 
   /// <summary>
   /// Gets the scale factor as a float (percentage divided by 100).
