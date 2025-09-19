@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
 using System.Windows.Forms;
 using TNT.Commons;
 using TNT.Drawing.DrawingModes;
@@ -63,7 +62,7 @@ public class Canvas : Control
     _scrollableParent?.Also(it => it.AutoScroll = true);
 
     // DrawingMode can't be null so set an initial DrawingMode
-    DrawingMode = new DrawingMode(new CanvasLayer());
+    DrawingMode = new DrawingMode(new ObjectLayer());
   }
 
   // Properties
@@ -210,8 +209,7 @@ public class Canvas : Control
   /// </summary>
   public void AlignToSnapInterval()
   {
-    var selectedObjects = Layers.SelectMany(l => l.GetSelected()).ToList();
-    selectedObjects.ForEach(o => o.Align(SnapInterval));
+    (DrawingMode.Layer as ObjectLayer).Also(l => l.AlignToSnapInterval(SnapInterval));
     Invalidate();
   }
 
@@ -220,16 +218,7 @@ public class Canvas : Control
   /// </summary>
   public new void BringToFront()
   {
-    Layers.ForEach(layer =>
-    {
-      var selectedObjects = layer.GetSelected();
-      selectedObjects.ForEach(obj =>
-          {
-            layer.CanvasObjects.Remove(obj);
-            layer.CanvasObjects.Add(obj);
-          });
-    });
-
+    (DrawingMode.Layer as ObjectLayer)?.Also(l => l.BringToFront());
     Invalidate();
   }
 

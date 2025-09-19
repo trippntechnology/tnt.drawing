@@ -11,7 +11,7 @@ namespace TNT.Drawing.DrawingModes;
 /// Provides a drawing mode for creating rectangles (squares) on the canvas.
 /// Users can click and drag to define the rectangle's bounds, which is rendered as a closed <see cref="BezierPath"/>.
 /// </summary>
-public class RectangleMode(CanvasLayer layer, CanvasObject? defaultObject = null) : DrawingMode(layer, defaultObject)
+public class RectangleMode(ObjectLayer layer, CanvasObject? defaultObject = null) : DrawingMode(layer, defaultObject)
 {
   /// <summary>
   /// Gets the default <see cref="BezierPath"/> template used for new rectangles.

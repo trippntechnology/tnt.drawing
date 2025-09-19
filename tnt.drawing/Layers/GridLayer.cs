@@ -3,22 +3,51 @@
 namespace TNT.Drawing.Layers;
 
 /// <summary>
-/// Represents the grid area of the drawing surface
+/// Provides a visual grid overlay for the drawing surface.
+/// Handles property change notifications and optimizes redraws using bitmap caching.
 /// </summary>
 public class GridLayer : CanvasLayer
 {
+  // Fields
   private Pen _Pen = new Pen(Color.Black);
   private Bitmap? _Bitmap = null;
 
   /// <summary>
-  /// The color of the grid lines
+  /// Indicates whether the grid layer needs to be repainted.
+  /// - Initialized to <c>true</c> so the grid is drawn on first render.
+  /// - Set to <c>true</c> whenever a property managed by <see cref="_BackingFields"/> changes (e.g., color, dimensions, visibility).
+  /// - Used in <see cref="Draw"/> to determine if the grid bitmap should be regenerated.
+  /// - Reset to <c>false</c> after redrawing, so the grid is only regenerated when necessary.
   /// </summary>
-  public Color LineColor { get => _BackingFields.Get(_Pen.Color); set => _BackingFields.Set(value); }
+  private bool _Redraw = true;
 
-  /// <summary>  
-  /// Renders the grid layer onto the provided graphics context.  
-  /// This includes drawing grid lines based on the canvas's snap interval and visibility settings.  
-  /// </summary>  
+  // Properties
+  /// <summary>
+  /// Gets or sets the color of the grid lines.
+  /// Changes to this property trigger a redraw of the grid.
+  /// </summary>
+  public Color LineColor
+  {
+    get => _BackingFields.Get(_Pen.Color);
+    set => _BackingFields.Set(value);
+  }
+
+  // Constructors
+  /// <summary>
+  /// Initializes a new instance of <see cref="GridLayer"/>.
+  /// Subscribes to property change notifications to trigger grid redraws when properties change.
+  /// </summary>
+  public GridLayer()
+  {
+    _BackingFields.OnFieldChanged += (field, value) => { _Redraw = true; };
+  }
+
+  // Methods
+  /// <summary>
+  /// Renders the grid onto the provided graphics context.
+  /// Regenerates the grid bitmap only when necessary, based on property changes or initial draw.
+  /// Draws grid lines at intervals, with thicker lines for major segments.
+  /// </summary>
   public override void Draw(Graphics graphics, int snapInterval)
   {
     if (IsVisible)

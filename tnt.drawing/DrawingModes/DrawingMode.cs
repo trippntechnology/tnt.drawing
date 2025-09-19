@@ -11,7 +11,7 @@ namespace TNT.Drawing.DrawingModes;
 /// <summary>
 /// Base class for all drawing modes
 /// </summary>
-public class DrawingMode(CanvasLayer layer, CanvasObject? defaultObject = null)
+public class DrawingMode(ObjectLayer layer, CanvasObject? defaultObject = null)
 {
   /// <summary>
   /// Indicates when the mouse button is pressed
@@ -31,7 +31,7 @@ public class DrawingMode(CanvasLayer layer, CanvasObject? defaultObject = null)
   /// <summary>
   /// The <see cref="CanvasLayer"/> manipulated by this <see cref="DrawingMode"/>
   /// </summary>
-  public CanvasLayer Layer { get; private set; } = layer;
+  public ObjectLayer Layer { get; private set; } = layer;
 
   /// <summary>
   /// The <see cref="CanvasObject"/> that gets created by the <see cref="DrawingMode"/>

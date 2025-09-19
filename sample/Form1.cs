@@ -16,9 +16,9 @@ public partial class Form1 : Form
 {
   private ApplicationRegistry? _applicationRegistery = null;
   private readonly Canvas _canvas;
-  private readonly DrawingMode _selectMode = new DrawingMode(new CanvasLayer());
-  private readonly DrawingMode _rectangularMode = new DrawingMode(new CanvasLayer());
-  private readonly DrawingMode _lineMode = new DrawingMode(new CanvasLayer());
+  private readonly DrawingMode _selectMode = new DrawingMode(new ObjectLayer());
+  private readonly DrawingMode _rectangularMode = new DrawingMode(new ObjectLayer());
+  private readonly DrawingMode _lineMode = new DrawingMode(new ObjectLayer());
 
   public Form1()
   {
@@ -34,7 +34,7 @@ public partial class Form1 : Form
 
     var gridLayer = new GridLayer() { Name = "Grid", LineColor = Color.Aqua };
 
-    var objectsLayer = new CanvasLayer()
+    var objectsLayer = new ObjectLayer()
     {
       Name = "Object",
       CanvasObjects = new List<CanvasObject>()

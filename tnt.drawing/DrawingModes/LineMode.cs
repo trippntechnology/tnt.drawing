@@ -9,7 +9,7 @@ using TNT.Drawing.Objects;
 
 namespace TNT.Drawing.DrawingModes;
 
-public class LineMode(CanvasLayer layer, BezierPath defaultObject) : DrawingMode(layer, defaultObject)
+public class LineMode(ObjectLayer layer, BezierPath defaultObject) : DrawingMode(layer, defaultObject)
 {
   private BezierPath DefaultBezierPath => (DefaultObject as BezierPath)!;
 

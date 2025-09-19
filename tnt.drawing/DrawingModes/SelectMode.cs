@@ -14,7 +14,7 @@ namespace TNT.Drawing.DrawingModes;
 /// <summary>
 /// Provides a drawing mode for selecting and moving objects on the canvas.
 /// </summary>
-public class SelectMode(CanvasLayer layer) : DrawingMode(layer)
+public class SelectMode(ObjectLayer layer) : DrawingMode(layer)
 {
   private bool _allowMove = false;
   private readonly List<CanvasObject> _activeObjects = new();
