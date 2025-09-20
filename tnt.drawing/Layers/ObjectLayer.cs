@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using TNT.Commons;
 using TNT.Drawing.Objects;
 
 namespace TNT.Drawing.Layers;
@@ -59,6 +60,19 @@ public class ObjectLayer : CanvasLayer
     {
       CanvasObjects.Remove(obj);
       CanvasObjects.Add(obj);
+    });
+  }
+
+  /// <summary>
+  /// Copies relevant properties from another <see cref="CanvasLayer"/> instance.
+  /// For <see cref="ObjectLayer"/>, copies the <see cref="CanvasObjects"/> collection reference from the source layer.
+  /// </summary>
+  public override void CopyFrom(CanvasLayer layer)
+  {
+    base.CopyFrom(layer);
+    (layer as ObjectLayer)?.Also(layer =>
+    {
+      CanvasObjects = layer.CanvasObjects;
     });
   }
 }

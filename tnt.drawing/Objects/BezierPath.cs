@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Windows.Forms;
 using TNT.Commons;
 using TNT.Drawing.Extensions;
@@ -598,5 +599,21 @@ public class BezierPath : CanvasObject
       var c2 = new ControlPoint(vertex.ToPoint) { OnMoved = OnMoved, IsVisible = IsControlPointVisible };
       CanvasPoints.InsertRange((int)insertIndex, new List<CanvasPoint>() { c1, vertex, c2 });
     }
+  }
+
+  /// <summary>
+  /// Called after deserialization to reinitialize delegates and state for all points in the BezierPath.
+  /// Ensures that OnMoved and IsVisible are set for each CanvasPoint, and updates the closed path state.
+  /// </summary>
+  [OnDeserialized]
+  internal void OnDeserializedMethod(StreamingContext context)
+  {
+    foreach (var point in CanvasPoints)
+    {
+      point.OnMoved = OnMoved;
+      if (point is ControlPoint ctrl)
+        ctrl.IsVisible = IsControlPointVisible;
+    }
+    _isClosedPath = CanvasPoints.FirstOrDefault()?.Let(p => CanvasPoints.FindCoincident(p)) != null;
   }
 }

@@ -171,7 +171,11 @@ public class Canvas : Control
     set
     {
       Properties = value.properties;
-      Layers = value.layers;
+      value.layers.ForEach(layer =>
+      {
+        var thisLayer = Layers.Find(l => l.Name == layer.Name);
+        thisLayer?.CopyFrom(layer);
+      });
     }
   }
 

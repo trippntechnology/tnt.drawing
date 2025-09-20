@@ -87,4 +87,12 @@ public class CanvasLayer
       graphics.FillRectangle(new SolidBrush(BackgroundColor), _backgroundRect);
     }
   }
+
+  /// <summary>
+  /// Copies relevant properties from another <see cref="CanvasLayer"/> instance.
+  /// </summary>
+  public virtual void CopyFrom(CanvasLayer layer)
+  {
+    BackgroundColor = layer.BackgroundColor;
+  }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using TNT.Commons;
 
 namespace TNT.Drawing.Layers;
 
@@ -62,5 +63,19 @@ public class GridLayer : CanvasLayer
 
       graphics.DrawImage(_Bitmap, 0, 0);
     }
+  }
+
+  /// <summary>
+  /// Copies relevant properties from another <see cref="CanvasLayer"/> instance.
+  /// For <see cref="GridLayer"/>, copies the <see cref="LineColor"/> property.
+  /// </summary>
+  public override void CopyFrom(CanvasLayer layer)
+  {
+    base.CopyFrom(layer);
+
+    (layer as GridLayer)?.Also(layer =>
+    {
+      LineColor = layer.LineColor;
+    });
   }
 }
