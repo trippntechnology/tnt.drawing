@@ -111,20 +111,7 @@ public partial class Form1 : Form
     });
   }
 
-  private void LineToolStripMenuItem_Click(object? sender, System.EventArgs e)
-  {
-    if (sender is ToolStripMenuItem menuItem)
-    {
-      if (menuItem.Tag is DrawingMode mode)
-      {
-        propertyGrid1.SelectedObject = mode.DefaultObject;
-        _canvas.DrawingMode.Reset(_canvas);
-        _canvas.DrawingMode = mode;
-      }
-    }
-  }
-
-  private void PropertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e) => _canvas.DrawingMode.Layer.Also(layer => _canvas.Refresh(layer));
+  private void PropertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e) => _canvas.Refresh();
 
   private void SetupToolStripItems()
   {

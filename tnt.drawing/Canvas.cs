@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Windows.Forms;
 using TNT.Commons;
 using TNT.Drawing.DrawingModes;
@@ -213,7 +214,7 @@ public class Canvas : Control
   /// </summary>
   public void AlignToSnapInterval()
   {
-    (DrawingMode.Layer as ObjectLayer).Also(l => l.AlignToSnapInterval(SnapInterval));
+    Layers.Cast<ObjectLayer>().ToList().ForEach(it => it.AlignToSnapInterval(SnapInterval));
     Invalidate();
   }
 
@@ -222,17 +223,8 @@ public class Canvas : Control
   /// </summary>
   public new void BringToFront()
   {
-    (DrawingMode.Layer as ObjectLayer)?.Also(l => l.BringToFront());
+    Layers.Cast<ObjectLayer>().ToList().ForEach(it => it.BringToFront());
     Invalidate();
-  }
-
-  /// <summary>
-  /// Forces the control to immediately redraw itself for the specified layer.
-  /// </summary>
-  /// <param name="layer">The layer to refresh.</param>
-  public void Refresh(CanvasLayer layer)
-  {
-    base.Refresh();
   }
 
   /// <summary>

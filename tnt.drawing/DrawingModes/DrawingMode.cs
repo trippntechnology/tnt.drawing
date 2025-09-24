@@ -31,7 +31,7 @@ public class DrawingMode(ObjectLayer layer, CanvasObject? defaultObject = null)
   /// <summary>
   /// The <see cref="CanvasLayer"/> manipulated by this <see cref="DrawingMode"/>
   /// </summary>
-  public ObjectLayer Layer { get; private set; } = layer;
+  protected ObjectLayer Layer { get; private set; } = layer;
 
   /// <summary>
   /// The <see cref="CanvasObject"/> that gets created by the <see cref="DrawingMode"/>
