@@ -99,12 +99,12 @@ public class SelectMode(ObjectLayer layer) : DrawingMode(layer)
   {
     var location = canvas.SnapToInterval == modifierKeys.DoesNotContain(Keys.Control) ? e.Location.Snap(canvas.SnapInterval) : e.Location;
 
-    if (_isSelecting && IsMouseDown)
+    if (_isSelecting && _isMouseDown)
     {
       _selectionCurrent = location;
       canvas.Invalidate();
     }
-    else if (IsMouseDown && _allowMove)
+    else if (_isMouseDown && _allowMove)
     {
       var dx = location.X - _lastMouseLocation.X;
       var dy = location.Y - _lastMouseLocation.Y;

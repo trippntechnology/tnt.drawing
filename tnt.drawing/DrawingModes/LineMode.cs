@@ -30,27 +30,27 @@ public class LineMode(ObjectLayer layer, BezierPath defaultObject) : DrawingMode
     var isClosed = false;
 
     // Add a new vertex at the mouse location
-    vertices.Add(new Vertex(activeVertex));
+      _vertices.Add(new Vertex(_activeVertex));
 
-    vertices.Select(v => v as CanvasPoint).ToList().Also(canvasPoints =>
+      _vertices.Select(v => v as CanvasPoint).ToList().Also(canvasPoints =>
     {
       canvasPoints.FirstOrDefault()?.Also(first => canvasPoints.FindCoincident(first)?.Also(_ => isClosed = true));
     });
 
     // If CTRL is held, finish the line
-    if (isClosed || (modifierKeys & Keys.Control) == Keys.Control && vertices.Count > 1)
+      if (isClosed || (modifierKeys & Keys.Control) == Keys.Control && _vertices.Count > 1)
     {
-      if (vertices.Count > 1)
+        if (_vertices.Count > 1)
       {
         // Create a new BezierPath and add each vertex
         var path = (DefaultBezierPath.Clone() as BezierPath)!;
-        foreach (var v in vertices)
+          foreach (var v in _vertices)
         {
           path.AddVertex(new Vertex(v));
         }
         Layer.CanvasObjects.Add(path);
       }
-      vertices.Clear();
+        _vertices.Clear();
     }
 
     canvas.Invalidate();
@@ -65,9 +65,9 @@ public class LineMode(ObjectLayer layer, BezierPath defaultObject) : DrawingMode
     var location = e.Location;
 
     // If SHIFT is pressed, constrain to every 15 degrees from the origin vertex
-    if ((modifierKeys & Keys.Shift) == Keys.Shift && vertices.Count > 0)
+    if ((modifierKeys & Keys.Shift) == Keys.Shift && _vertices.Count > 0)
     {
-      var origin = vertices.Last().ToPoint;
+      var origin = _vertices.Last().ToPoint;
       var dx = location.X - origin.X;
       var dy = location.Y - origin.Y;
       var distance = Math.Sqrt(dx * dx + dy * dy);
@@ -85,7 +85,7 @@ public class LineMode(ObjectLayer layer, BezierPath defaultObject) : DrawingMode
 
     location = canvas.SnapToInterval ? location.Snap(canvas.SnapInterval) : location;
 
-    activeVertex.MoveTo(location.X, location.Y, modifierKeys, Point.Empty);
+    _activeVertex.MoveTo(location.X, location.Y, modifierKeys, Point.Empty);
     canvas.Invalidate();
   }
 
@@ -94,16 +94,16 @@ public class LineMode(ObjectLayer layer, BezierPath defaultObject) : DrawingMode
     base.OnDraw(graphics, canvas);
 
     // Draw the lines connecting the vertices
-    var points = vertices.ConvertAll(v => v.ToPoint);
+    var points = _vertices.ConvertAll(v => v.ToPoint);
     // Add the active vertex to the end of the points list for drawing
-    points.Add(activeVertex.ToPoint);
+    points.Add(_activeVertex.ToPoint);
     if (points.Count > 1)
     {
       graphics.DrawLines(LinesPen, points.ToArray());
     }
     // Draw the vertices
-    vertices.ForEach(v => v.Draw(graphics));
+    _vertices.ForEach(v => v.Draw(graphics));
     // Draw the active vertex
-    activeVertex.Draw(graphics);
+    _activeVertex.Draw(graphics);
   }
 }

@@ -42,25 +42,25 @@ public class RectangleMode(ObjectLayer layer, CanvasObject? defaultObject = null
   {
     var location = canvas.SnapToInterval ? e.Location.Snap(canvas.SnapInterval) : e.Location;
 
-    if (vertices.Count > 0)
+    if (_vertices.Count > 0)
     {
       // Create a new BezierPath and add each vertex
       var path = (DefaultBezierPath.Clone() as BezierPath)!;
 
-      vertices.ForEach(v => path.AddVertex(new Vertex(v)));
+      _vertices.ForEach(v => path.AddVertex(new Vertex(v)));
       // Close the path by adding the first vertex again
-      path.AddVertex(new Vertex(vertices.First()));
+      path.AddVertex(new Vertex(_vertices.First()));
 
       Layer.CanvasObjects.Add(path);
 
-      vertices.Clear();
+      _vertices.Clear();
     }
     else
     {
-      vertices.Add(new Vertex(location));
-      vertices.Add(new Vertex(location));
-      vertices.Add(new Vertex(location));
-      vertices.Add(new Vertex(location));
+      _vertices.Add(new Vertex(location));
+      _vertices.Add(new Vertex(location));
+      _vertices.Add(new Vertex(location));
+      _vertices.Add(new Vertex(location));
     }
 
     canvas.Invalidate();
@@ -78,23 +78,23 @@ public class RectangleMode(ObjectLayer layer, CanvasObject? defaultObject = null
 
     var location = canvas.SnapToInterval ? e.Location.Snap(canvas.SnapInterval) : e.Location;
 
-    if (vertices.Count != 0)
+    if (_vertices.Count != 0)
     {
-      var startVertex = vertices.First();
+      var startVertex = _vertices.First();
 
       // Update preview rectangle dimensions
-      int width = location.X - vertices.First().X;
-      int height = location.Y - vertices.First().Y;
+      int width = location.X - _vertices.First().X;
+      int height = location.Y - _vertices.First().Y;
 
       var p2 = new Point(startVertex.X + width, startVertex.Y);
       var p4 = new Point(startVertex.X, startVertex.Y + height);
-      vertices[1].MoveTo(p2.X, p2.Y, Keys.None, Point.Empty);
-      vertices[2].MoveTo(location.X, location.Y, Keys.None, Point.Empty);
-      vertices[3].MoveTo(p4.X, p4.Y, Keys.None, Point.Empty);
+      _vertices[1].MoveTo(p2.X, p2.Y, Keys.None, Point.Empty);
+      _vertices[2].MoveTo(location.X, location.Y, Keys.None, Point.Empty);
+      _vertices[3].MoveTo(p4.X, p4.Y, Keys.None, Point.Empty);
     }
     else
     {
-      activeVertex.MoveTo(location.X, location.Y, modifierKeys, Point.Empty);
+      _activeVertex.MoveTo(location.X, location.Y, modifierKeys, Point.Empty);
     }
 
     canvas.Invalidate();
@@ -108,20 +108,20 @@ public class RectangleMode(ObjectLayer layer, CanvasObject? defaultObject = null
   {
     base.OnDraw(graphics, canvas);
 
-    if (vertices.Count < 4)
+    if (_vertices.Count < 4)
     {
-      activeVertex.Draw(graphics);
+      _activeVertex.Draw(graphics);
       return; // Not enough vertices to draw a rectangle
     }
 
     // Draw the rectangle using the vertices
-    var points = vertices.Select(v => v.ToPoint).ToArray();
+    var points = _vertices.Select(v => v.ToPoint).ToArray();
 
     graphics.FillRectangle(new SolidBrush(DefaultBezierPath.FillColor), new Rectangle(points[0], new Size(points[2].X - points[0].X, points[2].Y - points[0].Y)));
     graphics.DrawPolygon(LinesPen, points);
 
     // Optionally, draw the vertices as small circles for visual feedback
-    vertices.ForEach(v =>
+    _vertices.ForEach(v =>
     {
       // Call the Draw method of each vertex to draw it
       v.Draw(graphics);
