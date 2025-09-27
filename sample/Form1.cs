@@ -61,6 +61,7 @@ public partial class Form1 : Form
       {
         Cursor = feedback.Cursor;
         toolStripStatusLabel1.Text = feedback.Hint;
+        toolStripStatusLabel1.Owner?.Refresh();
       },
     };
 

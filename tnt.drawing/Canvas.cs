@@ -302,7 +302,7 @@ public class Canvas : Control
   protected override void OnKeyDown(KeyEventArgs e)
   {
     _keyEventArgs = e;
-    switch (_keyEventArgs.KeyCode)
+    switch (e.KeyCode)
     {
       case Keys.Space:
         Cursor = Cursors.Hand;

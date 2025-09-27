@@ -1,8 +1,10 @@
+using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using TNT.Drawing.Extensions;
 using TNT.Drawing.Layers;
+using TNT.Drawing.Model;
 using TNT.Drawing.Objects;
 
 namespace TNT.Drawing.DrawingModes;
@@ -82,9 +84,24 @@ public class RectangleMode(ObjectLayer layer, CanvasObject? defaultObject = null
     {
       var startVertex = _vertices.First();
 
-      // Update preview rectangle dimensions
-      int width = location.X - _vertices.First().X;
-      int height = location.Y - _vertices.First().Y;
+      int width = location.X - startVertex.X;
+      int height = location.Y - startVertex.Y;
+
+      // If Shift is held, constrain to square
+      if (modifierKeys.HasFlag(Keys.Shift))
+      {
+        int side = Math.Max(Math.Abs(width), Math.Abs(height));
+        // Preserve drag direction
+        width = width < 0 ? -side : side;
+        height = height < 0 ? -side : side;
+        location = new Point(startVertex.X + width, startVertex.Y + height);
+
+        canvas.OnFeedbackChanged(Feedback.RECTANGLE_MODE_OPPOSITE_VERTEX_SHIFT);
+      }
+      else
+      {
+        canvas.OnFeedbackChanged(Feedback.RECTANGLE_MODE_OPPOSITE_VERTEX);
+      }
 
       var p2 = new Point(startVertex.X + width, startVertex.Y);
       var p4 = new Point(startVertex.X, startVertex.Y + height);
@@ -94,6 +111,7 @@ public class RectangleMode(ObjectLayer layer, CanvasObject? defaultObject = null
     }
     else
     {
+      canvas.OnFeedbackChanged(Feedback.RECTANGLE_MODE_INITIAL_VERTEX);
       _activeVertex.MoveTo(location.X, location.Y, modifierKeys, Point.Empty);
     }
 

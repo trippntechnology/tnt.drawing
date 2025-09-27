@@ -1,89 +1,105 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace TNT.Drawing.Resource;
 
 /// <summary>
-/// Resources
+/// Provides access to embedded image and cursor resources for TNT.Drawing.
+/// Resources are loaded from the assembly manifest and exposed as static properties.
 /// </summary>
 public static class Resources
 {
   /// <summary>
-  /// Images
+  /// Contains embedded image resources used for drawing controls and icons.
   /// </summary>
   public static class Images
   {
     /// <summary>
-    /// <see cref="ControlPoint"/> <see cref="Image"/>
+    /// Control point icon image resource.
     /// </summary>
     public static Image ControlPoint { get; } = ResourceToImage("TNT.Drawing.Resource.Image.ControlPoint.png");
 
     /// <summary>
-    /// <see cref="Vertex"/> <see cref="Image"/>
+    /// Vertex icon image resource.
     /// </summary>
     public static Image Vertex { get; } = ResourceToImage("TNT.Drawing.Resource.Image.Vertex.png");
 
     /// <summary>
-    /// Extra small Rotate icon <see cref="Image"/> (16x16)
+    /// Extra small rotate icon image (16x16).
     /// </summary>
     public static Image Rotate16 { get; } = ResourceToImage("TNT.Drawing.Resource.Image.Rotate_16.png");
 
     /// <summary>
-    /// Small Rotate icon <see cref="Image"/> (24x24)
+    /// Small rotate icon image (24x24).
     /// </summary>
     public static Image Rotate24 { get; } = ResourceToImage("TNT.Drawing.Resource.Image.Rotate_24.png");
 
     /// <summary>
-    /// Large Rotate icon <see cref="Image"/> (48x48)
+    /// Large rotate icon image (48x48).
     /// </summary>
     public static Image Rotate48 { get; } = ResourceToImage("TNT.Drawing.Resource.Image.Rotate_48.png");
   }
 
   /// <summary>
-  /// Cursors
+  /// Contains embedded cursor resources for custom drawing operations.
   /// </summary>
   public static class Cursors
   {
     /// <summary>
-    /// <see cref="Cursor"/> that represents an Add Curve action
+    /// Cursor for Add Curve action.
     /// </summary>
     public static Cursor AddCurve { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.AddCurve.cur");
 
     /// <summary>
-    /// <see cref="Cursor"/> that represents an Add Point action
+    /// Cursor for Add Point action.
     /// </summary>
     public static Cursor AddPoint { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.AddPoint.cur");
 
     /// <summary>
-    /// <see cref="Cursor"/> that represents an Add Curve action
+    /// Cursor for Curve action.
     /// </summary>
     public static Cursor Curve { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Curve.cur");
 
     /// <summary>
-    /// <see cref="Cursor"/> that represents an Move Point action
+    /// Cursor for Move Point action.
     /// </summary>
     public static Cursor MovePoint { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.MovePoint.cur");
 
     /// <summary>
-    /// <see cref="Cursor"/> that represents an Remove Point action
+    /// Cursor for Remove Point action.
     /// </summary>
     public static Cursor RemovePoint { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.RemovePoint.cur");
 
     /// <summary>
-    /// <see cref="Cursor"/> that represents a Rotate action
+    /// Cursor for Rotate action.
     /// </summary>
     public static Cursor Rotate { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Rotate.cur");
+
+    /// <summary>
+    /// Cursor for Line selection.
+    /// </summary>
+    public static Cursor DrawLine { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.DrawLine.cur");
+
+    /// <summary>
+    /// Cursor for rectangle selection (Aero style).
+    /// </summary>
+    public static Cursor DrawRectangle { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.DrawRectangle.cur");
   }
 
   /// <summary>
-  /// Gets an image associated with the <paramref name="resource"/> value within the calling assembly
+  /// Loads an embedded image resource from the calling assembly.
+  /// Throws an exception if the resource is not found.
   /// </summary>
-  public static Image ResourceToImage(string resource)
+  /// <param name="resource">Resource name (manifest path)</param>
+  /// <returns>Image loaded from resource</returns>
+  /// <exception cref="Exception">Thrown if resource is not found</exception>
+  private static Image ResourceToImage(string resource)
   {
     var assembly = Assembly.GetCallingAssembly();
-    var resourceName = assembly.GetManifestResourceNames();
     var resourceStream = assembly.GetManifestResourceStream(resource);
     var image = resourceStream == null ? null : new Bitmap(resourceStream);
     if (image == null) throw new Exception($"Resource {resource} not found");
@@ -91,13 +107,44 @@ public static class Resources
   }
 
   /// <summary>
-  /// Converts <paramref name="resource"/> to <see cref="Cursor"/>
+  /// Loads an embedded cursor resource from the calling assembly.
+  /// Returns the default cursor if the resource is not found.
   /// </summary>
-  /// <returns><see cref="Cursor"/> represented by the <paramref name="resource"/></returns>
-  public static Cursor ResourceToCursor(string resource)
+  /// <param name="resourceName">Resource name (manifest path)</param>
+  /// <returns>Cursor loaded from resource or default cursor</returns>
+  private static Cursor ResourceToCursor(string resourceName)
   {
-    var cursor = Utilities.Utilities.LoadColorCursor(resource);
-    if (cursor == null) throw new Exception($"Resource {resource} not found");
+    // Get the name of a temporary file
+    string path = Path.GetTempFileName();
+
+    // Put the resource into a stream and save it to a file
+    using Stream? stream = Assembly.GetCallingAssembly().GetManifestResourceStream(resourceName);
+
+    if (stream == null) return System.Windows.Forms.Cursors.Default;
+
+    using (FileStream fileStream = File.Create(path, (int)stream.Length))
+    {
+      // Fill the bytes[] array with the stream data         
+      byte[] bytesInStream = new byte[stream.Length];
+      stream.ReadExactly(bytesInStream, 0, bytesInStream.Length);
+
+      // Use FileStream object to write to the specified file         
+      fileStream.Write(bytesInStream, 0, bytesInStream.Length);
+    }
+
+    // Load the cursor from the file and delete file
+    Cursor cursor = new Cursor(LoadCursorFromFile(path));
+    File.Delete(path);
+
     return cursor;
   }
+
+  /// <summary>
+  /// Loads a cursor from a file using Win32 API.
+  /// </summary>
+  /// <param name="lpFileName">Path to cursor file</param>
+  /// <returns>Pointer to loaded cursor</returns>
+  [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+  private static extern IntPtr LoadCursorFromFile(string lpFileName);
+
 }

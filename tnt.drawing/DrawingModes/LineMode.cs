@@ -29,6 +29,8 @@ public class LineMode(ObjectLayer layer, BezierPath defaultObject) : DrawingMode
   {
     var isClosed = false;
 
+    if (e.Button == MouseButtons.Left)
+    {
     // Add a new vertex at the mouse location
       _vertices.Add(new Vertex(_activeVertex));
 
@@ -51,6 +53,11 @@ public class LineMode(ObjectLayer layer, BezierPath defaultObject) : DrawingMode
         Layer.CanvasObjects.Add(path);
       }
         _vertices.Clear();
+    }
+    }
+    else if (e.Button == MouseButtons.Right)
+    {
+      _vertices.RemoveAt(_vertices.Count - 1);
     }
 
     canvas.Invalidate();

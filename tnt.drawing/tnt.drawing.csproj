@@ -26,7 +26,9 @@
     <EmbeddedResource Include="Resource\Cursor\AddCurve.cur" />
     <EmbeddedResource Include="Resource\Cursor\AddPoint.cur" />
     <EmbeddedResource Include="Resource\Cursor\Curve.cur" />
+    <EmbeddedResource Include="Resource\Cursor\DrawLine.cur" />
     <EmbeddedResource Include="Resource\Cursor\MovePoint.cur" />
+    <EmbeddedResource Include="Resource\Cursor\DrawRectangle.cur" />
     <EmbeddedResource Include="Resource\Cursor\RemovePoint.cur" />
     <EmbeddedResource Include="Resource\Cursor\Rotate.cur" />
     <EmbeddedResource Include="Resource\Image\ControlPoint.png" />
