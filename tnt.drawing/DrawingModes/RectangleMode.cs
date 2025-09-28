@@ -37,32 +37,41 @@ public class RectangleMode(ObjectLayer layer, CanvasObject? defaultObject = null
   }
 
   /// <summary>
-  /// Handles the mouse button release event to finalize or start a rectangle.
-  /// If vertices exist, creates a closed <see cref="BezierPath"/> and adds it to the layer; otherwise, initializes rectangle vertices.
+  /// Handles the mouse button release event for rectangle drawing.
+  /// - If the left mouse button is released and vertices exist, finalizes the rectangle by creating a closed <see cref="BezierPath"/> and adds it to the layer.
+  /// - If no vertices exist, initializes the rectangle's four vertices at the current location.
+  /// - If the right mouse button is released, cancels the rectangle preview and clears vertices.
   /// </summary>
   public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys, Canvas canvas)
   {
     var location = canvas.SnapToInterval ? e.Location.Snap(canvas.SnapInterval) : e.Location;
 
-    if (_vertices.Count > 0)
+    if (e.Button == MouseButtons.Left)
     {
-      // Create a new BezierPath and add each vertex
-      var path = (DefaultBezierPath.Clone() as BezierPath)!;
+      if (_vertices.Count > 0)
+      {
+        // Create a new BezierPath and add each vertex
+        var path = (DefaultBezierPath.Clone() as BezierPath)!;
 
-      _vertices.ForEach(v => path.AddVertex(new Vertex(v)));
-      // Close the path by adding the first vertex again
-      path.AddVertex(new Vertex(_vertices.First()));
+        _vertices.ForEach(v => path.AddVertex(new Vertex(v)));
+        // Close the path by adding the first vertex again
+        path.AddVertex(new Vertex(_vertices.First()));
 
-      Layer.CanvasObjects.Add(path);
+        Layer.CanvasObjects.Add(path);
 
-      _vertices.Clear();
+        _vertices.Clear();
+      }
+      else
+      {
+        _vertices.Add(new Vertex(location));
+        _vertices.Add(new Vertex(location));
+        _vertices.Add(new Vertex(location));
+        _vertices.Add(new Vertex(location));
+      }
     }
-    else
+    else if (e.Button == MouseButtons.Right)
     {
-      _vertices.Add(new Vertex(location));
-      _vertices.Add(new Vertex(location));
-      _vertices.Add(new Vertex(location));
-      _vertices.Add(new Vertex(location));
+      _vertices.Clear();
     }
 
     canvas.Invalidate();
