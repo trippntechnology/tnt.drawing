@@ -210,20 +210,28 @@ public class Canvas : Control
   }
 
   /// <summary>
-  /// Aligns all selected objects to the snap interval.
+  /// Aligns all selected objects in all object layers to the current canvas snap interval.
+  /// Triggers a redraw of the canvas after alignment.
   /// </summary>
   public void AlignToSnapInterval()
   {
-    Layers.Cast<ObjectLayer>().ToList().ForEach(it => it.AlignToSnapInterval(SnapInterval));
+    Layers
+      .OfType<ObjectLayer>()
+      .ToList()
+      .ForEach(it => it.AlignToSnapInterval(SnapInterval));
     Invalidate();
   }
 
   /// <summary>
-  /// Brings selected objects in all layers to the front (top of z-order).
+  /// Moves all selected objects in all object layers to the front of the z-order in their respective layers.
+  /// Triggers a redraw of the canvas after alignment.
   /// </summary>
   public new void BringToFront()
   {
-    Layers.Cast<ObjectLayer>().ToList().ForEach(it => it.BringToFront());
+    Layers
+      .OfType<ObjectLayer>()
+      .ToList()
+      .ForEach(layer => layer.BringToFront());
     Invalidate();
   }
 

@@ -19,13 +19,14 @@ public abstract class CanvasObject : Observable
   /// <summary>
   /// <see cref="Guid"/> of the object
   /// </summary>
-  [ReadOnly(true)]
+  [Browsable(false)]
   public string Id { get; set; }
 
   /// <summary>
   /// Indicates whether the object is selected or not
   /// </summary>
   [JsonIgnore]
+  [Browsable(false)]
   public virtual bool IsSelected { get => Get(false); set => Set(value); }
 
   /// <summary>

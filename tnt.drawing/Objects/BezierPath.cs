@@ -30,11 +30,13 @@ public class BezierPath : CanvasObject
   /// <summary>
   /// The <see cref="List{CanvasPoint}"/> represented by this <see cref="BezierPath"/>
   /// </summary>
+  [Browsable(false)]
   public List<CanvasPoint> CanvasPoints { get; set; } = new List<CanvasPoint>();
 
   /// <summary>
   /// Represents the <see cref="FillColor"/> as an ARGB value so that it can be persisted
   /// </summary>
+  [Browsable(false)]
   public int FillARGB { get => FillColor.ToArgb(); set => FillColor = Color.FromArgb(value); }
 
   /// <summary>
@@ -43,6 +45,23 @@ public class BezierPath : CanvasObject
   [DisplayName("Fill Color")]
   [JsonIgnore]
   public Color FillColor { get => Get(Color.Transparent); set => Set(value); }
+
+  /// <summary>
+  /// Indicates the fill opacity of the <see cref="BezierPath"/>. Value between 0.0 (transparent) and 1.0 (opaque).
+  /// </summary>
+  [DisplayName("Fill Opacity")]
+  [JsonIgnore]
+  public int FillOpacity
+  {
+    get => Convert.ToInt32(FillColor.A / 255.0 * 100);
+    set
+    {
+      // Clamp value between 0 and 100
+      var clamped = Math.Max(0, Math.Min(100, value));
+      var color = FillColor;
+      FillColor = Color.FromArgb((int)(clamped / 100.0 * 255), color.R, color.G, color.B);
+    }
+  }
 
   /// <summary>
   /// Gets or sets whether the BezierPath is selected.
@@ -66,13 +85,32 @@ public class BezierPath : CanvasObject
   /// <summary>
   /// Represents the <see cref="LineColor"/> as an ARGB value so that it can be persisted
   /// </summary>
+  [Browsable(false)]
   public int LineARGB { get => LineColor.ToArgb(); set => LineColor = Color.FromArgb(value); }
+
   /// <summary>
   /// Indicates the <see cref="LineColor"/> of the <see cref="BezierPath"/>
   /// </summary>
   [DisplayName("Line Color")]
   [JsonIgnore]
   public Color LineColor { get => Get(Color.Blue); set => Set(value); }
+
+  /// <summary>
+  /// Indicates the line opacity of the <see cref="BezierPath"/>. Value between 0 (transparent) and 100 (opaque).
+  /// </summary>
+  [DisplayName("Line Opacity")]
+  [JsonIgnore]
+  public int LineOpacity
+  {
+    get => Convert.ToInt32(LineColor.A / 255.0 * 100);
+    set
+    {
+      // Clamp value between 0 and 100
+      var clamped = Math.Max(0, Math.Min(100, value));
+      var color = LineColor;
+      LineColor = Color.FromArgb((int)(clamped / 100.0 * 255), color.R, color.G, color.B);
+    }
+  }
 
   /// <summary>
   /// Indicates the <see cref="DashStyle"/> of the <see cref="BezierPath"/>
@@ -106,20 +144,6 @@ public class BezierPath : CanvasObject
       path.AddBeziers(points);
       if (_isClosedPath) path.CloseFigure();
       return path;
-    }
-  }
-
-  /// <summary>
-  /// Needed for deserialization so that set gets called. 
-  /// </summary>
-  [JsonIgnore]
-  public CanvasPoint[] PointsArray
-  {
-    get => CanvasPoints.ToArray();
-    set
-    {
-      CanvasPoints = value.ToList();
-      // For deserialization; can be extended if needed
     }
   }
 
