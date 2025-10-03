@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\tnt.drawing\TNT.Drawing.csproj" />
+		<PackageReference Include="TNT.Utilities" Version="3.0.0" />
   </ItemGroup>
 
 </Project>

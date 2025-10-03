@@ -14,7 +14,8 @@ using TNT.Drawing.Model;
 namespace TNT.Drawing;
 
 /// <summary>
-/// Provides a grid-based drawing surface with layer and drawing mode support.
+/// Represents the main grid-based drawing surface for TNT.Drawing, supporting multiple layers, drawing modes, coordinate transformations, and interactive user input.
+/// Handles mouse and keyboard events, manages zoom and pan, and provides event hooks for selection and feedback.
 /// </summary>
 public class Canvas : Control
 {
@@ -283,14 +284,13 @@ public class Canvas : Control
   /// <param name="e">The mouse event arguments.</param>
   protected override void OnMouseMove(MouseEventArgs e)
   {
-    var graphics = CreateTransformedGraphics();
-    var mea = Transform(e, graphics);
+    using var graphics = CreateTransformedGraphics();
+    var transformedMEA = Transform(e, graphics);
 
-    if (_keyEventArgs?.KeyCode != Keys.Space) DrawingMode.OnMouseMove(mea, ModifierKeys, this);
+    if (_keyEventArgs?.KeyCode != Keys.Space) DrawingMode.OnMouseMove(transformedMEA, ModifierKeys, this);
 
     var currentCursorPosition = Cursor.Position;
-    var mousePosition = new Point(e.X, e.Y);
-    _previousGridPosition = mousePosition.ToGridCoordinates(graphics);
+    _previousGridPosition = transformedMEA.Location;
 
     if (_keyEventArgs?.KeyCode == Keys.Space)
     {
@@ -360,7 +360,7 @@ public class Canvas : Control
   protected override void OnMouseUp(MouseEventArgs e)
   {
     base.OnMouseUp(e);
-    var graphics = CreateTransformedGraphics();
+    using var graphics = CreateTransformedGraphics();
     var mea = Transform(e, graphics);
     DrawingMode.OnMouseUp(mea, ModifierKeys, this);
   }
@@ -383,7 +383,7 @@ public class Canvas : Control
     {
       // Adjust position when Paint() is called
       _adjustPostion = true;
-      var graphics = CreateTransformedGraphics();
+      using var graphics = CreateTransformedGraphics();
       var positionOnCanvas = new Point(e.X, e.Y);
       _previousGridPosition = positionOnCanvas.ToGridCoordinates(graphics);
       ScalePercentage += detents;
@@ -462,13 +462,25 @@ public class Canvas : Control
   /// <returns>A <see cref="MouseEventArgs"/> with the transformed location.</returns>
   private MouseEventArgs Transform(MouseEventArgs e, Graphics? graphics = null)
   {
+    var disposeGraphics = graphics == null;
     graphics = graphics ?? CreateTransformedGraphics();
-    var layerPoint = e.Location.ToGridCoordinates(graphics); //.Snap(10);
+    var layerPoint = e.Location.ToGridCoordinates(graphics);
+    if (disposeGraphics) { graphics.Dispose(); }
     return new MouseEventArgs(e.Button, e.Clicks, layerPoint.X, layerPoint.Y, e.Delta);
   }
 
   /// <summary>
-  /// Returns a <see cref="Graphics"/> object with the canvas's current scale and translation applied.
+  /// Creates and returns a <see cref="Graphics"/> object with the current canvas scale and translation applied.
+  /// <para>
+  /// This method configures the graphics context so that drawing operations and coordinate conversions
+  /// are mapped between grid (world) coordinates and canvas (screen) coordinates using the current zoom and centering.
+  /// </para>
+  /// <para>
+  /// Always use the returned graphics context for rendering layers, objects, and transforming mouse events
+  /// to ensure correct coordinate mapping and drawing mode behavior.
+  /// </para>
+  /// <param name="graphics">Optional. An existing graphics context to apply transformations to. If <c>null</c>, a new graphics context is created for the canvas.</param>
+  /// <returns>A <see cref="Graphics"/> object with scale and translation transforms applied for grid-to-canvas mapping. This must be disposed of by the caller.</returns>
   /// </summary>
   /// <param name="graphics">An optional graphics context to apply transformations to.</param>
   /// <returns>The transformed <see cref="Graphics"/> object.</returns>
