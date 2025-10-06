@@ -42,7 +42,7 @@ public partial class Form1 : Form
         //GetSquarePath(100,100,100, Color.Blue),
         //GetSquarePath(500,500,200, Color.Red),
         //GetLine(300,100),
-        //GetLine(500,100),
+        GetLine(500,100),
         GetClosedBezierPath(200,400),
       }
     };

@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using TNT.Commons;
 using TNT.Drawing.Extensions;
 using TNT.Drawing.Layers;
+using TNT.Drawing.Model;
 using TNT.Drawing.Objects;
 
 namespace TNT.Drawing.DrawingModes;
@@ -31,29 +32,29 @@ public class LineMode(ObjectLayer layer, BezierPath defaultObject) : DrawingMode
 
     if (e.Button == MouseButtons.Left)
     {
-    // Add a new vertex at the mouse location
+      // Add a new vertex at the mouse location
       _vertices.Add(new Vertex(_activeVertex));
 
       _vertices.Select(v => v as CanvasPoint).ToList().Also(canvasPoints =>
-    {
-      canvasPoints.FirstOrDefault()?.Also(first => canvasPoints.FindCoincident(first)?.Also(_ => isClosed = true));
-    });
-
-    // If CTRL is held, finish the line
-      if (isClosed || (modifierKeys & Keys.Control) == Keys.Control && _vertices.Count > 1)
-    {
-        if (_vertices.Count > 1)
       {
-        // Create a new BezierPath and add each vertex
-        var path = (DefaultBezierPath.Clone() as BezierPath)!;
-          foreach (var v in _vertices)
+        canvasPoints.FirstOrDefault()?.Also(first => canvasPoints.FindCoincident(first)?.Also(_ => isClosed = true));
+      });
+
+      // If CTRL is held, finish the line
+      if (isClosed || (modifierKeys & Keys.Control) == Keys.Control && _vertices.Count > 1)
+      {
+        if (_vertices.Count > 1)
         {
-          path.AddVertex(new Vertex(v));
+          // Create a new BezierPath and add each vertex
+          var path = (DefaultBezierPath.Clone() as BezierPath)!;
+          foreach (var v in _vertices)
+          {
+            path.AddVertex(new Vertex(v));
+          }
+          Layer.CanvasObjects.Add(path);
         }
-        Layer.CanvasObjects.Add(path);
-      }
         _vertices.Clear();
-    }
+      }
     }
     else if (e.Button == MouseButtons.Right)
     {
@@ -71,22 +72,38 @@ public class LineMode(ObjectLayer layer, BezierPath defaultObject) : DrawingMode
 
     var location = e.Location;
 
-    // If SHIFT is pressed, constrain to every 15 degrees from the origin vertex
-    if ((modifierKeys & Keys.Shift) == Keys.Shift && _vertices.Count > 0)
+    if (_vertices.Count == 0)
     {
-      var origin = _vertices.Last().ToPoint;
-      var dx = location.X - origin.X;
-      var dy = location.Y - origin.Y;
-      var distance = Math.Sqrt(dx * dx + dy * dy);
-      if (distance > 0)
+      canvas.OnFeedbackChanged(Feedback.LINE_MODE_INITIAL_VERTEX);
+    }
+    else if (_vertices.Count > 0)
+    {
+      // If SHIFT is pressed, constrain to every 15 degrees from the origin vertex
+      if ((modifierKeys & Keys.Shift) == Keys.Shift)
       {
-        var angle = Math.Atan2(dy, dx); // radians
-        var angleDeg = angle * 180.0 / Math.PI;
-        var snappedAngleDeg = Math.Round(angleDeg / 15.0) * 15.0;
-        var snappedAngleRad = snappedAngleDeg * Math.PI / 180.0;
-        var snappedX = origin.X + (int)Math.Round(distance * Math.Cos(snappedAngleRad));
-        var snappedY = origin.Y + (int)Math.Round(distance * Math.Sin(snappedAngleRad));
-        location = new Point(snappedX, snappedY);
+        var origin = _vertices.Last().ToPoint;
+        var dx = location.X - origin.X;
+        var dy = location.Y - origin.Y;
+        var distance = Math.Sqrt(dx * dx + dy * dy);
+        if (distance > 0)
+        {
+          var angle = Math.Atan2(dy, dx); // radians
+          var angleDeg = angle * 180.0 / Math.PI;
+          var snappedAngleDeg = Math.Round(angleDeg / 15.0) * 15.0;
+          var snappedAngleRad = snappedAngleDeg * Math.PI / 180.0;
+          var snappedX = origin.X + (int)Math.Round(distance * Math.Cos(snappedAngleRad));
+          var snappedY = origin.Y + (int)Math.Round(distance * Math.Sin(snappedAngleRad));
+          location = new Point(snappedX, snappedY);
+        }
+      }
+
+      if ((modifierKeys & Keys.Control) == Keys.Control)
+      {
+        canvas.OnFeedbackChanged(Feedback.LINE_MODE_SECOND_VERTEX_CTRL);
+      }
+      else if (_vertices.Count > 0)
+      {
+        canvas.OnFeedbackChanged(Feedback.LINE_MODE_SECOND_VERTEX);
       }
     }
 

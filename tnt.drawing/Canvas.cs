@@ -316,7 +316,7 @@ public class Canvas : Control
         Cursor = Cursors.Hand;
         break;
       default:
-        DrawingMode.OnKeyDown(e);
+        DrawingMode.OnKeyDown(_previousGridPosition, ModifierKeys, this);
         break;
     }
   }
@@ -328,8 +328,8 @@ public class Canvas : Control
   protected override void OnKeyUp(KeyEventArgs e)
   {
     _keyEventArgs = null;
-    Cursor = Cursors.Default;
-    DrawingMode.OnKeyUp(e);
+    //Cursor = Cursors.Default;
+    DrawingMode.OnKeyUp(_previousGridPosition, ModifierKeys, this);
   }
 
   /// <summary>

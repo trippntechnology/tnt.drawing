@@ -44,6 +44,36 @@ public class SelectMode(ObjectLayer layer) : DrawingMode(layer)
   }
 
   /// <summary>
+  /// Handles key down events in selection mode, updating feedback for the object under the mouse and passing the event to the base drawing mode.
+  /// <para>
+  /// This method is called with the cursor position in grid coordinates and any active modifier keys. If an object is under the mouse, its feedback is retrieved and sent to the canvas for UI updates (cursor, hint).
+  /// </para>
+  /// <param name="cursorPosition">The cursor position in grid (world) coordinates.</param>
+  /// <param name="modifiers">The active modifier keys (e.g., Control, Shift).</param>
+  /// <param name="canvas">The target <see cref="Canvas"/> instance.</param>
+  /// </summary>
+  public override void OnKeyDown(Point cursorPosition, Keys modifiers, Canvas canvas)
+  {
+    base.OnKeyDown(cursorPosition, modifiers, canvas);
+    _objectUnderMouse?.GetFeedback(cursorPosition, modifiers)?.Also(f => canvas.OnFeedbackChanged(f));
+  }
+
+  /// <summary>
+  /// Handles key up events in selection mode, updating feedback for the object under the mouse and passing the event to the base drawing mode.
+  /// <para>
+  /// This method is called with the cursor position in grid coordinates and any active modifier keys. If an object is under the mouse, its feedback is retrieved and sent to the canvas for UI updates (cursor, hint).
+  /// </para>
+  /// <param name="cursorPosition">The cursor position in grid (world) coordinates.</param>
+  /// <param name="modifiers">The active modifier keys (e.g., Control, Shift).</param>
+  /// <param name="canvas">The target <see cref="Canvas"/> instance.</param>
+  /// </summary>
+  public override void OnKeyUp(Point cursorPosition, Keys modifiers, Canvas canvas)
+  {
+    _objectUnderMouse?.GetFeedback(cursorPosition, modifiers)?.Also(f => canvas.OnFeedbackChanged(f));
+    base.OnKeyUp(cursorPosition, modifiers, canvas);
+  }
+
+  /// <summary>
   /// Handles mouse down event for selection.
   /// </summary>
   public override void OnMouseDown(MouseEventArgs e, Keys modifierKeys, Canvas canvas)

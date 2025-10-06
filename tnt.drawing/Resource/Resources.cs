@@ -88,6 +88,11 @@ public static class Resources
     /// Cursor for rectangle selection (Aero style).
     /// </summary>
     public static Cursor DrawRectangle { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.DrawRectangle.cur");
+
+    public static Cursor Hand { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Hand.cur");
+    public static Cursor Move { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Move.cur");
+    public static Cursor Add { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Add.cur");
+    public static Cursor Remove { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Remove.cur");
   }
 
   /// <summary>

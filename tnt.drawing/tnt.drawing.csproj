@@ -9,10 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resource\Cursor\Add.cur" />
     <None Remove="Resource\Cursor\AddCurve.cur" />
     <None Remove="Resource\Cursor\AddPoint.cur" />
     <None Remove="Resource\Cursor\Curve.cur" />
+    <None Remove="Resource\Cursor\Hand.cur" />
+    <None Remove="Resource\Cursor\Move.cur" />
     <None Remove="Resource\Cursor\MovePoint.cur" />
+    <None Remove="Resource\Cursor\Remove.cur" />
     <None Remove="Resource\Cursor\RemovePoint.cur" />
     <None Remove="Resource\Cursor\Rotate.cur" />
     <None Remove="Resource\Image\ControlPoint.png" />
@@ -23,12 +27,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resource\Cursor\Add.cur" />
     <EmbeddedResource Include="Resource\Cursor\AddCurve.cur" />
     <EmbeddedResource Include="Resource\Cursor\AddPoint.cur" />
     <EmbeddedResource Include="Resource\Cursor\Curve.cur" />
     <EmbeddedResource Include="Resource\Cursor\DrawLine.cur" />
+    <EmbeddedResource Include="Resource\Cursor\Hand.cur" />
+    <EmbeddedResource Include="Resource\Cursor\Move.cur" />
     <EmbeddedResource Include="Resource\Cursor\MovePoint.cur" />
     <EmbeddedResource Include="Resource\Cursor\DrawRectangle.cur" />
+    <EmbeddedResource Include="Resource\Cursor\Remove.cur" />
     <EmbeddedResource Include="Resource\Cursor\RemovePoint.cur" />
     <EmbeddedResource Include="Resource\Cursor\Rotate.cur" />
     <EmbeddedResource Include="Resource\Image\ControlPoint.png" />

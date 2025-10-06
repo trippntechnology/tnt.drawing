@@ -15,9 +15,17 @@ public record Feedback(Cursor Cursor, string Hint)
   /// </summary>
   public static readonly Feedback Default = new Feedback(System.Windows.Forms.Cursors.Default, string.Empty);
 
-  public static readonly Feedback LINE_MODE_DEFAULT = new Feedback(Resources.Cursors.DrawLine, "Click to add vertex.");
-  public static readonly Feedback LINEMODE_MANY_VERTEX = new Feedback(Cursors.Default, "Press Shift to contrain to angle. Ctrl or close path to terminate.");
-  public static readonly Feedback LINEMODE_ONE_VERTEX = new Feedback(Cursors.Default, "Press Shift to contrain to angle. Ctrl to terminate.");
+  public static readonly Feedback SELECT_DEFAULT = new Feedback(Resources.Cursors.Hand, "Click to select. Ctrl+Click to select multiple objects.");
+  public static readonly Feedback SELECT_MULTIPLE = new Feedback(Resources.Cursors.Hand, "Click to toggle selection.");
+  public static readonly Feedback SELECT_ADD= new Feedback(Resources.Cursors.Add, "Add.");
+  public static readonly Feedback SELECT_REMOVE= new Feedback(Resources.Cursors.Remove, "Remove.");
+  public static readonly Feedback SELECT_MOVE= new Feedback(Resources.Cursors.Move, "Move.");
+
+
+  public static readonly Feedback LINE_MODE_INITIAL_VERTEX = new Feedback(Resources.Cursors.DrawLine, "Click to add initial vertex.");
+  public static readonly Feedback LINE_MODE_ADD_VERTEX = new Feedback(Cursors.Default, "Press Shift to contrain to angle. Ctrl or close path to terminate.");
+  public static readonly Feedback LINE_MODE_SECOND_VERTEX = new Feedback(Resources.Cursors.DrawLine, "Press Shift to contrain to angle. Ctrl+Click to terminate.");
+  public static readonly Feedback LINE_MODE_SECOND_VERTEX_CTRL = new Feedback(Resources.Cursors.DrawLine, "Press Shift to contrain to angle. Click to terminate.");
 
   public static readonly Feedback RECTANGLE_MODE_INITIAL_VERTEX = new Feedback(Resources.Cursors.DrawRectangle, "Click to add initial vertex.");
   public static readonly Feedback RECTANGLE_MODE_OPPOSITE_VERTEX = new Feedback(Resources.Cursors.DrawRectangle, "Click to add opposite vertex. Shift to constrain to a square.");

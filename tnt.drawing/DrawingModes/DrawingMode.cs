@@ -13,83 +13,83 @@ namespace TNT.Drawing.DrawingModes;
 /// </summary>
 public class DrawingMode(ObjectLayer layer, CanvasObject? defaultObject = null)
 {
-    // Fields
+  // Fields
 
-    /// <summary>
-    /// Indicates when the mouse button is pressed
-    /// </summary>
-    protected bool _isMouseDown = false;
+  /// <summary>
+  /// Indicates when the mouse button is pressed
+  /// </summary>
+  protected bool _isMouseDown = false;
 
-    /// <summary>
-    /// The active vertex that is being manipulated in the drawing mode.
-    /// </summary>
-    protected Vertex _activeVertex = new Vertex();
+  /// <summary>
+  /// The active vertex that is being manipulated in the drawing mode.
+  /// </summary>
+  protected Vertex _activeVertex = new Vertex();
 
-    /// <summary>
-    /// List of vertices that are being drawn in the current drawing mode.
-    /// </summary>
-    protected List<Vertex> _vertices = new List<Vertex>();
+  /// <summary>
+  /// List of vertices that are being drawn in the current drawing mode.
+  /// </summary>
+  protected List<Vertex> _vertices = new List<Vertex>();
 
-    // Properties
+  // Properties
 
-    /// <summary>
-    /// The <see cref="CanvasLayer"/> manipulated by this <see cref="DrawingMode"/>
-    /// </summary>
-    protected ObjectLayer Layer { get; private set; } = layer;
+  /// <summary>
+  /// The <see cref="CanvasLayer"/> manipulated by this <see cref="DrawingMode"/>
+  /// </summary>
+  protected ObjectLayer Layer { get; private set; } = layer;
 
-    /// <summary>
-    /// The <see cref="CanvasObject"/> that gets created by the <see cref="DrawingMode"/>
-    /// </summary>
-    public CanvasObject? DefaultObject { get; } = defaultObject;
+  /// <summary>
+  /// The <see cref="CanvasObject"/> that gets created by the <see cref="DrawingMode"/>
+  /// </summary>
+  public CanvasObject? DefaultObject { get; } = defaultObject;
 
-    // Methods
+  // Methods
 
-    /// <summary>
-    /// Clears all vertices and refreshes the canvas display.
-    /// </summary>
-    public virtual void Reset(Canvas canvas)
-    {
-        _vertices.Clear();
-        canvas.Invalidate();
-    }
+  /// <summary>
+  /// Clears all vertices and refreshes the canvas display.
+  /// </summary>
+  public virtual void Reset(Canvas canvas)
+  {
+    _vertices.Clear();
+    canvas.Invalidate();
+  }
 
-    /// <summary>
-    /// Called when the mouse moves across the <see cref="Canvas"/>.
-    /// </summary>
-    public virtual void OnMouseMove(MouseEventArgs e, Keys modifierKeys, Canvas canvas) => Log();
+  /// <summary>
+  /// Called when the mouse moves across the <see cref="Canvas"/>.
+  /// </summary>
+  public virtual void OnMouseMove(MouseEventArgs e, Keys modifierKeys, Canvas canvas) => Log();
 
-    /// <summary>
-    /// Called when the mouse button is pressed.
-    /// </summary>
-    public virtual void OnMouseDown(MouseEventArgs e, Keys modifierKeys, Canvas canvas) { _isMouseDown = true; Log(); }
+  /// <summary>
+  /// Called when the mouse button is pressed.
+  /// </summary>
+  public virtual void OnMouseDown(MouseEventArgs e, Keys modifierKeys, Canvas canvas) { _isMouseDown = true; Log(); }
 
-    /// <summary>
-    /// Called when the mouse button is released.
-    /// </summary>
-    public virtual void OnMouseUp(MouseEventArgs e, Keys modifierKeys, Canvas canvas) { _isMouseDown = false; Log(); }
+  /// <summary>
+  /// Called when the mouse button is released.
+  /// </summary>
+  public virtual void OnMouseUp(MouseEventArgs e, Keys modifierKeys, Canvas canvas) { _isMouseDown = false; Log(); }
 
-    /// <summary>
-    /// Called when the mouse button is double clicked
-    /// </summary>
-    public virtual void OnMouseDoubleClick(MouseEventArgs e) => Log();
+  /// <summary>
+  /// Called when the mouse button is double clicked
+  /// </summary>
+  public virtual void OnMouseDoubleClick(MouseEventArgs e) => Log();
 
-    /// <summary>
-    /// Called when a key is pressed
-    /// </summary>
-    public virtual void OnKeyDown(KeyEventArgs e) => Log($"{e.KeyCode}");
+  /// <summary>
+  /// Called when a key is pressed
+  /// </summary>
+  public virtual void OnKeyDown(Point cursorPosition, Keys modifiers, Canvas canvas) => Log($"{modifiers}");
 
-    /// <summary>
-    /// Called when a key is released
-    /// </summary>
-    public virtual void OnKeyUp(KeyEventArgs e) => Log($"{e.KeyCode}");
+  /// <summary>
+  /// Called when a key is released
+  /// </summary>
+  public virtual void OnKeyUp(Point cursorPosition, Keys modifiers, Canvas canvas) => Log($"{modifiers}");
 
-    /// <summary>
-    /// Called when the <see cref="Canvas"/> is being painted.
-    /// </summary>
-    public virtual void OnDraw(Graphics graphics, Canvas canvas) => Log();
+  /// <summary>
+  /// Called when the <see cref="Canvas"/> is being painted.
+  /// </summary>
+  public virtual void OnDraw(Graphics graphics, Canvas canvas) => Log();
 
-    /// <summary>
-    /// Called to log to <see cref="Debug"/>
-    /// </summary>
-    protected virtual void Log(string msg = "", [CallerMemberName] string callingMethod = "") { }// => TNTLogger.Info(msg, callingMethod);
+  /// <summary>
+  /// Called to log to <see cref="Debug"/>
+  /// </summary>
+  protected virtual void Log(string msg = "", [CallerMemberName] string callingMethod = "") { }// => TNTLogger.Info(msg, callingMethod);
 }

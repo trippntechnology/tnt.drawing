@@ -293,50 +293,48 @@ public class BezierPath : CanvasObject
   }
 
   /// <summary>
-  /// Gets a <see cref="Cursor"/> representing the state of the <see cref="BezierPath"/> that is represented by <paramref name="location"/>
+  /// Gets a <see cref="Cursor"/> representing the state of the <see cref="BezierPath"/> that is represented by <paramref name="mousePosition"/>
   /// </summary>
-  public override Feedback GetFeedback(Point location, Keys modifierKeys)
+  public override Feedback GetFeedback(Point mousePosition, Keys modifierKeys)
   {
-    var cursor = Cursors.Hand;
-    var hint = "Click to select. CTRL for multiple objects.";
+    var feedback = Feedback.SELECT_DEFAULT;
     if (IsSelected)
     {
-      cursor = Cursors.Hand;
-      hint = "CTRL and SHIFT to add point.";
-      var vertex = CanvasPoints.FirstOrDefault(p => p is Vertex && p.MouseOver(location, modifierKeys).HitObject != null);
-      var ctrlPoint = CanvasPoints.FirstOrDefault(p => p is ControlPoint && p.MouseOver(location, modifierKeys).HitObject != null);
+      feedback = Feedback.SELECT_MOVE;
+
+      var vertex = CanvasPoints.FirstOrDefault(p => p is Vertex && p.MouseOver(mousePosition, modifierKeys).HitObject != null);
+      var ctrlPoint = CanvasPoints.FirstOrDefault(p => p is ControlPoint && p.MouseOver(mousePosition, modifierKeys).HitObject != null);
       CanvasPoint? point = vertex ?? ctrlPoint;
+
+      var mouseOverPath = Path.IsOutlineVisible(mousePosition, OUTLINE_PEN_HIT_WITDTH);
+
       if (point != null)
       {
         if (modifierKeys == (Keys.Control | Keys.Shift))
         {
-          cursor = Resources.Cursors.RemovePoint;
-          hint = "Click to remove point";
+          feedback = Feedback.SELECT_REMOVE;
         }
         else if (ctrlPoint != null && modifierKeys == Keys.Shift)
         {
-          cursor = Resources.Cursors.AddCurve;
+          //cursor = Resources.Cursors.AddCurve;
         }
         else
         {
-          cursor = Resources.Cursors.MovePoint;
-          hint = "CTRL and SHIFT to remove. SHIFT to curve.";
+          feedback = Feedback.SELECT_MOVE;
+          //cursor = Resources.Cursors.MovePoint;
+          //hint = "CTRL and SHIFT to remove. SHIFT to curve.";
         }
       }
-      else
+      else if (mouseOverPath && modifierKeys == (Keys.Control | Keys.Shift))
       {
-        if (modifierKeys == (Keys.Control | Keys.Shift))
-        {
-          cursor = Resources.Cursors.AddPoint;
-          hint = "Click to add point";
-        }
+        feedback = Feedback.SELECT_ADD;
       }
     }
     else if (modifierKeys == Keys.Control)
     {
-      hint = "Click to toggle selection.";
+      feedback = Feedback.SELECT_MULTIPLE;
     }
-    return new Feedback(cursor, hint);
+    return feedback;
   }
 
   /// <summary>
