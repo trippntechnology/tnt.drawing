@@ -10,7 +10,6 @@ using System.Windows.Forms;
 using TNT.Commons;
 using TNT.Drawing.Extensions;
 using TNT.Drawing.Model;
-using TNT.Drawing.Resource;
 
 namespace TNT.Drawing.Objects;
 
@@ -312,27 +311,33 @@ public class BezierPath : CanvasObject
       {
         if (modifierKeys == (Keys.Control | Keys.Shift))
         {
-          feedback = Feedback.SELECT_REMOVE;
+          feedback = vertex != null ? Feedback.SELECT_REMOVE_POINT : Feedback.SELECT_HIDE_CTRL_POINT;
         }
         else if (ctrlPoint != null && modifierKeys == Keys.Shift)
         {
-          //cursor = Resources.Cursors.AddCurve;
+          feedback = Feedback.SELECT_DRAG_CTRL_POINT;
         }
-        else
+        else if (vertex != null)
         {
-          feedback = Feedback.SELECT_MOVE;
-          //cursor = Resources.Cursors.MovePoint;
-          //hint = "CTRL and SHIFT to remove. SHIFT to curve.";
+          feedback = Feedback.SELECT_DRAG_POINT;
+        }
+        else if (ctrlPoint != null)
+        {
+          feedback = Feedback.SELECT_DRAG_CTRL_POINT;
         }
       }
       else if (mouseOverPath && modifierKeys == (Keys.Control | Keys.Shift))
       {
         feedback = Feedback.SELECT_ADD;
       }
+      else if (modifierKeys == Keys.Control)
+      {
+        feedback = Feedback.SELECT_REMOVE_SELECTION;
+      }
     }
     else if (modifierKeys == Keys.Control)
     {
-      feedback = Feedback.SELECT_MULTIPLE;
+      feedback = Feedback.SELECT_ADD_SELECTION;
     }
     return feedback;
   }

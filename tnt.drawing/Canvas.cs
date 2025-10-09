@@ -482,8 +482,6 @@ public class Canvas : Control
   /// <param name="graphics">Optional. An existing graphics context to apply transformations to. If <c>null</c>, a new graphics context is created for the canvas.</param>
   /// <returns>A <see cref="Graphics"/> object with scale and translation transforms applied for grid-to-canvas mapping. This must be disposed of by the caller.</returns>
   /// </summary>
-  /// <param name="graphics">An optional graphics context to apply transformations to.</param>
-  /// <returns>The transformed <see cref="Graphics"/> object.</returns>
   private Graphics CreateTransformedGraphics(Graphics? graphics = null)
   {
     graphics = graphics ?? CreateGraphics();

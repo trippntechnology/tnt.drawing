@@ -93,6 +93,17 @@ public static class Resources
     public static Cursor Move { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Move.cur");
     public static Cursor Add { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Add.cur");
     public static Cursor Remove { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Remove.cur");
+    public static Cursor AddControlPoint { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.AddControlPoint.cur");
+    public static Cursor Drag { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Drag.cur");
+
+    public static Cursor DragControlPoint { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.DragControlPoint.cur");
+    public static Cursor DragPoint { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.DragPoint.cur");
+    public static Cursor HideControlPoint { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.HideCtrlPoint.cur");
+
+    public static Cursor AddSelection { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.AddSelection.cur");
+    public static Cursor RemoveSelection { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.RemoveSelection.cur");
+
+
   }
 
   /// <summary>
