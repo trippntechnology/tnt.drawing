@@ -317,6 +317,10 @@ public class BezierPath : CanvasObject
         {
           feedback = Feedback.SELECT_DRAG_CTRL_POINT;
         }
+        else if (vertex != null && modifierKeys == (Keys.Control))
+        {
+          feedback = vertex.IsSelected ? Feedback.SELECT_REMOVE_SELECTION : Feedback.SELECT_ADD_SELECTION;
+        }
         else if (vertex != null)
         {
           feedback = Feedback.SELECT_DRAG_POINT;

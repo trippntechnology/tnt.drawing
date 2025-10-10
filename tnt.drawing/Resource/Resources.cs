@@ -29,19 +29,9 @@ public static class Resources
     public static Image Vertex { get; } = ResourceToImage("TNT.Drawing.Resource.Image.Vertex.png");
 
     /// <summary>
-    /// Extra small rotate icon image (16x16).
-    /// </summary>
-    public static Image Rotate16 { get; } = ResourceToImage("TNT.Drawing.Resource.Image.Rotate_16.png");
-
-    /// <summary>
     /// Small rotate icon image (24x24).
     /// </summary>
-    public static Image Rotate24 { get; } = ResourceToImage("TNT.Drawing.Resource.Image.Rotate_24.png");
-
-    /// <summary>
-    /// Large rotate icon image (48x48).
-    /// </summary>
-    public static Image Rotate48 { get; } = ResourceToImage("TNT.Drawing.Resource.Image.Rotate_48.png");
+    public static Image Rotate24 { get; } = ResourceToImage("TNT.Drawing.Resource.Image.directory_sync_24dp.png");
   }
 
   /// <summary>
