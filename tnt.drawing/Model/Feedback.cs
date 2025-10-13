@@ -27,7 +27,7 @@ public record Feedback(Cursor Cursor, string Hint)
   public static readonly Feedback SELECT_HIDE_CTRL_POINT = new Feedback(Resources.Cursors.HideControlPoint, "Move.");
   public static readonly Feedback SELECT_ADD_SELECTION = new Feedback(Resources.Cursors.AddSelection, "Move.");
   public static readonly Feedback SELECT_REMOVE_SELECTION = new Feedback(Resources.Cursors.RemoveSelection, "Move.");
-
+  public static readonly Feedback SELECT_ROTATE= new Feedback(Resources.Cursors.Rotate, "Move.");
 
 
   public static readonly Feedback LINE_MODE_INITIAL_VERTEX = new Feedback(Resources.Cursors.DrawLine, "Click to add initial vertex.");

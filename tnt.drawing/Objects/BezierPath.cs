@@ -301,13 +301,22 @@ public class BezierPath : CanvasObject
     {
       feedback = Feedback.SELECT_MOVE;
 
+      var centroid = _centroid.MouseOver(mousePosition, modifierKeys).HitObject as Centroid;
       var vertex = CanvasPoints.FirstOrDefault(p => p is Vertex && p.MouseOver(mousePosition, modifierKeys).HitObject != null);
       var ctrlPoint = CanvasPoints.FirstOrDefault(p => p is ControlPoint && p.MouseOver(mousePosition, modifierKeys).HitObject != null);
       CanvasPoint? point = vertex ?? ctrlPoint;
 
       var mouseOverPath = Path.IsOutlineVisible(mousePosition, OUTLINE_PEN_HIT_WITDTH);
 
-      if (point != null)
+      if (centroid?.IsSelected == false)
+      {
+        feedback = Feedback.SELECT_ROTATE;
+      }
+      else if (centroid == null && _centroid.IsSelected)
+      {
+        feedback = Feedback.SELECT_ROTATE;
+      }
+      else if (point != null)
       {
         if (modifierKeys == (Keys.Control | Keys.Shift))
         {
@@ -412,6 +421,10 @@ public class BezierPath : CanvasObject
       vertices.ForEach(v => v?.Move(moveInfo, modifierKeys, supressCallback));
       GetCentroidPosition()?.Also(p => _centroid.MoveTo(p.X, p.Y, Keys.None, Point.Empty, false));
     }
+    else
+    {
+      Rotate(moveInfo, modifierKeys);
+    }
   }
 
   /// <summary>
@@ -440,6 +453,10 @@ public class BezierPath : CanvasObject
         CanvasPoints.ForEach(p => p.IsSelected = false);
         hitCentroid.IsSelected = !hitCentroid.IsSelected;
         response = response with { InnerHitObject = hitCentroid.IsSelected ? hitCentroid : null, AllowMove = false };
+      }
+      else if (_centroid.IsSelected)
+      {
+        // We're in rotation mode. Don't check anything else.
       }
       else if (modifierKeys == Keys.Shift && hitCtrlPoint != null)
       {
@@ -494,7 +511,9 @@ public class BezierPath : CanvasObject
   }
 
   /// <summary>
-  /// Called when the <paramref name="canvasPoint"/> is moved
+  /// Handles logic when a <see cref="CanvasPoint"/> (either a <see cref="Vertex"/> or <see cref="ControlPoint"/>) is moved within the <see cref="BezierPath"/>.
+  /// Updates control points, synchronizes coincident vertices for closed paths, and manages multi-select movement.
+  /// Also updates the centroid position after movement.
   /// </summary>
   private void OnMoved(CanvasPoint canvasPoint, Point mouseLocation, int dx, int dy, Keys modifierKeys)
   {
@@ -502,24 +521,9 @@ public class BezierPath : CanvasObject
 
     if (_centroid.IsSelected)
     {
-      var centroidPos = GetCentroidPosition();
-      if (centroidPos != null)
-      {
-        Point prevLocation = new Point(canvasPoint.X - dx, canvasPoint.Y - dy);
-        int cx = centroidPos.Value.X;
-        int cy = centroidPos.Value.Y;
-        double v1x = prevLocation.X - cx;
-        double v1y = prevLocation.Y - cy;
-        double v2x = mouseLocation.X - cx;
-        double v2y = mouseLocation.Y - cy;
-        double dot = v1x * v2x + v1y * v2y;
-        double det = v1x * v2y - v1y * v2x;
-        double angleRadians = Math.Atan2(det, dot);
-        double angleDegrees = angleRadians * (180.0 / Math.PI);
-        TNTLogger.Info($"Angle from previous to current location to centroid: {angleDegrees:F2} degrees");
-        canvasPoint.MoveTo(prevLocation.X, prevLocation.Y, modifierKeys, mouseLocation, true);
-        RotateBy(angleDegrees, modifierKeys);
-      }
+      Point prevLocation = new Point(canvasPoint.X - dx, canvasPoint.Y - dy);
+      canvasPoint.MoveTo(prevLocation.X, prevLocation.Y, modifierKeys, mouseLocation, true);
+      Rotate(new MoveInfo(mouseLocation, dx, dy), modifierKeys);
       return;
     }
 
@@ -582,6 +586,31 @@ public class BezierPath : CanvasObject
     CanvasPoints.RemoveRange(Math.Max(0, vertexIndex - 1), count);
     var orphanedCtrlPoint = CanvasPoints.FirstOrDefault() as ControlPoint ?? CanvasPoints.LastOrDefault() as ControlPoint;
     orphanedCtrlPoint?.Also(p => CanvasPoints.Remove(p));
+  }
+
+  /// <summary>
+  /// Rotates the <see cref="BezierPath"/> interactively based on mouse movement around its centroid.
+  /// Calculates the angle between the previous and current mouse positions relative to the centroid,
+  /// then applies the rotation by calling <see cref="RotateBy(double, Keys)"/>.
+  /// </summary>
+  private void Rotate(MoveInfo moveInfo, Keys modifierKeys)
+  {
+    var centroidPos = GetCentroidPosition();
+    if (centroidPos != null)
+    {
+      Point prevLocation = moveInfo.PreviousLocation;
+      int cx = centroidPos.Value.X;
+      int cy = centroidPos.Value.Y;
+      double v1x = prevLocation.X - cx;
+      double v1y = prevLocation.Y - cy;
+      double v2x = moveInfo.MouseLocation.X - cx;
+      double v2y = moveInfo.MouseLocation.Y - cy;
+      double dot = v1x * v2x + v1y * v2y;
+      double det = v1x * v2y - v1y * v2x;
+      double angleRadians = Math.Atan2(det, dot);
+      double angleDegrees = angleRadians * (180.0 / Math.PI);
+      RotateBy(angleDegrees, modifierKeys);
+    }
   }
 
   /// <summary>

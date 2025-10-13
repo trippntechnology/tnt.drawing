@@ -7,6 +7,8 @@ namespace TNT.Drawing.Model;
 /// </summary>
 public record MoveInfo(Point MouseLocation, int Dx, int Dy)
 {
+  public Point PreviousLocation => new Point(MouseLocation.X - Dx, MouseLocation.Y - Dy);
+
   public MoveInfo(Point mouseLocation) : this(mouseLocation, 0, 0) { }
 
   public static MoveInfo Create(Point mouseLocation) => new MoveInfo(mouseLocation);
