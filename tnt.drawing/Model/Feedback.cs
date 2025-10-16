@@ -27,13 +27,14 @@ public record Feedback(Cursor Cursor, string Hint)
   public static readonly Feedback SELECT_HIDE_CTRL_POINT = new Feedback(Resources.Cursors.HideControlPoint, "Move.");
   public static readonly Feedback SELECT_ADD_SELECTION = new Feedback(Resources.Cursors.AddSelection, "Move.");
   public static readonly Feedback SELECT_REMOVE_SELECTION = new Feedback(Resources.Cursors.RemoveSelection, "Move.");
-  public static readonly Feedback SELECT_ROTATE= new Feedback(Resources.Cursors.Rotate, "Move.");
+  public static readonly Feedback SELECT_ROTATE = new Feedback(Resources.Cursors.Rotate, "Move.");
 
 
-  public static readonly Feedback LINE_MODE_INITIAL_VERTEX = new Feedback(Resources.Cursors.DrawLine, "Click to add initial vertex.");
+  public static readonly Feedback LINE_MODE_INITIAL_VERTEX = new Feedback(Resources.Cursors.DrawPolyLine, "Click to add initial vertex.");
   public static readonly Feedback LINE_MODE_ADD_VERTEX = new Feedback(Cursors.Default, "Press Shift to contrain to angle. Ctrl or close path to terminate.");
-  public static readonly Feedback LINE_MODE_SECOND_VERTEX = new Feedback(Resources.Cursors.DrawLine, "Press Shift to contrain to angle. Ctrl+Click to terminate.");
-  public static readonly Feedback LINE_MODE_SECOND_VERTEX_CTRL = new Feedback(Resources.Cursors.DrawLine, "Press Shift to contrain to angle. Click to terminate.");
+  public static readonly Feedback LINE_MODE_SECOND_VERTEX = new Feedback(Resources.Cursors.DrawPolyLine, "Press Shift to contrain to angle. Ctrl+Click to terminate.");
+  public static readonly Feedback LINE_MODE_SECOND_VERTEX_CTRL = new Feedback(Resources.Cursors.DrawPolyLine, "Press Shift to contrain to angle. Click to terminate.");
+  public static readonly Feedback LINE_MODE_CLOSED = new Feedback(Resources.Cursors.DrawClosedPolyLine, "");
 
   public static readonly Feedback RECTANGLE_MODE_INITIAL_VERTEX = new Feedback(Resources.Cursors.DrawRectangle, "Click to add initial vertex.");
   public static readonly Feedback RECTANGLE_MODE_OPPOSITE_VERTEX = new Feedback(Resources.Cursors.DrawRectangle, "Click to add opposite vertex. Shift to constrain to a square.");

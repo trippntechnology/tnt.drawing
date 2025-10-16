@@ -1,8 +1,9 @@
-﻿using TNT.ToolStripItemManager;
+﻿using TNT.Drawing.Resource;
+using TNT.ToolStripItemManager;
 
 namespace Sample.Group;
 
-internal class Line() : ToolStripItemGroup(ResourceToImage("Sample.Images.line_curve_24.png"))
+internal class Line() : ToolStripItemGroup(Resources.Images.Polyline)
 {
   public override string Text => "Line";
 

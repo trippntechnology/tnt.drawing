@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using TNT.Commons;
 using TNT.Drawing.Extensions;
 using TNT.Drawing.Layers;
 using TNT.Drawing.Model;
@@ -26,36 +25,49 @@ public class LineMode(ObjectLayer layer, BezierPath defaultObject) : DrawingMode
     }
   }
 
+  /// <summary>
+  /// Handles mouse button release events for the Line drawing mode.
+  /// Adds a new vertex to the current line, closes the path if appropriate, and creates a new BezierPath object.
+  /// - Left mouse button: Adds a vertex if not near an existing one, or closes the path if near the first vertex and enough vertices exist.
+  /// - CTRL key: Finishes the line if held and at least two vertices exist.
+  /// - Right mouse button: Removes the last vertex.
+  /// Triggers a canvas redraw and calls the base implementation.
+  /// </summary>
   public override void OnMouseUp(MouseEventArgs e, Keys modifierKeys, Canvas canvas)
   {
-    var isClosed = false;
-
     if (e.Button == MouseButtons.Left)
     {
-      // Add a new vertex at the mouse location
-      _vertices.Add(new Vertex(_activeVertex));
+      var isClosed = false;
+      var newVertex = new Vertex(_activeVertex);
 
-      _vertices.Select(v => v as CanvasPoint).ToList().Also(canvasPoints =>
+      // Add the new vertex if not near any existing vertex
+      if (!_vertices.Any(v => v.IsNear(newVertex)))
       {
-        canvasPoints.FirstOrDefault()?.Also(first => canvasPoints.FindCoincident(first)?.Also(_ => isClosed = true));
-      });
+        _vertices.Add(newVertex);
+      }
+      // If enough vertices and new vertex is near the first, close the path
+      else if (_vertices.Count > 2 && newVertex.IsNear(_vertices.First()))
+      {
+        isClosed = true;
+        _vertices.Add(newVertex);
+      }
 
-      // If CTRL is held, finish the line
-      if (isClosed || (modifierKeys & Keys.Control) == Keys.Control && _vertices.Count > 1)
+      // Finish the line if closed or CTRL is held and at least two vertices exist
+      if (isClosed || ((modifierKeys & Keys.Control) == Keys.Control && _vertices.Count > 1))
       {
-        if (_vertices.Count > 1)
+        // Create a new BezierPath and add each vertex
+        var path = (DefaultBezierPath.Clone() as BezierPath)!;
+        foreach (var v in _vertices)
         {
-          // Create a new BezierPath and add each vertex
-          var path = (DefaultBezierPath.Clone() as BezierPath)!;
-          foreach (var v in _vertices)
-          {
-            path.AddVertex(new Vertex(v));
-          }
-          Layer.CanvasObjects.Add(path);
+          //path.AddVertex(new Vertex(v));
+          path.AddVertex(v);
         }
+        Layer.CanvasObjects.Add(path);
+
         _vertices.Clear();
       }
     }
+    // Remove the last vertex on right mouse button
     else if (e.Button == MouseButtons.Right)
     {
       _vertices.RemoveAt(_vertices.Count - 1);
@@ -103,7 +115,14 @@ public class LineMode(ObjectLayer layer, BezierPath defaultObject) : DrawingMode
       }
       else if (_vertices.Count > 0)
       {
-        canvas.OnFeedbackChanged(Feedback.LINE_MODE_SECOND_VERTEX);
+        if (_vertices.First().IsMouseOver(location, modifierKeys))
+        {
+          canvas.OnFeedbackChanged(Feedback.LINE_MODE_CLOSED);
+        }
+        else
+        {
+          canvas.OnFeedbackChanged(Feedback.LINE_MODE_SECOND_VERTEX);
+        }
       }
     }
 

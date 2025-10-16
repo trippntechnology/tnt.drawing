@@ -18,6 +18,8 @@
     <None Remove="Resource\Cursor\Drag.cur" />
     <None Remove="Resource\Cursor\DragControlPoint.cur" />
     <None Remove="Resource\Cursor\DragPoint.cur" />
+    <None Remove="Resource\Cursor\DrawClosedPolyline.cur" />
+    <None Remove="Resource\Cursor\DrawPolyline.cur" />
     <None Remove="Resource\Cursor\Hand.cur" />
     <None Remove="Resource\Cursor\HideCtrlPoint.cur" />
     <None Remove="Resource\Cursor\Move.cur" />
@@ -28,6 +30,7 @@
     <None Remove="Resource\Cursor\Rotate.cur" />
     <None Remove="Resource\Image\ControlPoint.png" />
     <None Remove="Resource\Image\directory_sync_24dp.png" />
+    <None Remove="Resource\Image\polyline_24dp.png" />
     <None Remove="Resource\Image\Vertex.png" />
   </ItemGroup>
 
@@ -41,7 +44,9 @@
     <EmbeddedResource Include="Resource\Cursor\Drag.cur" />
     <EmbeddedResource Include="Resource\Cursor\DragControlPoint.cur" />
     <EmbeddedResource Include="Resource\Cursor\DragPoint.cur" />
+    <EmbeddedResource Include="Resource\Cursor\DrawClosedPolyline.cur" />
     <EmbeddedResource Include="Resource\Cursor\DrawLine.cur" />
+    <EmbeddedResource Include="Resource\Cursor\DrawPolyline.cur" />
     <EmbeddedResource Include="Resource\Cursor\Hand.cur" />
     <EmbeddedResource Include="Resource\Cursor\HideCtrlPoint.cur" />
     <EmbeddedResource Include="Resource\Cursor\Move.cur" />
@@ -53,6 +58,7 @@
     <EmbeddedResource Include="Resource\Cursor\Rotate.cur" />
     <EmbeddedResource Include="Resource\Image\ControlPoint.png" />
     <EmbeddedResource Include="Resource\Image\directory_sync_24dp.png" />
+    <EmbeddedResource Include="Resource\Image\polyline_24dp.png" />
     <EmbeddedResource Include="Resource\Image\Vertex.png" />
   </ItemGroup>
 
