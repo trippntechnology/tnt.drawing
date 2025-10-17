@@ -18,11 +18,7 @@ public class GridLayer : CanvasLayer
   /// Gets or sets the color of the grid lines.
   /// Changes to this property trigger a redraw of the grid.
   /// </summary>
-  public Color LineColor
-  {
-    get => _BackingFields.Get(_Pen.Color);
-    set => _BackingFields.Set(value);
-  }
+  public Color LineColor { get => Get(_Pen.Color); set => Set(value); }
 
   // Methods
   /// <summary>

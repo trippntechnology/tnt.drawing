@@ -7,12 +7,8 @@ namespace TNT.Drawing.Layers;
 /// <summary>
 /// Represents a layer managed by the <see cref="Canvas"/>
 /// </summary>
-public class CanvasLayer
+public class CanvasLayer : Observable
 {
-  /// <summary>
-  /// Backing fields for properties
-  /// </summary>
-  protected BackingFields _BackingFields = new BackingFields();
   private Rectangle _backgroundRect;
 
   /// <summary>
@@ -33,19 +29,19 @@ public class CanvasLayer
   /// <summary>
   /// Background color 
   /// </summary>
-  public Color BackgroundColor { get => _BackingFields.Get<Color>(Color.Transparent); set => _BackingFields.Set(value); }
+  public Color BackgroundColor { get => Get(Color.Transparent); set => Set(value); }
 
   /// <summary>
   /// The width of the <see cref="CanvasLayer"/>
   /// </summary>
   [JsonIgnore]
-  public int Width { get => _BackingFields.Get(1024); set => _BackingFields.Set(value); }
+  public int Width { get => Get(1024); set => Set(value); }
 
   /// <summary>
   /// The height of the <see cref="CanvasLayer"/>
   /// </summary>
   [JsonIgnore]
-  public int Height { get => _BackingFields.Get(768); set => _BackingFields.Set(value); }
+  public int Height { get => Get(768); set => Set(value); }
 
   /// <summary>
   /// Name of Layer
@@ -65,7 +61,7 @@ public class CanvasLayer
   /// </summary>
   public CanvasLayer()
   {
-    _BackingFields.OnFieldChanged += (field, value) => { _backingFieldChanged = true; };
+    OnPropertyChanged += (field, value) => { _backingFieldChanged = true; };
   }
 
   /// <summary>

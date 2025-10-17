@@ -3,35 +3,35 @@
   <Class Name="TNT.Drawing.DrawingModes.DrawingMode">
     <Position X="25.75" Y="3.5" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AIAAAAAAAACEBAAIAAJAAAAAABoQAAAEIAAAAAICAAA=</HashCode>
+      <HashCode>AIAAAAAAAACBBAAIAABAAAAAABoAAAAEIAgAAAACEAA=</HashCode>
       <FileName>DrawingModes\DrawingMode.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TNT.Drawing.DrawingModes.LineMode">
-    <Position X="23.25" Y="8.5" Width="1.75" />
+    <Position X="23.25" Y="8.25" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAQAAAAAAAAAAAAABAAAAAABBAAAAAAAAAAAACAgA=</HashCode>
       <FileName>DrawingModes\LineMode.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TNT.Drawing.DrawingModes.SelectMode">
-    <Position X="28.25" Y="8.5" Width="2" />
+    <Position X="28.25" Y="8.25" Width="2" />
     <TypeIdentifier>
-      <HashCode>wgAAAAAAAAAABAAQAIBAAAAAABKgAAAAIAAkAAACAAA=</HashCode>
+      <HashCode>wgAAAAAAAACABAAQAIBAAAAAABKgAAAAIAAkAAACAAA=</HashCode>
       <FileName>DrawingModes\SelectMode.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TNT.Drawing.Layers.CanvasLayer">
-    <Position X="23" Y="12.5" Width="1.5" />
+    <Position X="24" Y="11.5" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAgAIAAABAAAEgAMAAIAQEQACCAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAABAAAEiAEAAAQgEQACAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Layers\CanvasLayer.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TNT.Drawing.Layers.GridLayer">
-    <Position X="23" Y="17.25" Width="1.5" />
+    <Position X="23" Y="16" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AQAAAAAAAAAAAgAAAAABAAAAAAAAAAAAAAAAAAAAACA=</HashCode>
+      <HashCode>AQAAAAAAAAAAAiAAAAABAAAAAAAAAAAAAAAAAAAAACA=</HashCode>
       <FileName>Layers\GridLayer.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -66,7 +66,7 @@
   <Class Name="TNT.Drawing.Canvas" Collapsed="true">
     <Position X="31.25" Y="3.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>KZCAAgAIQADABBGAlACQgAZgEDIAAAAEICABqAADAAE=</HashCode>
+      <HashCode>K8CIAgBIQACAFACAlACIAAYgADIAAAAkICAArAADEAE=</HashCode>
       <FileName>Canvas.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -80,12 +80,12 @@
   <Class Name="TNT.Drawing.CanvasProperties" Collapsed="true">
     <Position X="31.25" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAgAAAAAABAAABAAAAAAgAAAAAAAAACAAAAABAAA=</HashCode>
+      <HashCode>AAAAAgAAAAAABAAABAAAAAAgAAAAAAAAAAAAACABAAA=</HashCode>
       <FileName>CanvasProperties.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TNT.Drawing.DrawingModes.RectangleMode">
-    <Position X="25.75" Y="8.5" Width="1.75" />
+    <Position X="25.75" Y="8.25" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAQAAAAAAAAAAAAABAAAAAABBAAAAAAAAAAAACAgA=</HashCode>
       <FileName>DrawingModes\RectangleMode.cs</FileName>
@@ -94,8 +94,15 @@
   <Class Name="TNT.Drawing.Objects.BezierPath">
     <Position X="19" Y="9.5" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AQQAAIAAAIBQEgJQADAAIEIBAAAQACAEIEJAAEiAABo=</HashCode>
+      <HashCode>AQTAAIAAAIBQEgJAADAAIEIBEAAQACAEIEJAAEiAABo=</HashCode>
       <FileName>Objects\BezierPath.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TNT.Drawing.Layers.ObjectLayer">
+    <Position X="25.25" Y="16" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAiAIAAAAAAAAAAAAAAAAAAAAiAAAAAA=</HashCode>
+      <FileName>Layers\ObjectLayer.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />
