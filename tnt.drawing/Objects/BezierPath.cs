@@ -220,7 +220,7 @@ public class BezierPath : CanvasObject
   {
     if (point is Vertex vertex)
     {
-      if (CanvasPoints.Count(p => p is Vertex) > 2)
+      if (CanvasPoints.Count(p => p is Vertex) > (_isClosedPath ? 3 : 2))
       {
         // If closed and deleting first or last vertex, remove coincident point and open the path
         if (_isClosedPath && CanvasPoints.IsFirstOrLast(vertex))
@@ -252,12 +252,13 @@ public class BezierPath : CanvasObject
       var vertices = CanvasPoints.FindAll(p => p is Vertex);
       vertices.ForEach(v =>
       {
-        CanvasPoints.AdjacentTo(v).ForEach(a =>
-              {
-                graphics.DrawLine(_ControlPointConnectorPen, v.ToPoint, a.ToPoint);
-              });
+        CanvasPoints.AdjacentTo(v).ForEach(a => graphics.DrawLine(_ControlPointConnectorPen, v.ToPoint, a.ToPoint));
       });
-      _centroid.Draw(graphics);
+
+      if (CanvasPoints.OfType<Vertex>().Count() > 2)
+      {
+        _centroid.Draw(graphics);
+      }
     }
   }
 
@@ -316,7 +317,14 @@ public class BezierPath : CanvasObject
       {
         if (modifierKeys == (Keys.Control | Keys.Shift))
         {
-          feedback = vertex != null ? Feedback.SELECT_REMOVE_POINT : Feedback.SELECT_HIDE_CTRL_POINT;
+          if (point is Vertex && CanvasPoints.OfType<Vertex>().Count() > (_isClosedPath ? 3 : 2))
+          {
+            feedback = Feedback.SELECT_REMOVE_POINT;
+          }
+          else if (point is ControlPoint)
+          {
+            feedback = Feedback.SELECT_HIDE_CTRL_POINT;
+          }
         }
         else if (ctrlPoint != null && modifierKeys == Keys.Shift)
         {
@@ -462,10 +470,13 @@ public class BezierPath : CanvasObject
       }
       else if (modifierKeys == (Keys.Control | Keys.Shift) && deletablePoint != null)
       {
-        // If Ctrl+Shift is held and a deletable point is hit, delete it and clear selection
-        DeletePoint(deletablePoint);
-        CanvasPoints.ForEach(p => p.IsSelected = false);
-        response = response with { AllowMove = false };
+        if ((deletablePoint is Vertex && CanvasPoints.OfType<Vertex>().Count() > (_isClosedPath ? 3 : 2)) || deletablePoint is ControlPoint)
+        {
+          // If Ctrl+Shift is held and a deletable point is hit, delete it and clear selection
+          DeletePoint(deletablePoint);
+          CanvasPoints.ForEach(p => p.IsSelected = false);
+          response = response with { AllowMove = false };
+        }
       }
       else if (modifierKeys == (Keys.Control | Keys.Shift) && deletablePoint == null)
       {

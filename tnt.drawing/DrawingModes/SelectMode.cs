@@ -106,6 +106,12 @@ public class SelectMode(ObjectLayer layer) : DrawingMode(layer)
         if (modifierKeys == Keys.Control)
         {
           _objectUnderMouse.IsSelected = !_objectUnderMouse.IsSelected;
+          Layer.CanvasObjects.FindAll(o => o.IsSelected).ForEach(o =>
+          {
+            // Selection is toggled to clear a selected centroid
+            o.IsSelected = false;
+            o.IsSelected = true;
+          });
           _allowMove = false;
         }
         else if (!_objectUnderMouse.IsSelected)
