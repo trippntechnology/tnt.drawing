@@ -3,7 +3,7 @@ using TNT.ToolStripItemManager;
 
 namespace Sample.Group;
 
-internal class Line() : ToolStripItemGroup(Resources.Images.Polyline)
+internal class Line() : ToolStripItemGroup(Resources.Images.PolylineTool)
 {
   public override string Text => "Line";
 

@@ -308,11 +308,7 @@ public class BezierPath : CanvasObject
 
       var mouseOverPath = Path.IsOutlineVisible(mousePosition, OUTLINE_PEN_HIT_WITDTH);
 
-      if (centroid?.IsSelected == false)
-      {
-        feedback = Feedback.SELECT_ROTATE;
-      }
-      else if (centroid == null && _centroid.IsSelected)
+      if (centroid?.IsSelected == false || (centroid == null && _centroid.IsSelected))
       {
         feedback = Feedback.SELECT_ROTATE;
       }

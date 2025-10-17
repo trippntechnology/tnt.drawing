@@ -13,7 +13,7 @@ public class Centroid : CanvasPoint
   private static readonly SolidBrush _brush = new(Color.Blue);
 
   // The image used to represent the centroid visually.
-  private Image _image = Resources.Images.Rotate24;
+  private Image _image = Resources.Images.Rotate;
 
   /// <summary>
   /// Initializes a new instance of the <see cref="Centroid"/> class.

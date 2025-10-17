@@ -1,8 +1,9 @@
-﻿using TNT.ToolStripItemManager;
+﻿using TNT.Drawing.Resource;
+using TNT.ToolStripItemManager;
 
 namespace Sample.Group;
 
-internal class Rectangle() : ToolStripItemGroup(ResourceToImage("Sample.Images.rectangle_24.png"))
+internal class Rectangle() : ToolStripItemGroup(Resources.Images.RectangleTool)
 {
   public override string Text => "Rectangle";
 

@@ -46,7 +46,7 @@ public class LineMode(ObjectLayer layer, BezierPath defaultObject) : DrawingMode
         _vertices.Add(newVertex);
       }
       // If enough vertices and new vertex is near the first, close the path
-      else if (_vertices.Count > 2 && newVertex.IsNear(_vertices.First()))
+      else if (_vertices.Count > 1 && newVertex.IsNear(_vertices.First()))
       {
         isClosed = true;
         _vertices.Add(newVertex);
@@ -115,7 +115,7 @@ public class LineMode(ObjectLayer layer, BezierPath defaultObject) : DrawingMode
       }
       else if (_vertices.Count > 0)
       {
-        if (_vertices.First().IsMouseOver(location, modifierKeys))
+        if (_vertices.Count > 1 && _vertices.First().IsMouseOver(location, modifierKeys))
         {
           canvas.OnFeedbackChanged(Feedback.LINE_MODE_CLOSED);
         }

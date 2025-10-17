@@ -11,10 +11,7 @@
   <ItemGroup>
     <None Remove="Resource\Cursor\Add.cur" />
     <None Remove="Resource\Cursor\AddControlPoint.cur" />
-    <None Remove="Resource\Cursor\AddCurve.cur" />
-    <None Remove="Resource\Cursor\AddPoint.cur" />
     <None Remove="Resource\Cursor\AddSelection.cur" />
-    <None Remove="Resource\Cursor\Curve.cur" />
     <None Remove="Resource\Cursor\Drag.cur" />
     <None Remove="Resource\Cursor\DragControlPoint.cur" />
     <None Remove="Resource\Cursor\DragPoint.cur" />
@@ -22,44 +19,36 @@
     <None Remove="Resource\Cursor\DrawPolyline.cur" />
     <None Remove="Resource\Cursor\Hand.cur" />
     <None Remove="Resource\Cursor\HideCtrlPoint.cur" />
-    <None Remove="Resource\Cursor\Move.cur" />
-    <None Remove="Resource\Cursor\MovePoint.cur" />
     <None Remove="Resource\Cursor\Remove.cur" />
-    <None Remove="Resource\Cursor\RemovePoint.cur" />
     <None Remove="Resource\Cursor\RemoveSelection.cur" />
     <None Remove="Resource\Cursor\Rotate.cur" />
-    <None Remove="Resource\Image\ControlPoint.png" />
+    <None Remove="Resource\Cursor\Select.cur" />
+    <None Remove="Resource\Image\arrow_selector_tool_24dp.png" />
     <None Remove="Resource\Image\directory_sync_24dp.png" />
+    <None Remove="Resource\Image\hand_24px.png" />
     <None Remove="Resource\Image\polyline_24dp.png" />
-    <None Remove="Resource\Image\Vertex.png" />
+    <None Remove="Resource\Image\rectangle_24dp.png" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Resource\Cursor\Add.cur" />
     <EmbeddedResource Include="Resource\Cursor\AddControlPoint.cur" />
-    <EmbeddedResource Include="Resource\Cursor\AddCurve.cur" />
-    <EmbeddedResource Include="Resource\Cursor\AddPoint.cur" />
     <EmbeddedResource Include="Resource\Cursor\AddSelection.cur" />
-    <EmbeddedResource Include="Resource\Cursor\Curve.cur" />
     <EmbeddedResource Include="Resource\Cursor\Drag.cur" />
     <EmbeddedResource Include="Resource\Cursor\DragControlPoint.cur" />
     <EmbeddedResource Include="Resource\Cursor\DragPoint.cur" />
     <EmbeddedResource Include="Resource\Cursor\DrawClosedPolyline.cur" />
-    <EmbeddedResource Include="Resource\Cursor\DrawLine.cur" />
     <EmbeddedResource Include="Resource\Cursor\DrawPolyline.cur" />
     <EmbeddedResource Include="Resource\Cursor\Hand.cur" />
     <EmbeddedResource Include="Resource\Cursor\HideCtrlPoint.cur" />
-    <EmbeddedResource Include="Resource\Cursor\Move.cur" />
-    <EmbeddedResource Include="Resource\Cursor\MovePoint.cur" />
     <EmbeddedResource Include="Resource\Cursor\DrawRectangle.cur" />
     <EmbeddedResource Include="Resource\Cursor\Remove.cur" />
-    <EmbeddedResource Include="Resource\Cursor\RemovePoint.cur" />
     <EmbeddedResource Include="Resource\Cursor\RemoveSelection.cur" />
     <EmbeddedResource Include="Resource\Cursor\Rotate.cur" />
-    <EmbeddedResource Include="Resource\Image\ControlPoint.png" />
+    <EmbeddedResource Include="Resource\Image\arrow_selector_tool_24dp.png" />
     <EmbeddedResource Include="Resource\Image\directory_sync_24dp.png" />
     <EmbeddedResource Include="Resource\Image\polyline_24dp.png" />
-    <EmbeddedResource Include="Resource\Image\Vertex.png" />
+    <EmbeddedResource Include="Resource\Image\rectangle_24dp.png" />
   </ItemGroup>
 
 	<ItemGroup>

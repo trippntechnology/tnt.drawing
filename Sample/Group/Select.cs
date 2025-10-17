@@ -1,8 +1,9 @@
-﻿using TNT.ToolStripItemManager;
+﻿using TNT.Drawing.Resource;
+using TNT.ToolStripItemManager;
 
 namespace Sample.Group;
 
-internal class Select() : ToolStripItemGroup(ResourceToImage("Sample.Images.arrow_selector_tool_24.png"))
+internal class Select() : ToolStripItemGroup(Resources.Images.SelectorTool)
 {
   public override string Text => "Select";
 

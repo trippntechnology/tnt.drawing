@@ -18,11 +18,10 @@ public static class Resources
   /// </summary>
   public static class Images
   {
-    public static Image ControlPoint { get; } = ResourceToImage("TNT.Drawing.Resource.Image.ControlPoint.png");
-    public static Image Hand { get; } = ResourceToImage("TNT.Drawing.Resource.Image.back_hand_24dp.png");
-    public static Image Polyline { get; } = ResourceToImage("TNT.Drawing.Resource.Image.polyline_24dp.png");
-    public static Image Rotate24 { get; } = ResourceToImage("TNT.Drawing.Resource.Image.directory_sync_24dp.png");
-    public static Image Vertex { get; } = ResourceToImage("TNT.Drawing.Resource.Image.Vertex.png");
+    public static Image PolylineTool { get; } = ResourceToImage("TNT.Drawing.Resource.Image.polyline_24dp.png");
+    public static Image RectangleTool { get; } = ResourceToImage("TNT.Drawing.Resource.Image.rectangle_24dp.png");
+    public static Image Rotate { get; } = ResourceToImage("TNT.Drawing.Resource.Image.directory_sync_24dp.png");
+    public static Image SelectorTool { get; } = ResourceToImage("TNT.Drawing.Resource.Image.arrow_selector_tool_24dp.png");
   }
 
   /// <summary>
@@ -32,26 +31,18 @@ public static class Resources
   {
     public static Cursor Add { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Add.cur");
     public static Cursor AddControlPoint { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.AddControlPoint.cur");
-    public static Cursor AddCurve { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.AddCurve.cur");
-    public static Cursor AddPoint { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.AddPoint.cur");
     public static Cursor AddSelection { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.AddSelection.cur");
-    public static Cursor Curve { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Curve.cur");
     public static Cursor Drag { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Drag.cur");
     public static Cursor DragControlPoint { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.DragControlPoint.cur");
     public static Cursor DragPoint { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.DragPoint.cur");
     public static Cursor DrawClosedPolyLine { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.DrawClosedPolyline.cur");
-    public static Cursor DrawLine { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.DrawLine.cur");
     public static Cursor DrawPolyLine { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.DrawPolyline.cur");
     public static Cursor DrawRectangle { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.DrawRectangle.cur");
     public static Cursor Hand { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Hand.cur");
     public static Cursor HideControlPoint { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.HideCtrlPoint.cur");
-    public static Cursor Move { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Move.cur");
-    public static Cursor MovePoint { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.MovePoint.cur");
     public static Cursor Remove { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Remove.cur");
-    public static Cursor RemovePoint { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.RemovePoint.cur");
     public static Cursor RemoveSelection { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.RemoveSelection.cur");
     public static Cursor Rotate { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Rotate.cur");
-    public static Cursor Select { get; } = ResourceToCursor("TNT.Drawing.Resource.Cursor.Select.cur");
   }
 
   /// <summary>
