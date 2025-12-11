@@ -1,11 +1,7 @@
-﻿using TNT.Drawing.Resource;
-using TNT.ToolStripItemManager;
+﻿using TNT.ToolStripItemManager;
 
 namespace Sample.Group;
 
-internal class Select() : ToolStripItemGroup(Resources.Images.SelectorTool)
+internal class Select() : ToolStripItemRadioGroup("Select", "Select Mode")
 {
-  public override string Text => "Select";
-
-  public override string ToolTipText => "Select Mode";
 }

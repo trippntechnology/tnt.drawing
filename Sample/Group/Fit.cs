@@ -2,9 +2,6 @@
 
 namespace Sample.Group;
 
-internal class Fit() : ToolStripItemGroup(ResourceToImage("Sample.Images.fit_screen_24.png"))
+internal class Fit() : ToolStripItemGroup("Fit", "Fit to Screen")
 {
-  public override string Text => "Fit";
-
-  public override string ToolTipText => "Fit to Screen";
 }

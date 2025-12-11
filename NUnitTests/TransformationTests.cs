@@ -86,7 +86,7 @@ public class TransformationTests
       Height = 456
     };
     var json = Json.serializeObject(layer);
-    var deserialized = Json.deserializeJson<TNT.Drawing.Layers.CanvasLayer>(json);
+    var deserialized = Json.deserializeJson<CanvasLayer>(json);
     Assert.That(deserialized, Is.Not.Null);
     Assert.That(deserialized.Name, Is.EqualTo(layer.Name));
     Assert.That(deserialized.IsVisible, Is.EqualTo(layer.IsVisible));

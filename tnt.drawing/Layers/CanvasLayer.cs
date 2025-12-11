@@ -34,13 +34,11 @@ public class CanvasLayer : Observable
   /// <summary>
   /// The width of the <see cref="CanvasLayer"/>
   /// </summary>
-  [JsonIgnore]
   public int Width { get => Get(1024); set => Set(value); }
 
   /// <summary>
   /// The height of the <see cref="CanvasLayer"/>
   /// </summary>
-  [JsonIgnore]
   public int Height { get => Get(768); set => Set(value); }
 
   /// <summary>

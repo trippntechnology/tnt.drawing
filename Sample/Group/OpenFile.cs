@@ -2,9 +2,6 @@
 
 namespace Sample.Group;
 
-internal class OpenFile() : ToolStripItemGroup(ResourceToImage("Sample.Images.file_open_24.png"))
+internal class OpenFile() : ToolStripItemGroup("Open", "Open File")
 {
-  public override string Text => "Open";
-
-  public override string ToolTipText => "Open File";
 }

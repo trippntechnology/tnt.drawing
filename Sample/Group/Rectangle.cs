@@ -1,11 +1,7 @@
-﻿using TNT.Drawing.Resource;
-using TNT.ToolStripItemManager;
+﻿using TNT.ToolStripItemManager;
 
 namespace Sample.Group;
 
-internal class Rectangle() : ToolStripItemGroup(Resources.Images.RectangleTool)
+internal class Rectangle() : ToolStripItemRadioGroup("Rectangle", "Rectangle Mode")
 {
-  public override string Text => "Rectangle";
-
-  public override string ToolTipText => "Rectangle Mode";
 }

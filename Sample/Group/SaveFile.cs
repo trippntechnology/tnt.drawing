@@ -2,9 +2,6 @@
 
 namespace Sample.Group;
 
-internal class SaveFile() : ToolStripItemGroup(ResourceToImage("Sample.Images.file_save_24.png"))
+internal class SaveFile() : ToolStripItemGroup("Save", "Save Drawing")
 {
-  public override string Text => "Save";
-
-  public override string ToolTipText => "Save Drawing";
 }

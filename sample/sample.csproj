@@ -9,28 +9,27 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Images\file_open_24.png" />
-    <None Remove="Images\file_save_24.png" />
-    <None Remove="Images\fit_screen_24.png" />
-    <None Remove="Images\flip_to_front_24.png" />
-    <None Remove="Images\grid_guides_24.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Images\file_open_24.png" />
-    <EmbeddedResource Include="Images\file_save_24.png" />
-    <EmbeddedResource Include="Images\fit_screen_24.png" />
-    <EmbeddedResource Include="Images\flip_to_front_24.png" />
-    <EmbeddedResource Include="Images\grid_guides_24.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="TNT.ToolStripItemManager" Version="3.0.0" />
+    <PackageReference Include="TNT.ToolStripItemManager" Version="4.0.5-beta01" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\tnt.drawing\TNT.Drawing.csproj" />
 		<PackageReference Include="TNT.Utilities" Version="3.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

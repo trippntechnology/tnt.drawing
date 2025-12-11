@@ -2,9 +2,6 @@
 
 namespace Sample.Group;
 
-internal class BringToFront() : ToolStripItemGroup(ResourceToImage("Sample.Images.flip_to_front_24.png"))
+internal class BringToFront() : ToolStripItemGroup("Bring to Front", "Bring selected object to the front")
 {
-  public override string Text => "Bring to Front";
-
-  public override string ToolTipText => "Bring selected object to the front";
 }

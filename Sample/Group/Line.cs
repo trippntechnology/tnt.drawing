@@ -1,11 +1,7 @@
-﻿using TNT.Drawing.Resource;
-using TNT.ToolStripItemManager;
+﻿using TNT.ToolStripItemManager;
 
 namespace Sample.Group;
 
-internal class Line() : ToolStripItemGroup(Resources.Images.PolylineTool)
+internal class Line() : ToolStripItemRadioGroup("Line", "Line Mode")
 {
-  public override string Text => "Line";
-
-  public override string ToolTipText => "Line Mode";
 }
